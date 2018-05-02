@@ -59,5 +59,6 @@ if __name__ == "__main__":
                 print("  " + "  " + answer.value)
             print("")
 
-        last_update_time = flows[-1].modified_on + datetime.timedelta(microseconds=1)  # TODO: Check if using time is ok
+        # Uncomment for incremental fetching. Note that we need to check that this method is guaranteed to work.
+        # last_update_time = flows[-1].modified_on + datetime.timedelta(microseconds=1)
 
