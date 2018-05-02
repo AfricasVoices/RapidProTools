@@ -6,7 +6,7 @@ import time
 import logging
 
 PHONE_NUMBER = "441632300010"
-SERVER_ADDR = "http://localhost:8000/c/ex/e9148e8f-d230-4fe3-8705-bb1ee760b10f/"
+SERVER_ADDR = ""
 PORT = 8082
 
 log = logging.getLogger('werkzeug')

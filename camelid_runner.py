@@ -6,7 +6,7 @@ import time
 import logging
 
 START_PHONE_NUMBER = "11111000000"  # Number to start the first flow from. Will increment by 1 for each subsequent run.
-SERVER_ADDR = "http://localhost:8000/c/ex/e9148e8f-d230-4fe3-8705-bb1ee760b10f/"
+SERVER_ADDR = ""
 PORT = 8082
 
 log = logging.getLogger('werkzeug')
