@@ -88,20 +88,12 @@ opportunity to send another message in response. If using the provided sample fl
 The tool will output summary data on all flows on the first request, then on all new flows on subsequent polls,
 as well as timing data for each poll attempt.
 
-### Exporting Flow Data via RapidPro
-RapidPro can export all runs of a particular flow as a .xlsx file. To do this:
-
-1. Go to `Flows`
-1. Tick the checkbox of the flow you would like to export
-1. Click the `Download Results` button (Excel logo), then `Ok`.
-
 ### Load Testing
 To automatically run the camelids flow many times, use the provided `camelid_runner.py` script.
 The structure of this script is very similar to that of the command line channel, so follow
 the [instructions for the command line channel](#command-line-channel), adapting to assign variables in, then to run
 the script, `camelid_runner.py`. There is no need to create a new channel, provided you terminate `cli_channel.py`
 before running `camelid_runner.py` 
-
 
 ### Adding Credits
 Flow messages consume credits. By default, RapidPro only issues you with 1,000 "free" credits.
@@ -125,6 +117,13 @@ viewing your credit balance.
 This does not always update immediately - if this is still showing the old balance then click on this old balance
 to view your Top Ups history, and look for the new entry here. The preview credit balance on the organisation page
 will update to reflect the new balance once the current preview balance has been consumed.
+
+### Exporting Flow Data via RapidPro
+RapidPro can export all runs of a particular flow as a .xlsx file. To do this:
+
+1. Go to `Flows`
+1. Tick the checkbox of the flow you would like to export
+1. Click the `Download Results` button (Excel logo), then `Ok`.
 
 ### Simulate Sending Individual Messages into RapidPro
 If you don't care about receiving messages or triggering flows, RapidPro has a command line tool for easily
