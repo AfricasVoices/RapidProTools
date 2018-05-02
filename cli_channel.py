@@ -3,13 +3,14 @@ from threading import Thread
 from flask_restful import Resource, Api
 import requests
 import time
-
-app = Flask(__name__)
-api = Api(app)
+import logging
 
 PHONE_NUMBER = "441632300010"
 SERVER_ADDR = "http://localhost:8000/c/ex/e9148e8f-d230-4fe3-8705-bb1ee760b10f/"
 PORT = 8082
+
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 
 class Messages(Resource):
@@ -31,6 +32,8 @@ class Messages(Resource):
         requests.post(SERVER_ADDR + "receive?from=" + PHONE_NUMBER + "&text=" + message)
 
 
+app = Flask(__name__)
+api = Api(app)
 api.add_resource(Messages, "/messages")
 
 

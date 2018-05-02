@@ -84,7 +84,12 @@ opportunity to send another message in response. If using the provided sample fl
 TODO
 
 ### Load Testing
-TODO
+To automatically run the camelids flow many times, use the provided `camelid_runner.py` script.
+The structure of this script is very similar to that of the command line channel, so follow
+the [instructions for the command line channel](#command-line-channel), adapting to assign variables in, then to run
+the script, `camelid_runner.py`. There is no need to create a new channel, provided you terminate `cli_channel.py`
+before running `camelid_runner.py` 
+
 
 ### Adding Credits
 Flow messages consume credits. By default, RapidPro only issues you with 1,000 "free" credits.
@@ -109,19 +114,10 @@ This does not always update immediately - if this is still showing the old balan
 to view your Top Ups history, and look for the new entry here. The preview credit balance on the organisation page
 will update to reflect the new balance once the current preview balance has been consumed.
 
-### Simulate Sending Messages to RapidPro
-RapidPro comes with a command line tool for this. From the rapidpro directory you cloned in step 1, run 
-`$ python manage.py msg_console --org <organisation-set-in-step-2>`
+### Simulate Sending Individual Messages into RapidPro
+If you don't care about receiving messages or triggering flows, RapidPro has a command line tool for easily
+inputting messages into the system.
+
+To use it, run this command from the RapidPro server directory:
+`$ python manage.py msg_console --org <your-organisation-name>`.
 The tool prints instructions for sending texts/changing the client phone number when it starts.
-
-### Poll the Local Server
-1. Set your API token in line 10 (<your-API-token>) of `poller.py`.
-You can retrieve your API token from the “Your Account” page of the RapidPro web interface.
-
-1. Install dependencies: `$ pip install -r pip-freeze.txt`
-
-1. Run the polling demonstrator: `$ python poller.py`.
-This will output the sender and text of all messages received by the system so far, and poll for new messages every 
-2 seconds. New messages will be printed to the console as they arrive.
-
-
