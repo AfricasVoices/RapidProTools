@@ -40,7 +40,7 @@ To export a Flow for sharing, `Flows -> flow-to-be-shared -> settings gear -> Ex
 The Flow editor includes an in-built simulator for testing (accessible by clicking the mobile phone icon).
 
 Interactions with a flow via the simulator are not persisted to the RapidPro database.
-For a flow to persist, it must be run on a "channel". To add a channel:
+For a run to persist, it must be run on a "channel". To add a channel:
 
 1. Go to your organisation page
 1. Choose the `Settings Gear -> Add Channel`
@@ -86,8 +86,8 @@ opportunity to send another message in response. If using the provided sample fl
 1. Update dependencies: `$ pipenv sync`
 1. Run: `$ pipenv run python poll_flow_runs.py <API-Token>`
 
-The tool will output summary data on all flows on the first request, then on all new flows on subsequent polls,
-as well as timing data for each poll attempt.
+The tool will output summary data on all runs, then poll for all runs again every few seconds.
+Change to incremental fetching by uncommenting the last line.
 
 ### Load Testing
 To automatically run the camelids flow many times, use the provided `camelid_runner.py` script.
@@ -119,7 +119,7 @@ This does not always update immediately - if this is still showing the old balan
 to view your Top Ups history, and look for the new entry here. The preview credit balance on the organisation page
 will update to reflect the new balance once the current preview balance has been consumed.
 
-### Exporting Flow Data via RapidPro
+### Exporting Flow Run Data via RapidPro
 RapidPro can export all runs of a particular flow as a .xlsx file. To do this:
 
 1. Go to `Flows`

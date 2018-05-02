@@ -27,8 +27,8 @@ if __name__ == "__main__":
         print("Polling")
         start = time.time()
 
-        # Download all flows which have been updated since the last poll.
-        flows = client.get_runs(after=last_update_time).all(retry_on_rate_exceed=True)
+        # Download all flow runs which have been updated since the last poll.
+        runs = client.get_runs(after=last_update_time).all(retry_on_rate_exceed=True)
         # IMPORTANT: The .all() approach may not scale to flows with some as yet unquantified "large" number of runs.
         # See http://rapidpro-python.readthedocs.io/en/latest/#fetching-objects for more details.
 
@@ -37,24 +37,24 @@ if __name__ == "__main__":
         print("Time taken: " + str(end - start))
 
         # Ignore flows which are incomplete because the respondent is still working through the questions.
-        flows = filter(lambda flow: flow.exited_on is not None, flows)
+        runs = filter(lambda run: run.exited_on is not None, runs)
 
         # Ignore flows which are incomplete because the respondent stopped answering.
-        flows = filter(lambda flow: flow.exit_type == "completed", flows)
+        runs = filter(lambda run: run.exit_type == "completed", runs)
 
         # Sort by ascending order of modification date
-        flows.reverse()
+        runs.reverse()
 
-        print("Fetched " + str(len(flows)) + " flows")
+        print("Fetched " + str(len(runs)) + " flows")
 
-        if len(flows) == 0:
+        if len(runs) == 0:
             continue
 
         # Print some data about the flow:
-        for flow in flows:
-            print("Contact: " + flow.contact.uuid)
-            print("Update Time: " + str(flow.modified_on))
-            for question, answer in flow.values.iteritems():
+        for run in runs:
+            print("Contact: " + run.contact.uuid)
+            print("Update Time: " + str(run.modified_on))
+            for question, answer in run.values.iteritems():
                 print("  " + question)
                 print("  " + "  " + answer.value)
             print("")
