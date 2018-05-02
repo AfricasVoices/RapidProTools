@@ -54,13 +54,37 @@ This repository includes a simple channel which can be used via the command line
 To set-up this channel:
 
 1. Go to your organisation page.
-1. Select ``
+1. Select `Settings Gear -> Add Channel -> External API`
+1. Enter:
+    1. `URN Type`: `Phone number`
+    1. `Number`: Any phone number of your choosing. 
+       Messages sent to the API will look like they have come from this number.
+    1. `Country`: Can be any
+    1. `Method`: `HTTP POST`
+    1. `Content Type`: `URL-Encoded`
+    1. `Max Length`: These instructions only tested with messages < max length
+    1. `Send URL`: The endpoint at which the CLI channel will be available. If running locally, this will be:
+       `http://localhost:8082/messages?from={{from}}&text={{text}}&to={{to}}&to_no_plus={{to_no_plus}}`.
+       This URL cannot be changed. You will need to delete the channel and create a new one to correct mistakes.
+    1. `Request Body`: Leave unchanged.
+1. Click `Submit`. RapidPro now takes you to an External API Configuration page.
+1. Examine the RapidPro URLs on the page to determine the base URL to which messages should be sent.
+   If RapidPro is running locally, the end result will look like `http://localhost:8000/c/ex/<UUID>`.
+1. Open `cli_channel.py`, included in this repository, in an editor.
+1. Set the `SERVER_ADDR` constant to the RapidPro base URL you determined earlier. 
+   You may optionally change the `PHONE_NUMBER` of the client you're simulating.
+1. Update dependencies: `$ pipenv sync`.
+1. Run the local channel: `$ pipenv run python cli_channel.py`.
+
+You may now type a message to send to the channel.
+If you send a flow trigger, the response from RapidPro will be printed to the console, and you will be given the
+opportunity to send another message in response. If using the provided sample flow, start by sending "camelid".
 
 ### Polling for new Flow runs
 TODO
 
 ### Load Testing
-TODO s
+TODO
 
 ### Adding Credits
 Flow messages consume credits. By default, RapidPro only issues you with 1,000 "free" credits.
