@@ -3,8 +3,8 @@
 ## Installation Instructions
 
 ### Install RapidPro Locally
-Follow the instructions on RapidPro's developer
-[web page](https://rapidpro.github.io/rapidpro/docs/development/).
+Follow the instructions on RapidPro's 
+[developer web page](https://rapidpro.github.io/rapidpro/docs/development/).
 
 Note:
 - A temba.settings file must be specified before the server can be run - the easiest way to create one is to
@@ -81,7 +81,19 @@ If you send a flow trigger, the response from RapidPro will be printed to the co
 opportunity to send another message in response. If using the provided sample flow, start by sending "camelid".
 
 ### Polling for new Flow runs
-TODO
+1. Find your API token. This is available on your Organisation page of RapidPro.
+1. Update dependencies: `$ pipenv sync`
+1. Run: `$ pipenv run python poll_flow_runs.py <API-Token>`
+
+The tool will output summary data on all flows on the first request, then on all new flows on subsequent polls,
+as well as timing data for each poll attempt.
+
+### Exporting Flow Data via RapidPro
+RapidPro can export all runs of a particular flow as a .xlsx file. To do this:
+
+1. Go to `Flows`
+1. Tick the checkbox of the flow you would like to export
+1. Click the `Download Results` button (Excel logo), then `Ok`.
 
 ### Load Testing
 To automatically run the camelids flow many times, use the provided `camelid_runner.py` script.
