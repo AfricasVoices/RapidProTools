@@ -30,14 +30,14 @@ available [here](http://docs.rapidpro.io/#topic_6) if needed.
 **To use the sample flow provided:**
 In RapidPro, go to your organisation page (click the button in the top-right). 
 Then choose `Settings Gear -> Import` and select `camelid-flow.json` from this repository. Finally, click `Import`.
-This will upload the flow *and the 'camelid' trigger*. This trigger will start the flow whenever a user transmits the 
-word "camelid" to one of your channels. Including this trigger is non-optional. If you wish to remove it, go to
+This will upload the flow *and enable the 'camelid' trigger*. This trigger will start the flow whenever a user transmits 
+the word "camelid" to one of your channels. Including this trigger is non-optional. If you wish to remove it, go to
 `Triggers` then tick the checkbox next to the camelid trigger. Finally, click the Archive button which appeared.
 
-To export a Flow for sharing, `Flows -> flow-to-be-shared -> settings gear -> Export -> Export [sic.]`.
+To export a Flow for sharing, `Flows -> flow-to-be-shared -> settings gear -> Export -> Export`.
 
 ### Interacting with the Flow
-The Flow editor includes an in-built simulator for testing (activate by clicking the mobile phone icon).
+The Flow editor includes an in-built simulator for testing (accessible by clicking the mobile phone icon).
 
 Interactions with a flow via the simulator are not persisted to the RapidPro database.
 For a flow to persist, it must be run on a "channel". To add a channel:
@@ -46,7 +46,8 @@ For a flow to persist, it must be run on a "channel". To add a channel:
 1. Choose the `Settings Gear -> Add Channel`
 1. Select the type of channel you'd like to configure, and follow the onscreen instructions.
    For further support refer to the [RapidPro Documentation](http://docs.rapidpro.io/#topic_11).
-   For interacting via the command line, a very simple tool is provided. Refer to the next section for instructions.
+   For interacting via the command line, a simple tool is provided with this repository. 
+   See [Command Line Channel](#command-line-channel) for instructions on how to set up this channel.
 1. Send your trigger message to the flow. If this is the provided sample, send the message "camelid".
 
 ### Command Line Channel
