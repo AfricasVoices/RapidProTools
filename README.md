@@ -1,4 +1,4 @@
-# RapidPro Flow Tester
+# RapidPro Flow Experiments
 
 ## Installation Instructions
 
