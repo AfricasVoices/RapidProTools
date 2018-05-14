@@ -8,6 +8,8 @@ flask = "*"
 flask-restful = "*"
 requests = "*"
 rapidpro-python = "*"
+CoreDataModules = {git = "file:///Users/alexander/avf/core-data-demo/CoreDataModules/.git", editable = true, ref = "52add6a71efdaf1ed0b928252ac4038947ed78ec"}
+jsonpickle = "*"
 
 [dev-packages]
 
