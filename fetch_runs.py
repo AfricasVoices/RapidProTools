@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import time
 
 import jsonpickle
@@ -61,6 +62,9 @@ if __name__ == "__main__":
 
 
     traced_runs = list(map(process_run, runs))
+
+    if not os.path.exists("data"):
+        os.makedirs("data")
 
     with open("data/output.json", "w") as f:
         # Serialize the list of TracedData to a format which can be trivially deserialized.
