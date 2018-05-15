@@ -11,14 +11,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Poll RapidPro for flow runs")
     parser.add_argument("token", help="RapidPro API Token", nargs=1)
     parser.add_argument("user", help="User launching this program", nargs=1)
+    parser.add_argument("output", help="Path to output file", nargs=1)
     parser.add_argument("--server", help="Address of RapidPro server. Defaults to localhost:8000.",
-                        nargs="?", default="http://localhost:8000/")
+                        nargs="?", default="http://localhost:8000")
     parser.add_argument("--flow-id", help="Id of flow to filter on. Defaults to returning runs for all flows",
                         nargs="?", default=None)
 
     args = parser.parse_args()
     token = args.token[0]
     user = args.user[0]
+    output_path = args.output[0]
     server = args.server
     flow_id = args.flow_id
 
@@ -49,9 +51,7 @@ if __name__ == "__main__":
 
 
     def process_run(run):
-        data = {
-            "Contact UUID": run.contact.uuid
-        }
+        data = {"Contact UUID": run.contact.uuid}
 
         for category, response in run.values.items():
             data[category.title() + " (Category) - " + run.flow.name] = response.category
@@ -63,10 +63,10 @@ if __name__ == "__main__":
 
     traced_runs = list(map(process_run, runs))
 
-    if not os.path.exists("data"):
-        os.makedirs("data")
+    if not os.path.exists(os.path.dirname(output_path)):
+        os.makedirs(os.path.dirname(output_path))
 
-    with open("data/output.json", "w") as f:
+    with open(output_path, "w") as f:
         # Serialize the list of TracedData to a format which can be trivially deserialized.
         pickled = jsonpickle.dumps(traced_runs)
 

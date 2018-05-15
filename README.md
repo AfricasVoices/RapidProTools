@@ -90,11 +90,10 @@ The tool will output summary data on all runs, then poll for all runs again ever
 Change to incremental fetching by uncommenting the last line.
 
 ### Downloading Runs to a TracedData data file
-Run `$ pipenv run python fetch_runs.py <token> <user>`, where `<token>` is your RapidPro API token and `<user>` is
-a string identifying the user initiating this operation. Optionally filter on a flow with the 
-switch `--flow-id <flow-id>`. A list of available flow ids can be accessed with a `GET` to `/api/v2/flows.json`.
-
-Downloaded data will be written to `data/output.json`.
+Run `$ pipenv run python fetch_runs.py <token> <user> <output>`, where `<token>` is your RapidPro API token, `<user>` 
+is a string identifying the user initiating this operation, and `<ouput>` is the path to write the output json file to.
+Optionally filter on a flow with the switch `--flow-id <flow-id>`. 
+A list of available flow ids can be accessed with a `GET` to `/api/v2/flows.json`.
 
 This script does not poll - it performs a single download and write to disk. 
 
