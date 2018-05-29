@@ -5,7 +5,7 @@ import time
 
 import jsonpickle
 from temba_client.v2 import TembaClient
-from core_data_modules.traced_data import TracedData, Metadata
+from core_data_modules import TracedData, Metadata
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Poll RapidPro for flow runs")
@@ -56,9 +56,9 @@ if __name__ == "__main__":
         for category, response in run.values.items():
             data[category.title() + " (Category) - " + run.flow.name] = response.category
             data[category.title() + " (Value) - " + run.flow.name] = response.value
-            data[category.title() + " (Text) - " + run.flow.name] = response.value  # [sic.]
+            data[category.title() + " (Text) - " + run.flow.name] = response.value  # TODO: response.text does not exist
 
-        return TracedData(data, Metadata(user, "fetch_runs.py", time.time()))
+        return TracedData(data, Metadata(user, Metadata.get_call_location(), time.time()))
 
 
     traced_runs = list(map(process_run, runs))
