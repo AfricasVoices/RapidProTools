@@ -1,11 +1,10 @@
 import argparse
-import json
 import os
 import time
 
-import jsonpickle
+from core_data_modules.traced_data import TracedData, Metadata
+from core_data_modules.traced_data.io import TracedDataJsonIO
 from temba_client.v2 import TembaClient
-from core_data_modules import TracedData, Metadata
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Poll RapidPro for flow runs")
@@ -45,6 +44,7 @@ if __name__ == "__main__":
     runs = filter(lambda run: run.exit_type == "completed", runs)
 
     # Sort by ascending order of modification date
+    runs = list(runs)
     runs.reverse()
 
     print(str(len(runs)) + " runs will be output")
@@ -63,15 +63,7 @@ if __name__ == "__main__":
 
     traced_runs = list(map(process_run, runs))
 
-    if not os.path.exists(os.path.dirname(output_path)):
+    if os.path.dirname(output_path) is not "" and not os.path.exists(os.path.dirname(output_path)):
         os.makedirs(os.path.dirname(output_path))
-
     with open(output_path, "w") as f:
-        # Serialize the list of TracedData to a format which can be trivially deserialized.
-        pickled = jsonpickle.dumps(traced_runs)
-
-        # Pretty-print the serialized json
-        pp = json.dumps(json.loads(pickled), indent=2, sort_keys=True)
-
-        # Write pretty-printed JSON to a file.
-        f.write(pp)
+        TracedDataJsonIO.export_traced_data_iterable_to_json(traced_runs, f, pretty_print=True)

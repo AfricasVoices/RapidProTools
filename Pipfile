@@ -8,10 +8,9 @@ flask = "*"
 flask-restful = "*"
 requests = "*"
 rapidpro-python = "*"
-CoreDataModules = {git = "ssh://git@github.com/AfricasVoices/CoreDataModules.git", editable = true, ref = "d6ece4c92c06c57e5b2079e7ecac6575ebb8bfbd"}
-jsonpickle = "*"
+CoreDataModules = {git = "ssh://git@github.com/AfricasVoices/CoreDataModules.git", editable = true, ref = "1dc6b8a3fd0b0ddfe078fba6ab28e93d8a6a5f57"}
 
 [dev-packages]
 
 [requires]
-python_version = "2.7"
+python_version = "3.6"
