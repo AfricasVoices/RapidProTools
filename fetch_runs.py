@@ -60,9 +60,10 @@ if __name__ == "__main__":
 
         return TracedData(data, Metadata(user, Metadata.get_call_location(), time.time()))
 
-
+    # Convert runs to TracedData.
     traced_runs = list(map(process_run, runs))
 
+    # Output TracedData to JSON.
     if os.path.dirname(output_path) is not "" and not os.path.exists(os.path.dirname(output_path)):
         os.makedirs(os.path.dirname(output_path))
     with open(output_path, "w") as f:
