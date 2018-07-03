@@ -57,6 +57,12 @@ if __name__ == "__main__":
             data[category.title() + " (Category) - " + run.flow.name] = response.category
             data[category.title() + " (Value) - " + run.flow.name] = response.value
             # data[category.title() + " (Text) - " + run.flow.name] = response.value  # TODO: response.text does not exist
+            data[category.title() + " (Time) - " + run.flow.name] = response.time.isoformat()
+
+        data["created_on"] = run.created_on.isoformat()
+        data["modified_on"] = run.modified_on.isoformat()
+        data["exited_on"] = run.exited_on.isoformat()
+        data["exit_type"] = run.exit_type
 
         return TracedData(data, Metadata(user, Metadata.get_call_location(), time.time()))
 
