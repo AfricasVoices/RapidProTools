@@ -56,7 +56,6 @@ if __name__ == "__main__":
         for category, response in run.values.items():
             data[category.title() + " (Category) - " + run.flow.name] = response.category
             data[category.title() + " (Value) - " + run.flow.name] = response.value
-            # data[category.title() + " (Text) - " + run.flow.name] = response.value  # TODO: response.text does not exist
             data[category.title() + " (Time) - " + run.flow.name] = response.time.isoformat()
 
         data["created_on"] = run.created_on.isoformat()
