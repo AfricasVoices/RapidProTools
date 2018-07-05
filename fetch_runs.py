@@ -1,11 +1,10 @@
 import argparse
-import json
 import os
 import time
 
-import jsonpickle
+from core_data_modules.traced_data import TracedData, Metadata
+from core_data_modules.traced_data.io import TracedDataJsonIO
 from temba_client.v2 import TembaClient
-from core_data_modules import TracedData, Metadata
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Poll RapidPro for flow runs")
@@ -45,6 +44,7 @@ if __name__ == "__main__":
     runs = filter(lambda run: run.exit_type == "completed", runs)
 
     # Sort by ascending order of modification date
+    runs = list(runs)
     runs.reverse()
 
     print(str(len(runs)) + " runs will be output")
@@ -56,22 +56,20 @@ if __name__ == "__main__":
         for category, response in run.values.items():
             data[category.title() + " (Category) - " + run.flow.name] = response.category
             data[category.title() + " (Value) - " + run.flow.name] = response.value
-            data[category.title() + " (Text) - " + run.flow.name] = response.value  # TODO: response.text does not exist
+            data[category.title() + " (Time) - " + run.flow.name] = response.time.isoformat()
+
+        data["created_on"] = run.created_on.isoformat()
+        data["modified_on"] = run.modified_on.isoformat()
+        data["exited_on"] = run.exited_on.isoformat()
+        data["exit_type"] = run.exit_type
 
         return TracedData(data, Metadata(user, Metadata.get_call_location(), time.time()))
 
-
+    # Convert runs to TracedData.
     traced_runs = list(map(process_run, runs))
 
-    if not os.path.exists(os.path.dirname(output_path)):
+    # Output TracedData to JSON.
+    if os.path.dirname(output_path) is not "" and not os.path.exists(os.path.dirname(output_path)):
         os.makedirs(os.path.dirname(output_path))
-
     with open(output_path, "w") as f:
-        # Serialize the list of TracedData to a format which can be trivially deserialized.
-        pickled = jsonpickle.dumps(traced_runs)
-
-        # Pretty-print the serialized json
-        pp = json.dumps(json.loads(pickled), indent=2, sort_keys=True)
-
-        # Write pretty-printed JSON to a file.
-        f.write(pp)
+        TracedDataJsonIO.export_traced_data_iterable_to_json(traced_runs, f, pretty_print=True)
