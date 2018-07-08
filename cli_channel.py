@@ -1,3 +1,5 @@
+import argparse
+
 from flask import Flask, request
 from threading import Thread
 from flask_restful import Resource, Api
@@ -5,49 +7,46 @@ import requests
 import time
 import logging
 
-PHONE_NUMBER = "441632300010"
-SERVER_ADDR = ""
-PORT = 8082
-
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-
-class Messages(Resource):
-    def post(self):
-        text = request.args.get("text")
-        print(text)
-
-        # Handle the user's response on a new thread so that POSTing doesn't timeout.
-        thread = Thread(target=self.collect_next_message)
-        thread.start()
-
-    @classmethod
-    def collect_next_message(cls):
-        response = raw_input("> ")
-        cls.send_message(response)
-
-    @staticmethod
-    def send_message(message):
-        requests.post(SERVER_ADDR + "receive?from=" + PHONE_NUMBER + "&text=" + message)
-
-
-app = Flask(__name__)
-api = Api(app)
-api.add_resource(Messages, "/messages")
-
-
-def collect_first_message():
-    time.sleep(5)  # Give the server enough time to start. TODO: Implement less yuckily.
-    Messages.collect_next_message()
-
-
-def run_server():
-    app.run(port=PORT)
-
-
 if __name__ == "__main__":
-    thread = Thread(target=collect_first_message)
+    parser = argparse.ArgumentParser(description="RapidPro Command Line Channel")
+    parser.add_argument("-p", "--port", help="Port to run on", default=8082)
+    parser.add_argument("server", help="Base URL of server channel to connect to, including c/ex/<uuid>/", nargs=1)
+    parser.add_argument("phone", metavar="phone-number", help="Phone number to send messages from", nargs=1)
+
+    args = parser.parse_args()
+    port = args.port
+    server = args.server[0]
+    phone_number = args.phone[0]
+
+
+    class Messages(Resource):
+        def post(self):
+            text = request.args.get("text")
+            id = request.args.get("id")
+            print(text)
+            requests.post(server + "delivered", params={"id": id})
+
+        @staticmethod
+        def send_message(message):
+            requests.post(server + "receive?from=" + phone_number + "&text=" + message)
+
+
+    app = Flask(__name__)
+    api = Api(app)
+    api.add_resource(Messages, "/messages")
+
+
+    def input_loop():
+        time.sleep(5)  # Give the server enough time to start. TODO: Implement less yuckily.
+        while True:
+            response = input("> ")
+            Messages.send_message(response)
+
+
+    thread = Thread(target=input_loop)
     thread.start()
 
-    run_server()
+    app.run(port=port)
