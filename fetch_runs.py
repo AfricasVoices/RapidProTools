@@ -45,13 +45,6 @@ if __name__ == "__main__":
     with open(phone_uuid_path, "r") as f:
         phone_uuids = PhoneNumberUuidTable.load(f)
 
-    # Download all contacts into a dict of contact uuid -> contact.
-    print("Fetching contacts...")
-    start = time.time()
-    contact_runs = {c.uuid: c for c in rapid_pro.get_contacts(after=project_start_date).all()}
-    assert len(set(contact_runs.keys())) == len(contact_runs), "Non-unique contact UUID in RapidPro"
-    print("Fetched {} contacts ({}s)".format(len(contact_runs), time.time() - start))
-
     # Determine id of flow to download
     if flow_name is None:
         flow_id = None
@@ -85,6 +78,13 @@ if __name__ == "__main__":
     # Sort by ascending order of modification date.
     runs = list(runs)
     runs.reverse()
+
+    # Download all contacts into a dict of contact uuid -> contact.
+    print("Fetching contacts...")
+    start = time.time()
+    contact_runs = {c.uuid: c for c in rapid_pro.get_contacts(after=project_start_date).all()}
+    assert len(set(contact_runs.keys())) == len(contact_runs), "Non-unique contact UUID in RapidPro"
+    print("Fetched {} contacts ({}s)".format(len(contact_runs), time.time() - start))
 
     # Convert the RapidPro run objects to TracedData.
     traced_runs = []
