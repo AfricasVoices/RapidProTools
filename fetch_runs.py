@@ -10,16 +10,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Poll RapidPro for flow runs")
     parser.add_argument("--server", help="Address of RapidPro server. Defaults to http://localhost:8000.",
                         nargs="?", default="http://localhost:8000")
-    parser.add_argument("--flow-name", help="Name of flow to filter on. Defaults to returning runs for all flows",
+    parser.add_argument("--flow-name", help="Name of flow to filter on. If no name is provided, runs from all flows "
+                                            "will be exported. ",
                         nargs="?", default=None)
     parser.add_argument("token", help="RapidPro API Token", nargs=1)
     parser.add_argument("user", help="User launching this program", nargs=1)
-    parser.add_argument("mode", help="How to interpret downloaded runs, either 'messages' or 'survey'. "
-                                     "If 'messages', treats each run as a radio show answer, and outputs multiple "
-                                     "answers per contact if multiple messages are received. "
-                                     "If 'survey', takes the latest value for each response field "
+    parser.add_argument("mode", help="How to interpret downloaded runs. "
+                                     "If 'all', outputs all runs from each contact. "
+                                     "If 'latest-only', takes the latest value for each response field "
                                      "(while maintaining the history of older values in TracedData)",
-                        nargs=1, choices=["messages", "survey"])
+                        nargs=1, choices=["all", "latest-only"])
     parser.add_argument("output", help="Path to output file", nargs=1)
 
     args = parser.parse_args()
@@ -82,7 +82,7 @@ if __name__ == "__main__":
             run_dict[category.title() + " (Time) - " + run.flow.name] = response.time.isoformat()
             run_dict[category.title() + " (Run ID) - " + run.flow.name] = run.id
 
-        if mode == "messages":
+        if mode == "all":
             run_dict["created_on"] = run.created_on.isoformat()
             run_dict["modified_on"] = run.modified_on.isoformat()
             run_dict["exited_on"] = run.exited_on.isoformat()
@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
         traced_runs.append(TracedData(run_dict, Metadata(user, Metadata.get_call_location(), time.time())))
 
-    if mode == "survey":
+    if mode == "latest-only":
         # Keep only the latest values for each node for each contact
         contacts = dict()  # of contact_uuid -> parsed_run
         for run in traced_runs:
