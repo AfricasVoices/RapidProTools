@@ -64,6 +64,7 @@ if __name__ == "__main__":
     runs = filter(lambda run: run.exit_type == "completed", runs)
 
     # Sort by ascending order of modification date
+    runs = list(runs)
     runs.reverse()
 
     print(str(len(runs)) + " runs will be output")
