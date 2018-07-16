@@ -6,10 +6,7 @@
 Follow the instructions on RapidPro's 
 [developer web page](https://rapidpro.github.io/rapidpro/docs/development/).
 
-Note:
-- A temba.settings file must be specified before the server can be run - the easiest way to create one is to
-reuse the provided development configuration (`$ cp temba/settings.py.dev temba/settings.py`).
-- The commit of RapidPro these instructions were tested against is `f988b82ed962c6bc3532393fa4f68cf301df6ebc`.
+The commit of RapidPro these instructions were tested against is `f988b82ed962c6bc3532393fa4f68cf301df6ebc`.
 
 ### Configure a RapidPro User
 1. After starting the server, as described by the developer instructions referenced in the previous step, 
@@ -90,10 +87,7 @@ The tool will output summary data on all runs, then poll for all runs again ever
 Change to incremental fetching by uncommenting the last line.
 
 ### Downloading Runs to a TracedData data file
-Run `$ pipenv run python fetch_runs.py <token> <user> <output>`, where `<token>` is your RapidPro API token, `<user>` 
-is a string identifying the user initiating this operation, and `<ouput>` is the path to write the output json file to.
-Optionally filter on a flow with the switch `--flow-id <flow-id>`. 
-A list of available flow ids can be accessed with a `GET` to `/api/v2/flows.json`.
+To export TracedData, use `$ pipenv run python fetch_runs.py`.
 
 This script does not poll - it performs a single download and write to disk. 
 
