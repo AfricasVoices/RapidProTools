@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d42e607ebd28032208a5a32718ba57a427ac31531729ed449b4301ad7641c74e"
+            "sha256": "b62da2545c19e0697740042d24bc5fb1c34dbfadfcbffddd8e73babeeb14e3eb"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -51,10 +51,10 @@
         },
         "deprecation": {
             "hashes": [
-                "sha256:2c259bfc0237f16bbe36cb32b6d81addd919b8f4bc7253738576816e82841b96",
-                "sha256:fc08ca4e9cb7543187206d45a02a6f25f10e079d9bbde2822e1d15f3581dc97a"
+                "sha256:65a105244df7e43025218751da6c83389cc1dda12a5b7919b23e5fde7c481ec3",
+                "sha256:cbe7d15006bc339709be5e02b14884ecc479639c1a3714a908de3a8ca13b5ca9"
             ],
-            "version": "==2.0.4"
+            "version": "==2.0.5"
         },
         "flask": {
             "hashes": [
@@ -135,18 +135,15 @@
         },
         "pytz": {
             "hashes": [
-                "sha256:65ae0c8101309c45772196b21b74c46b2e5d11b6275c45d251b150d5da334555",
-                "sha256:c06425302f2cf668f1bba7a0a03f3c1d34d4ebeef2c72003da308b3947c7f749"
+                "sha256:a061aa0a9e06881eb8b3b2b43f05b9439d6583c206d0a6c340ff72a7b6669053",
+                "sha256:ffb9ef1de172603304d9d2819af6f5ece76f2e85ec10692a524dd876e72bf277"
             ],
-            "version": "==2018.4"
+            "version": "==2018.5"
         },
         "rapidpro-python": {
-            "hashes": [
-                "sha256:08273ffe2f22de13223a460ca108f55b770b2c2e2ddfc4689961bf7fd76ec780",
-                "sha256:8def13816b0d21871995222a00b4bdd6e21022880e85934ace487a5f65101e01"
-            ],
-            "index": "pypi",
-            "version": "==2.3"
+            "editable": true,
+            "git": "ssh://git@github.com/rapidpro/rapidpro-python.git",
+            "ref": "7b65ed889225653a426e7d9188d7f8e5afc1a706"
         },
         "requests": {
             "hashes": [
@@ -174,6 +171,7 @@
                 "sha256:a68ac5e15e76e7e5dd2b8f94007233e01effe3e50e8daddf69acfd81cb686baf",
                 "sha256:b5725a0bd4ba422ab0e66e89e030c806576753ea3ee08554382c14e685d117b5"
             ],
+            "markers": "python_version >= '2.6' and python_version != '3.1.*' and python_version != '3.0.*' and python_version != '3.3.*' and python_version < '4' and python_version != '3.2.*'",
             "version": "==1.23"
         },
         "werkzeug": {
