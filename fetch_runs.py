@@ -8,28 +8,42 @@ from temba_client.v2 import TembaClient
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Poll RapidPro for flow runs")
+    parser.add_argument("--server", help="Address of RapidPro server. Defaults to http://localhost:8000.",
+                        nargs="?", default="http://localhost:8000")
+    parser.add_argument("--flow-name", help="Name of flow to filter on. Defaults to returning runs for all flows",
+                        nargs="?", default=None)
     parser.add_argument("token", help="RapidPro API Token", nargs=1)
     parser.add_argument("user", help="User launching this program", nargs=1)
     parser.add_argument("output", help="Path to output file", nargs=1)
-    parser.add_argument("--server", help="Address of RapidPro server. Defaults to localhost:8000.",
-                        nargs="?", default="http://localhost:8000")
-    parser.add_argument("--flow-id", help="Id of flow to filter on. Defaults to returning runs for all flows",
-                        nargs="?", default=None)
 
     args = parser.parse_args()
+    server = args.server
+    flow_name = args.flow_name
     token = args.token[0]
     user = args.user[0]
     output_path = args.output[0]
-    server = args.server
-    flow_id = args.flow_id
 
-    client = TembaClient(server, token)
+    rapid_pro = TembaClient(server, token)
 
     print("Fetching...")
     start = time.time()
 
+    if flow_name is None:
+        flow_id = None
+    else:
+        flows = rapid_pro.get_flows().all()
+        matching_flows = [f for f in flows if f.name == flow_name]
+
+        if len(matching_flows) == 0:
+            raise KeyError("Requested flow not found on RapidPro (Available flows: {})".format(
+                           ",".join(list(map(lambda f: f.name, flows)))))
+        if len(matching_flows) > 1:
+            raise KeyError("Non-unique flow name")
+
+        flow_id = matching_flows[0].uuid
+
     # Download all flow runs which have been updated since the last poll.
-    runs = client.get_runs(flow=flow_id).all(retry_on_rate_exceed=True)
+    runs = rapid_pro.get_runs(flow=flow_id).all()
     # IMPORTANT: The .all() approach may not scale to flows with some as yet unquantified "large" number of runs.
     # See http://rapidpro-python.readthedocs.io/en/latest/#fetching-objects for more details.
 
@@ -49,9 +63,8 @@ if __name__ == "__main__":
 
     print(str(len(runs)) + " runs will be output")
 
-
     def process_run(run):
-        data = {"Contact UUID": run.contact.uuid}
+        data = {"contact_uuid": run.contact.uuid, "run_id": run.id}
 
         for category, response in run.values.items():
             data[category.title() + " (Category) - " + run.flow.name] = response.category
