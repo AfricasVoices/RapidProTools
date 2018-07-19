@@ -9,23 +9,24 @@ from dateutil.parser import isoparse
 from temba_client.v2 import TembaClient
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Poll RapidPro for flow runs")
+    parser = argparse.ArgumentParser(description="Downloads runs from RapidPro.")
     parser.add_argument("--server", help="Address of RapidPro server. Defaults to http://localhost:8000.",
                         nargs="?", default="http://localhost:8000")
     parser.add_argument("--flow-name", help="Name of flow to filter on. If no name is provided, runs from all flows "
                                             "will be exported. ",
                         nargs="?", default=None)
     parser.add_argument("token", help="RapidPro API Token", nargs=1)
-    parser.add_argument("user", help="User launching this program", nargs=1)
+    parser.add_argument("user", help="Identifier of user launching this program, for use in TracedData Metadata",
+                        nargs=1)
     parser.add_argument("mode", help="How to interpret downloaded runs. "
                                      "If 'all', outputs all runs from each contact. "
                                      "If 'latest-only', takes the latest value for each response field "
                                      "(while maintaining the history of older values in TracedData)",
                         nargs=1, choices=["all", "latest-only"])
-    parser.add_argument("phone_uuid_table", metavar="phone-uuid-table", nargs=1,
+    parser.add_argument("phone_uuid_table_path", metavar="phone-uuid-table", nargs=1,
                         help="JSON file containing an existing phone number <-> UUID lookup table. "
                              "This file will be updated with the new phone numbers which are found by this process")
-    parser.add_argument("output", help="Path to output file", nargs=1)
+    parser.add_argument("json_output_path", help="Path to serialized TracedData JSON file", nargs=1)
 
     args = parser.parse_args()
     server = args.server
@@ -34,7 +35,7 @@ if __name__ == "__main__":
     user = args.user[0]
     mode = args.mode[0]
     phone_uuid_path = args.phone_uuid_table[0]
-    output_path = args.output[0]
+    json_output_path = args.output[0]
 
     project_start_date_iso = "2018-05-01T00:00:00Z"
     project_start_date = isoparse(project_start_date_iso)
@@ -129,7 +130,7 @@ if __name__ == "__main__":
         phone_uuids.dump(f)
 
     # Output TracedData to JSON.
-    if os.path.dirname(output_path) is not "" and not os.path.exists(os.path.dirname(output_path)):
-        os.makedirs(os.path.dirname(output_path))
-    with open(output_path, "w") as f:
+    if os.path.dirname(json_output_path) is not "" and not os.path.exists(os.path.dirname(json_output_path)):
+        os.makedirs(os.path.dirname(json_output_path))
+    with open(json_output_path, "w") as f:
         TracedDataJsonIO.export_traced_data_iterable_to_json(traced_runs, f, pretty_print=True)
