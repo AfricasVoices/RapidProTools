@@ -23,10 +23,11 @@ if __name__ == "__main__":
                                      "If 'latest-only', takes the latest value for each response field "
                                      "(while maintaining the history of older values in TracedData)",
                         nargs=1, choices=["all", "latest-only"])
-    parser.add_argument("phone_uuid_table_path", metavar="phone-uuid-table", nargs=1,
+    parser.add_argument("phone_uuid_table_path", metavar="phone-uuid-table-path", nargs=1,
                         help="JSON file containing an existing phone number <-> UUID lookup table. "
                              "This file will be updated with the new phone numbers which are found by this process")
-    parser.add_argument("json_output_path", help="Path to serialized TracedData JSON file", nargs=1)
+    parser.add_argument("json_output_path", metavar="json-output-path",
+                        help="Path to serialized TracedData JSON file", nargs=1)
 
     args = parser.parse_args()
     server = args.server
@@ -34,8 +35,8 @@ if __name__ == "__main__":
     token = args.token[0]
     user = args.user[0]
     mode = args.mode[0]
-    phone_uuid_path = args.phone_uuid_table[0]
-    json_output_path = args.output[0]
+    phone_uuid_path = args.phone_uuid_table_path[0]
+    json_output_path = args.json_output_path[0]
 
     project_start_date_iso = "2018-05-01T00:00:00Z"
     project_start_date = isoparse(project_start_date_iso)
