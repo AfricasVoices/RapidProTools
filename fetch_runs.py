@@ -44,6 +44,10 @@ if __name__ == "__main__":
     rapid_pro = TembaClient(server, token)
 
     # Load the existing phone number <-> UUID table.
+    if not os.path.exists(phone_uuid_path):
+        raise FileNotFoundError("No such phone uuid table file '{}'. "
+                                "To create a new, empty UUID table, "
+                                "run $ echo \"{{}}\" > <target-json-file>".format(phone_uuid_path))
     with open(phone_uuid_path, "r") as f:
         phone_uuids = PhoneNumberUuidTable.load(f)
 
