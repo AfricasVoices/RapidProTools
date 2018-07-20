@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "70a1e70da0da8eba938dfcfbfea5379bb2cb23a353ee90b0354d996406400428"
+            "sha256": "94d4d5169ed4999f67c4d4b60c2a94d3c4aabaea73e3c6c64009fd3767a4a7be"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -46,8 +46,8 @@
         },
         "coredatamodules": {
             "editable": true,
-            "git": "ssh://git@github.com/AfricasVoices/CoreDataModules.git",
-            "ref": "1dc6b8a3fd0b0ddfe078fba6ab28e93d8a6a5f57"
+            "git": "https://www.github.com/AfricasVoices/CoreDataModules",
+            "ref": "2dee092d4084683fc745ee75766f30fa004f5286"
         },
         "deprecation": {
             "hashes": [
@@ -143,7 +143,7 @@
         },
         "rapidpro-python": {
             "editable": true,
-            "git": "ssh://git@github.com/rapidpro/rapidpro-python.git",
+            "git": "https://www.github.com/rapidpro/rapidpro-python",
             "ref": "7b65ed889225653a426e7d9188d7f8e5afc1a706"
         },
         "requests": {

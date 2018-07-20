@@ -52,6 +52,7 @@ if __name__ == "__main__":
         phone_uuids = PhoneNumberUuidTable.load(f)
 
     # Determine id of flow to download
+    print("Determining id for flow `{}`...".format(flow_name))
     if flow_name is None:
         flow_id = None
     else:
