@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "94d4d5169ed4999f67c4d4b60c2a94d3c4aabaea73e3c6c64009fd3767a4a7be"
+            "sha256": "2f6dca81ab203d8db66c13c7d9652ab6664ac68afeaa0ca84a7d50389ec9ef70"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -142,9 +142,12 @@
             "version": "==2018.5"
         },
         "rapidpro-python": {
-            "editable": true,
-            "git": "https://www.github.com/rapidpro/rapidpro-python",
-            "ref": "7b65ed889225653a426e7d9188d7f8e5afc1a706"
+            "hashes": [
+                "sha256:04b791b4b26054d14e5776e96de0da19e961d4721c2f2923c6b07d83d2840dd9",
+                "sha256:094e6665ae9cd1db09088c76c10acd5fd875cf567be6b4ba970d2e0812148f2d"
+            ],
+            "index": "pypi",
+            "version": "==2.4"
         },
         "requests": {
             "hashes": [
