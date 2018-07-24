@@ -13,7 +13,7 @@ ADD Pipfile /app
 RUN pipenv sync
 
 # Copy the rest of the project
-ADD . /app
+ADD fetch_runs.py /app
 
 # Make a directory for intermediate data
 RUN mkdir /data

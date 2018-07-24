@@ -8,7 +8,7 @@ flask = "*"
 flask-restful = "*"
 requests = "*"
 python-dateutil = "*"
-rapidpro-python = {git = "https://www.github.com/rapidpro/rapidpro-python", editable = true, ref = "7b65ed889225653a426e7d9188d7f8e5afc1a706"}
+rapidpro-python = ">=2.4"
 CoreDataModules = {git = "https://www.github.com/AfricasVoices/CoreDataModules", editable = true, ref = "v0.3.0"}
 
 [dev-packages]
