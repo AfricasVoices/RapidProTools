@@ -112,7 +112,7 @@ if __name__ == "__main__":
         if mode == "all":
             run_dict["created_on"] = run.created_on.isoformat()
             run_dict["modified_on"] = run.modified_on.isoformat()
-            run_dict["exited_on"] = run.exited_on.isoformat()
+            run_dict["exited_on"] = None if run.exited_on is None else run.exited_on.isoformat()
             run_dict["exit_type"] = run.exit_type
 
         traced_runs.append(TracedData(run_dict, Metadata(user, Metadata.get_call_location(), time.time())))
