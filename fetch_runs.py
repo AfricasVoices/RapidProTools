@@ -38,9 +38,6 @@ if __name__ == "__main__":
     phone_uuid_path = args.phone_uuid_table_path[0]
     json_output_path = args.json_output_path[0]
 
-    project_start_date_iso = "2018-05-01T00:00:00Z"
-    project_start_date = isoparse(project_start_date_iso)
-
     rapid_pro = TembaClient(server, token)
 
     # Load the existing phone number <-> UUID table.
@@ -70,7 +67,7 @@ if __name__ == "__main__":
     # Download all runs for the requested flow.
     print("Fetching runs...")
     start = time.time()
-    runs = rapid_pro.get_runs(flow=flow_id, after=project_start_date).all()
+    runs = rapid_pro.get_runs(flow=flow_id).all()
     # IMPORTANT: The .all() approach may not scale to flows with some as yet unquantified "large" number of runs.
     # See http://rapidpro-python.readthedocs.io/en/latest/#fetching-objects for more details.
     print("Fetched {} runs ({}s)".format(len(runs), time.time() - start))
@@ -89,7 +86,7 @@ if __name__ == "__main__":
     # Download all contacts into a dict of contact uuid -> contact.
     print("Fetching contacts...")
     start = time.time()
-    contact_runs = {c.uuid: c for c in rapid_pro.get_contacts(after=project_start_date).all()}
+    contact_runs = {c.uuid: c for c in rapid_pro.get_contacts().all()}
     assert len(set(contact_runs.keys())) == len(contact_runs), "Non-unique contact UUID in RapidPro"
     print("Fetched {} contacts ({}s)".format(len(contact_runs), time.time() - start))
 
