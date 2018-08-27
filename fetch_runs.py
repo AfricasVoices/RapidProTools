@@ -12,30 +12,28 @@ if __name__ == "__main__":
     parser.add_argument("--server", help="Address of RapidPro server. Defaults to http://localhost:8000.",
                         nargs="?", default="http://localhost:8000")
     parser.add_argument("--flow-name", help="Name of flow to filter on. If no name is provided, runs from all flows "
-                                            "will be exported. ",
-                        nargs="?", default=None)
-    parser.add_argument("token", help="RapidPro API Token", nargs=1)
-    parser.add_argument("user", help="Identifier of user launching this program, for use in TracedData Metadata",
-                        nargs=1)
+                                            "will be exported. ", nargs="?", default=None)
+    parser.add_argument("token", help="RapidPro API Token")
+    parser.add_argument("user", help="Identifier of user launching this program, for use in TracedData Metadata")
     parser.add_argument("mode", help="How to interpret downloaded runs. "
                                      "If 'all', outputs all runs from each contact. "
                                      "If 'latest-only', takes the latest value for each response field "
                                      "(while maintaining the history of older values in TracedData)",
-                        nargs=1, choices=["all", "latest-only"])
-    parser.add_argument("phone_uuid_table_path", metavar="phone-uuid-table-path", nargs=1,
+                        choices=["all", "latest-only"])
+    parser.add_argument("phone_uuid_table_path", metavar="phone-uuid-table-path",
                         help="JSON file containing an existing phone number <-> UUID lookup table. "
                              "This file will be updated with the new phone numbers which are found by this process")
     parser.add_argument("json_output_path", metavar="json-output-path",
-                        help="Path to serialized TracedData JSON file", nargs=1)
+                        help="Path to serialized TracedData JSON file")
 
     args = parser.parse_args()
     server = args.server
     flow_name = args.flow_name
-    token = args.token[0]
-    user = args.user[0]
-    mode = args.mode[0]
-    phone_uuid_path = args.phone_uuid_table_path[0]
-    json_output_path = args.json_output_path[0]
+    token = args.token
+    user = args.user
+    mode = args.mode
+    phone_uuid_path = args.phone_uuid_table_path
+    json_output_path = args.json_output_path
 
     rapid_pro = TembaClient(server, token)
 
