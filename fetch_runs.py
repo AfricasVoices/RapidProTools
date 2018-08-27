@@ -69,13 +69,6 @@ if __name__ == "__main__":
     # See http://rapidpro-python.readthedocs.io/en/latest/#fetching-objects for more details.
     print("Fetched {} runs ({}s)".format(len(runs), time.time() - start))
 
-    # TODO: Check if the next two steps match current AVF practice.
-    # Ignore flows which are incomplete because the respondent is still working through the questions.
-    # runs = filter(lambda run: run.exited_on is not None, runs)
-    # Ignore flows which are incomplete because the respondent stopped answering.
-    # runs = filter(lambda run: run.exit_type == "completed", runs)
-    # TODO: Ignore AVF test runs once testing is complete.
-
     # Sort by ascending order of modification date.
     runs = list(runs)
     runs.reverse()
