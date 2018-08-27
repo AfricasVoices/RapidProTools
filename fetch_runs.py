@@ -5,7 +5,6 @@ import time
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.traced_data.io import TracedDataJsonIO
 from core_data_modules.util import PhoneNumberUuidTable
-from dateutil.parser import isoparse
 from temba_client.v2 import TembaClient
 
 if __name__ == "__main__":
@@ -53,7 +52,7 @@ if __name__ == "__main__":
     if flow_name is None:
         flow_id = None
     else:
-        flows = rapid_pro.get_flows().all()
+        flows = rapid_pro.get_flows().all(retry_on_rate_exceed=True)
         matching_flows = [f for f in flows if f.name == flow_name]
 
         if len(matching_flows) == 0:
@@ -67,7 +66,7 @@ if __name__ == "__main__":
     # Download all runs for the requested flow.
     print("Fetching runs...")
     start = time.time()
-    runs = rapid_pro.get_runs(flow=flow_id).all()
+    runs = rapid_pro.get_runs(flow=flow_id).all(retry_on_rate_exceed=True)
     # IMPORTANT: The .all() approach may not scale to flows with some as yet unquantified "large" number of runs.
     # See http://rapidpro-python.readthedocs.io/en/latest/#fetching-objects for more details.
     print("Fetched {} runs ({}s)".format(len(runs), time.time() - start))
@@ -86,7 +85,7 @@ if __name__ == "__main__":
     # Download all contacts into a dict of contact uuid -> contact.
     print("Fetching contacts...")
     start = time.time()
-    contact_runs = {c.uuid: c for c in rapid_pro.get_contacts().all()}
+    contact_runs = {c.uuid: c for c in rapid_pro.get_contacts().all(retry_on_rate_exceed=True)}
     assert len(set(contact_runs.keys())) == len(contact_runs), "Non-unique contact UUID in RapidPro"
     print("Fetched {} contacts ({}s)".format(len(contact_runs), time.time() - start))
 
