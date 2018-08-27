@@ -9,7 +9,7 @@ flask-restful = "*"
 requests = "*"
 python-dateutil = "*"
 rapidpro-python = ">=2.4"
-CoreDataModules = {git = "https://www.github.com/AfricasVoices/CoreDataModules", editable = true, ref = "v0.3.0"}
+CoreDataModules = {git = "https://www.github.com/AfricasVoices/CoreDataModules", editable = true, ref = "v0.5.1"}
 
 [dev-packages]
 
