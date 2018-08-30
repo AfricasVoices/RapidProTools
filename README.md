@@ -1,4 +1,5 @@
-# RapidPro Flow Experiments
+# RapidProTools
+Contains scripts for fetching runs from Rapid Pro, and for inserting messages into a Rapid Pro development server.
 
 ## Installation Instructions
 
