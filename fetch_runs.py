@@ -53,11 +53,10 @@ if __name__ == "__main__":
         phone_uuids = PhoneNumberUuidTable.load(f)
 
     # Load test contacts path if set, otherwise default to empty set.
+    test_contacts = set()
     if test_contacts_path is not None:
         with open(test_contacts_path, "r") as f:
-            test_contacts = set(json.load(f))
-    else:
-        test_contacts = set()
+            test_contacts.update(json.load(f))
 
     # Determine id of flow to download
     print("Determining id for flow `{}`...".format(flow_name))
