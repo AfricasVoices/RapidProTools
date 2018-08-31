@@ -7,10 +7,10 @@ IMAGE_NAME=rapid-pro-fetch-runs
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --flow-name)
-            FLOW_NAME="--flow-name $2"
+            FLOW_NAME_ARG="--flow-name $2"
             shift 2;;
         --test-contacts-path)
-            TEST_CONTACTS="--test-contacts-path /data/input-test-contacts.json"
+            TEST_CONTACTS_ARG="--test-contacts-path /data/input-test-contacts.json"
             TEST_CONTACTS_PATH="$2"
             shift 2;;
         --)
@@ -39,7 +39,7 @@ OUTPUT_JSON=$6
 docker build -t "$IMAGE_NAME" .
 
 # Create a container from the image that was just built.
-container="$(docker container create --env TEST_CONTACTS="$TEST_CONTACTS" --env SERVER="$SERVER" --env TOKEN="$TOKEN" --env FLOW_NAME="$FLOW_NAME" --env USER="$USER" --env MODE="$MODE" "$IMAGE_NAME")"
+container="$(docker container create --env FLOW_NAME="$FLOW_NAME_ARG"  --env TEST_CONTACTS="$TEST_CONTACTS_ARG" --env SERVER="$SERVER" --env TOKEN="$TOKEN" --env USER="$USER" --env MODE="$MODE" "$IMAGE_NAME")"
 
 function finish {
     # Tear down the container when done.
