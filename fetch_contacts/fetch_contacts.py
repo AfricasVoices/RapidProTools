@@ -39,7 +39,7 @@ if __name__ == "__main__":
     # Download all contacts
     print("Fetching contacts...")
     start = time.time()
-    contacts = [rapid_pro.get_contacts().first(retry_on_rate_exceed=True)]
+    contacts = rapid_pro.get_contacts().all(retry_on_rate_exceed=True)
     print("Fetched {} contacts ({}s)".format(len(contacts), time.time() - start))
 
     # Convert contacts to TracedData
