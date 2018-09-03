@@ -60,7 +60,7 @@ if __name__ == "__main__":
     # Convert contacts to TracedData
     traced_contacts = []
     for contact in contacts:
-        print("{}/{}".format(len(traced_contacts), len(contacts)))
+        print("{}/{}".format(len(traced_contacts) + 1, len(contacts)))
         contact_dict = dict()
         contact_dict["avf_phone_id"] = phone_uuids.add_phone(contact.urns[0])
 
@@ -74,6 +74,8 @@ if __name__ == "__main__":
             contact_dict,
             Metadata(user, Metadata.get_call_location(), time.time())
         ))
+
+    contacts = None
 
     # Write the UUIDs out to a file
     with open(phone_uuid_path, "w") as f:
