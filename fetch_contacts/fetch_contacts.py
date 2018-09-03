@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 import time
 
@@ -11,6 +12,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Downloads contacts from RapidPro")
     parser.add_argument("--server", help="Address of RapidPro server. Defaults to http://localhost:8000.",
                         nargs="?", default="http://localhost:8000")
+    parser.add_argument("--test-contacts-path",
+                        help="Path to a JSON file containing a list of Rapid Pro contact UUIDs. "
+                             "Messages sent from one of this ids will have the key \"test_run\" set to True "
+                             "in the output JSON", nargs="?", default=None)
     parser.add_argument("token", help="RapidPro API Token")
     parser.add_argument("user", help="Identifier of user launching this program, for use in TracedData Metadata")
     parser.add_argument("phone_uuid_table_path", metavar="phone-uuid-table-path",
@@ -22,6 +27,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     server = args.server
     token = args.token
+    test_contacts_path = args.test_contacts_path
     user = args.user
     phone_uuid_path = args.phone_uuid_table_path
     json_output_path = args.json_output_path
@@ -36,6 +42,12 @@ if __name__ == "__main__":
     with open(phone_uuid_path, "r") as f:
         phone_uuids = PhoneNumberUuidTable.load(f)
 
+    # Load test contacts path if set, otherwise default to empty set
+    test_contacts = set()
+    if test_contacts_path is not None:
+        with open(test_contacts_path, "r") as f:
+            test_contacts.update(json.load(f))
+
     # Download all contacts
     print("Fetching contacts...")
     start = time.time()
@@ -47,6 +59,10 @@ if __name__ == "__main__":
     for contact in contacts:
         contact_dict = dict()
         contact_dict["avf_phone_id"] = phone_uuids.add_phone(contact.urns[0])
+
+        if contact.uuid in test_contacts:
+            contact_dict["test_run"] = True
+
         contact_dict.update(contact.fields)
 
         traced_contacts.append(TracedData(
