@@ -67,8 +67,10 @@ if __name__ == "__main__":
         if contact.uuid in test_contacts:
             contact_dict["test_run"] = True
 
-        local_keys = ["District", "District Review", "Distirct", "Distirct Review"]
-        contact_dict.update({key: contact.field[key] for key in local_keys})
+        # local_keys = ["District", "District Review", "Distirct", "Distirct Review"]
+        # contact_dict.update({key: contact.field[key] for key in local_keys})
+
+        contact_dict.update(contact.fields)
 
         traced_contacts.append(TracedData(
             contact_dict,
