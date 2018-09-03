@@ -1,5 +1,7 @@
 import argparse
+import json
 import os
+import pickle
 import time
 
 from core_data_modules.traced_data import TracedData, Metadata
@@ -13,6 +15,10 @@ if __name__ == "__main__":
                         nargs="?", default="http://localhost:8000")
     parser.add_argument("--flow-name", help="Name of flow to filter on. If no name is provided, runs from all flows "
                                             "will be exported. ", nargs="?", default=None)
+    parser.add_argument("--test-contacts-path",
+                        help="Path to a JSON file containing a list of Rapid Pro contact UUIDs. "
+                             "Messages sent from one of this ids will have the key \"test_run\" set to True "
+                             "in the output JSON", nargs="?", default=None)
     parser.add_argument("token", help="RapidPro API Token")
     parser.add_argument("user", help="Identifier of user launching this program, for use in TracedData Metadata")
     parser.add_argument("mode", help="How to interpret downloaded runs. "
@@ -29,6 +35,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     server = args.server
     flow_name = args.flow_name
+    test_contacts_path = args.test_contacts_path
     token = args.token
     user = args.user
     mode = args.mode
@@ -44,6 +51,12 @@ if __name__ == "__main__":
                                 "run $ echo \"{{}}\" > <target-json-file>".format(phone_uuid_path))
     with open(phone_uuid_path, "r") as f:
         phone_uuids = PhoneNumberUuidTable.load(f)
+
+    # Load test contacts path if set, otherwise default to empty set.
+    test_contacts = set()
+    if test_contacts_path is not None:
+        with open(test_contacts_path, "r") as f:
+            test_contacts.update(json.load(f))
 
     # Determine id of flow to download
     print("Determining id for flow `{}`...".format(flow_name))
@@ -95,6 +108,9 @@ if __name__ == "__main__":
             run_dict[category.title() + " (Name) - " + run.flow.name] = response.name
             run_dict[category.title() + " (Time) - " + run.flow.name] = response.time.isoformat()
             run_dict[category.title() + " (Run ID) - " + run.flow.name] = run.id
+
+        if run.contact.uuid in test_contacts:
+            run_dict["test_run"] = True
 
         if mode == "all":
             run_dict["created_on"] = run.created_on.isoformat()
