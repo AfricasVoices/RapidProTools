@@ -86,4 +86,4 @@ if __name__ == "__main__":
     # Output TracedData to JSON
     IOUtils.ensure_dirs_exist_for_file(json_output_path)
     with open(json_output_path, "w") as f:
-        TracedDataJsonIO.export_traced_data_iterable_to_json(traced_contacts, f, pretty_print=True)
+        TracedDataJsonIO.export_traced_data_iterable_to_json(traced_contacts, f, pretty_print=False)
