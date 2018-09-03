@@ -60,6 +60,7 @@ if __name__ == "__main__":
     # Convert contacts to TracedData
     traced_contacts = []
     for contact in contacts:
+        print("{}/{}".format(len(traced_contacts), len(contacts)))
         contact_dict = dict()
         contact_dict["avf_phone_id"] = phone_uuids.add_phone(contact.urns[0])
 
