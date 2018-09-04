@@ -67,10 +67,7 @@ if __name__ == "__main__":
         if contact.uuid in test_contacts:
             contact_dict["test_run"] = True
 
-        # local_keys = ["District", "District Review", "Distirct", "Distirct Review"]
-        # contact_dict.update({key: contact.field[key] for key in local_keys})
-
-        contact_dict.update(contact.fields)
+        contact_dict.update({k: v for k, v in contact.fields.items() if v is not None})
 
         traced_contacts.append(TracedData(
             contact_dict,
@@ -86,4 +83,4 @@ if __name__ == "__main__":
     # Output TracedData to JSON
     IOUtils.ensure_dirs_exist_for_file(json_output_path)
     with open(json_output_path, "w") as f:
-        TracedDataJsonIO.export_traced_data_iterable_to_json(traced_contacts, f, pretty_print=False)
+        TracedDataJsonIO.export_traced_data_iterable_to_json(traced_contacts, f, pretty_print=True)
