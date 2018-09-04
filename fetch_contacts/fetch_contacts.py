@@ -3,6 +3,7 @@ import json
 import os
 import time
 
+from core_data_modules.cleaners import PhoneCleaner
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.traced_data.io import TracedDataJsonIO
 from core_data_modules.util import PhoneNumberUuidTable, IOUtils
@@ -60,8 +61,8 @@ if __name__ == "__main__":
     # Convert contacts to TracedData
     traced_contacts = []
     for contact in contacts:
-        if contact.urns[0] == "":
-            continue
+        if PhoneCleaner.normalise_phone(contact.urns[0]) == "":
+            print(contact.urns[0])
 
         print("{}/{}".format(len(traced_contacts) + 1, len(contacts)))
         contact_dict = dict()
