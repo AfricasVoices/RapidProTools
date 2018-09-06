@@ -64,6 +64,7 @@ if __name__ == "__main__":
         if PhoneCleaner.normalise_phone(contact.urns[0]) == "":
             print("Weird URN:")
             print(contact.urns[0])
+            continue
 
         contact_dict = dict()
         contact_dict["avf_phone_id"] = phone_uuids.add_phone(contact.urns[0])
