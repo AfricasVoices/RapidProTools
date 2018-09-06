@@ -62,6 +62,7 @@ if __name__ == "__main__":
     traced_contacts = []
     for contact in contacts:
         if PhoneCleaner.normalise_phone(contact.urns[0]) == "":
+            print("Weird URN:")
             print(contact.urns[0])
 
         print("{}/{}".format(len(traced_contacts) + 1, len(contacts)))
