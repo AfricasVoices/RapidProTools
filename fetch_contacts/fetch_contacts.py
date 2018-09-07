@@ -55,6 +55,9 @@ if __name__ == "__main__":
     contacts = rapid_pro.get_contacts().all(retry_on_rate_exceed=True)
     print("Fetched {} contacts ({}s)".format(len(contacts), time.time() - start))
 
+    # Filter out contacts with no contact information
+    contacts = [contact for contact in contacts if len(contact.urns) > 0]
+    
     # Convert contacts to TracedData
     traced_contacts = []
     for contact in contacts:
