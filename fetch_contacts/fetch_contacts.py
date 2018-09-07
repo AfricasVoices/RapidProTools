@@ -55,15 +55,14 @@ if __name__ == "__main__":
     contacts = rapid_pro.get_contacts().all(retry_on_rate_exceed=True)
     print("Fetched {} contacts ({}s)".format(len(contacts), time.time() - start))
 
-    # Filter out contacts with no contact information
-    contacts = [contact for contact in contacts if len(contact.urns) > 0]
-
     # Convert contacts to TracedData
     traced_contacts = []
     for contact in contacts:
-        if PhoneCleaner.normalise_phone(contact.urns[0]) == "":
-            print("Weird URN:")
-            print(contact.urns[0])
+        # Skip contacts with URNs that aren't a phone number or telegram, because the PhoneNumberUuidTable
+        # cannot handle these e.g. 'twitter'
+        urn_type = contact.urns[0].split(":")[0]
+        if urn_type != "tel" and urn_type != "telegram":
+            print("Warning: Skipping contact with unknown URN type '{}'".format(urn_type))
             continue
 
         contact_dict = dict()
@@ -78,8 +77,6 @@ if __name__ == "__main__":
             contact_dict,
             Metadata(user, Metadata.get_call_location(), time.time())
         ))
-
-    contacts = None
 
     # Write the UUIDs out to a file
     with open(phone_uuid_path, "w") as f:
