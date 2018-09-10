@@ -96,6 +96,10 @@ if __name__ == "__main__":
     # Convert the RapidPro run objects to TracedData.
     traced_runs = []
     for run in runs:
+        if run.contact.uuid not in contact_runs:
+            print("Warning: Run found with uuid '{}', but this id is not present in contacts".format(run.contact.uuid))
+            continue
+
         contact_urns = contact_runs[run.contact.uuid].urns
         # assert len(contact_urns) == 1, "Contact has multiple URNs" TODO: Re-enable once AVF test runs are ignored.
         run_dict = {"avf_phone_id": phone_uuids.add_phone(contact_urns[0])}
