@@ -97,6 +97,9 @@ if __name__ == "__main__":
     traced_runs = []
     for run in runs:
         if run.contact.uuid not in contact_runs:
+            # Sometimes contact uuids which appear in `runs` do not appear in `contact_runs`.
+            # I have only observed this happen for contacts which were created very recently.
+            # This test skips the run in this case; it should be included next time this script is executed.
             print("Warning: Run found with uuid '{}', but this id is not present in contacts".format(run.contact.uuid))
             continue
 
