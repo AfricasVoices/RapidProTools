@@ -104,6 +104,11 @@ if __name__ == "__main__":
             continue
 
         contact_urns = contact_runs[run.contact.uuid].urns
+        
+        if len(contact_urns) == 0:
+            print ("WARNING: ignoring contact with no urn. URNs: {}, UUID: {}".format(contact_urns, run.contact.uuid))
+            continue
+        
         # assert len(contact_urns) == 1, "Contact has multiple URNs" TODO: Re-enable once AVF test runs are ignored.
         run_dict = {"avf_phone_id": phone_uuids.add_phone(contact_urns[0])}
 
