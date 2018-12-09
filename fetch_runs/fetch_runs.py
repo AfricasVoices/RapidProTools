@@ -64,7 +64,7 @@ if __name__ == "__main__":
         flow_id = None
     else:
         flows = rapid_pro.get_flows().all(retry_on_rate_exceed=True)
-        matching_flows = [f for f in flows if f.name == flow_name]
+        matching_flows = [f for f in flows if f.name == flow_name and not f.archived]
 
         if len(matching_flows) == 0:
             raise KeyError("Requested flow not found on RapidPro (Available flows: {})".format(
@@ -149,7 +149,7 @@ if __name__ == "__main__":
     # Write the UUIDs out to a file
     with open(phone_uuid_path, "w") as f:
         phone_uuids.dump(f)
-
+        
     # Output TracedData to JSON.
     if os.path.dirname(json_output_path) is not "" and not os.path.exists(os.path.dirname(json_output_path)):
         os.makedirs(os.path.dirname(json_output_path))
