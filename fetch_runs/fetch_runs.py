@@ -1,12 +1,13 @@
 import argparse
+import datetime
 import json
 import os
-import pickle
 import time
 
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.traced_data.io import TracedDataJsonIO
 from core_data_modules.util import PhoneNumberUuidTable
+from dateutil.parser import isoparse
 from temba_client.v2 import TembaClient
 
 if __name__ == "__main__":
@@ -15,6 +16,12 @@ if __name__ == "__main__":
                         nargs="?", default="http://localhost:8000")
     parser.add_argument("--flow-name", help="Name of flow to filter on. If no name is provided, runs from all flows "
                                             "will be exported. ", nargs="?", default=None)
+    parser.add_argument("--range-start-inclusive", help="Only download runs last modified on this datetime or later. "
+                                                        "The date must be in ISO 8601 format.",
+                        nargs="?", default=None)
+    parser.add_argument("--range-end-exclusive", help="Only download runs last modified earlier than this datetime. "
+                                                      "The date must be in ISO 8601 format.",
+                        nargs="?", default=None)
     parser.add_argument("--test-contacts-path",
                         help="Path to a JSON file containing a list of Rapid Pro contact UUIDs. "
                              "Messages sent from one of this ids will have the key \"test_run\" set to True "
@@ -36,6 +43,8 @@ if __name__ == "__main__":
     server = args.server
     flow_name = args.flow_name
     test_contacts_path = args.test_contacts_path
+    range_start_inclusive = args.range_start_inclusive
+    range_end_exclusive = args.range_end_exclusive
     token = args.token
     user = args.user
     mode = args.mode
@@ -43,6 +52,11 @@ if __name__ == "__main__":
     json_output_path = args.json_output_path
 
     rapid_pro = TembaClient(server, token)
+
+    if range_start_inclusive is not None:
+        range_start_inclusive = isoparse(range_start_inclusive)
+    if range_end_exclusive is not None:
+        range_end_exclusive = isoparse(range_end_exclusive)
 
     # Load the existing phone number <-> UUID table.
     if not os.path.exists(phone_uuid_path):
@@ -77,7 +91,10 @@ if __name__ == "__main__":
     # Download all runs for the requested flow.
     print("Fetching runs...")
     start = time.time()
-    runs = rapid_pro.get_runs(flow=flow_id).all(retry_on_rate_exceed=True)
+    range_end_inclusive = None
+    if range_end_exclusive is not None:
+        range_end_inclusive = range_end_exclusive - datetime.timedelta(microseconds=1)
+    runs = rapid_pro.get_runs(flow=flow_id, after=range_start_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
     # IMPORTANT: The .all() approach may not scale to flows with some as yet unquantified "large" number of runs.
     # See http://rapidpro-python.readthedocs.io/en/latest/#fetching-objects for more details.
     print("Fetched {} runs ({}s)".format(len(runs), time.time() - start))

@@ -12,13 +12,13 @@ ADD Pipfile.lock /app
 ADD Pipfile /app
 RUN pipenv sync
 
-# Copy the rest of the project
-ADD fetch_runs.py /app
-
 # Make a directory for intermediate data
 RUN mkdir /data
 
+# Copy the rest of the project
+ADD fetch_runs.py /app
+
 # Environment variables need to be set when constructing this container e.g. via
 # docker run or docker container create. Use docker-run.sh to set these automatically.
-CMD pipenv run python -u fetch_runs.py --server "$SERVER" "$TOKEN" $FLOW_NAME \
+CMD pipenv run python -u fetch_runs.py --server "$SERVER" "$TOKEN" $FLOW_NAME $RANGE_START_INCLUSIVE $RANGE_END_EXCLUSIVE \
     $TEST_CONTACTS "$USER" "$MODE" /data/phone-uuid-table.json /data/output.json
