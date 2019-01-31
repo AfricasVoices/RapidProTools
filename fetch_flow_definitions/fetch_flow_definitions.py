@@ -39,7 +39,9 @@ if __name__ == "__main__":
     # Download the flow definition(s) from Rapid Pro
     print(f"Fetching definitions for {len(flow_ids)} flow(s)...")
     start = time.time()
-    definitions = rapid_pro.get_definitions(flows=flow_ids, dependencies="none")
+    # call with dependencies='all' to additionally retrieve flows (recursively) triggered by the requested flow,
+    # and the triggers for all exported flows.
+    definitions = rapid_pro.get_definitions(flows=flow_ids, dependencies="all")
     print(f"Fetched flow definitions ({time.time() - start}s)")
 
     with open(output_file_path, "w") as f:
