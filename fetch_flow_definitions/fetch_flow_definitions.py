@@ -28,10 +28,10 @@ if __name__ == "__main__":
         matching_flows = [f for f in flows if f.name == flow_name]
 
         if len(matching_flows) == 0:
-            raise KeyError("Requested flow not found on RapidPro (Available flows: {})".format(
-                           ",".join(list(map(lambda f: f.name, flows)))))
+            raise KeyError(f"Requested flow '{flow_name}' not found on RapidPro "
+                           f"(Available flows: {','.join([f.name for f in flows])})")
         if len(matching_flows) > 1:
-            raise KeyError("Non-unique flow name")
+            raise KeyError(f"Non-unique flow name: '{flow_name}'")
 
         flow_id = matching_flows[0].uuid
         flow_ids.append(flow_id)
