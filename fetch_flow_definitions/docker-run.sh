@@ -22,7 +22,6 @@ while [[ $# -gt 1 ]]; do
     shift 1
 done
 
-#FLOW_NAMES=(${@:3:$(($#-3))}) # All arguments but first 2 and last
 OUTPUT_JSON=$1
 
 # Build an image for this pipeline stage.
