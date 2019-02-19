@@ -126,8 +126,10 @@ if __name__ == "__main__":
             print("Warning: Ignoring contact with no urn. URNs: {}, UUID: {}".format(contact_urns, run.contact.uuid))
             continue
         
-        # assert len(contact_urns) == 1, "Contact has multiple URNs" TODO: Re-enable once AVF test runs are ignored.
-        run_dict = {"avf_phone_id": phone_uuids.add_phone(contact_urns[0])}
+        run_dict = {
+            "avf_phone_id": phone_uuids.add_phone(contact_urns[0]),
+            "run_id": run.id
+        }
 
         for category, response in run.values.items():
             run_dict[category.title() + " (Category) - " + run.flow.name] = response.category
