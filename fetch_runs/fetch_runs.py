@@ -123,8 +123,8 @@ if __name__ == "__main__":
         contact_urns = contact_runs[run.contact.uuid].urns
         
         if len(contact_urns) == 0:
-            print(f"Warning: Ignoring contact with no urn. URNs: {contact_urns}, "
-                  f"Rapid Pro Contact UUID: {run.contact.uuid}")
+            print(f"Warning: Ignoring contact with no urn. URNs: {contact_urns} "
+                  f"(Rapid Pro Contact UUID: {run.contact.uuid})")
             continue
         
         run_dict = {
