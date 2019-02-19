@@ -82,7 +82,7 @@ if __name__ == "__main__":
 
         if len(matching_flows) == 0:
             raise KeyError("Requested flow not found on RapidPro (Available flows: {})".format(
-                           ",".join(list(map(lambda f: f.name, flows)))))
+                           ", ".join(list(map(lambda f: f.name, flows)))))
         if len(matching_flows) > 1:
             raise KeyError("Non-unique flow name")
 
