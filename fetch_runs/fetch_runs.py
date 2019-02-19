@@ -143,6 +143,9 @@ if __name__ == "__main__":
 
         if run.contact.uuid in test_contacts:
             run_dict["test_run"] = True
+        else:
+            assert len(contact_urns) == 1, \
+                f"A non-test contact has multiple URNs (Rapid Pro Contact UUID: {run.contact.uuid})"
 
         if mode == "all":
             run_dict["created_on"] = run.created_on.isoformat()
