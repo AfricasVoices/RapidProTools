@@ -130,7 +130,7 @@ if __name__ == "__main__":
         
         run_dict = {
             "avf_phone_id": phone_uuids.add_phone(contact_urns[0]),
-            "run_id": run.id
+            f"run_id - {run.flow.name}": run.id
         }
 
         for category, response in run.values.items():
