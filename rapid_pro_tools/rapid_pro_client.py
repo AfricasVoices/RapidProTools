@@ -51,19 +51,24 @@ class RapidProClient(object):
         if range_end_exclusive is not None:
             range_end_inclusive = range_end_exclusive - datetime.timedelta(microseconds=1)
             
-        print("Fetching all raw contacts...")
+        print("Fetching raw contacts...")
         raw_contacts = self.rapid_pro.get_contacts(
             after=range_start_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
         assert len(set(c.uuid for c in raw_contacts)) == len(raw_contacts), "Non-unique contact UUID in RapidPro"
         print(f"Fetched {len(raw_contacts)} contacts")
+        
+        # Sort in ascending order of modification date
+        raw_contacts = list(raw_contacts)
+        raw_contacts.reverse()
+        
         return raw_contacts
 
     @staticmethod
     def filter_latest_raw_contacts(raw_contacts):
-        raw_contacts.sort(key=lambda contact: isoparse(contact["modified_on"]))
+        raw_contacts.sort(key=lambda contact: isoparse(contact.modified_on))
         contacts_lut = dict()
         for contact in raw_contacts:
-            contacts_lut[contact["uuid"]] = contact
+            contacts_lut[contact.uuid] = contact
         return contacts_lut.values()
 
     @staticmethod
