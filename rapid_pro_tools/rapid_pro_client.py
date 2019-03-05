@@ -2,6 +2,7 @@ import datetime
 
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils
+from dateutil.parser import isoparse
 from temba_client.v2 import TembaClient
 
 
@@ -43,12 +44,27 @@ class RapidProClient(object):
 
         return raw_runs
 
-    def get_raw_contacts(self):
+    def get_raw_contacts(self, range_start_inclusive=None, range_end_exclusive=None):
+        # TODO: This implementation assumes the same after/before semantics as fetch_runs.
+        #       Need to test this properly.
+        range_end_inclusive = None
+        if range_end_exclusive is not None:
+            range_end_inclusive = range_end_exclusive - datetime.timedelta(microseconds=1)
+            
         print("Fetching all raw contacts...")
-        raw_contacts = self.rapid_pro.get_contacts().all(retry_on_rate_exceed=True)
+        raw_contacts = self.rapid_pro.get_contacts(
+            after=range_start_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
         assert len(set(c.uuid for c in raw_contacts)) == len(raw_contacts), "Non-unique contact UUID in RapidPro"
         print(f"Fetched {len(raw_contacts)} contacts")
         return raw_contacts
+
+    @staticmethod
+    def filter_latest_raw_contacts(raw_contacts):
+        raw_contacts.sort(key=lambda contact: isoparse(contact["modified_on"]))
+        contacts_lut = dict()
+        for contact in raw_contacts:
+            contacts_lut[contact["uuid"]] = contact
+        return contacts_lut.values()
 
     @staticmethod
     def convert_runs_to_traced_data(user, raw_runs, raw_contacts, phone_uuids, test_contacts=None):
