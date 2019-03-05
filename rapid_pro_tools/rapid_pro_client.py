@@ -2,7 +2,6 @@ import datetime
 
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils
-from dateutil.parser import isoparse
 from temba_client.v2 import TembaClient
 
 
@@ -62,10 +61,16 @@ class RapidProClient(object):
         raw_contacts.reverse()
         
         return raw_contacts
+    
+    def something_raw_contacts(self, prev_raw_contacts=None):
+        if prev_raw_contacts is None or len(prev_raw_contacts) == 0:
+            pass
+        else:
+            pass
 
     @staticmethod
     def filter_latest_raw_contacts(raw_contacts):
-        raw_contacts.sort(key=lambda contact: isoparse(contact.modified_on))
+        raw_contacts.sort(key=lambda contact: contact.modified_on)
         contacts_lut = dict()
         for contact in raw_contacts:
             contacts_lut[contact.uuid] = contact
