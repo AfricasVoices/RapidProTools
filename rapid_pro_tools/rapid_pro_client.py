@@ -32,7 +32,7 @@ class RapidProClient(object):
         if range_end_exclusive is not None:
             range_end_inclusive = range_end_exclusive - datetime.timedelta(microseconds=1)
 
-        print(f"Fetching raw runs for flow with id {flow_id}...")
+        print(f"Fetching raw runs for flow with id '{flow_id}'...")
         raw_runs = self.rapid_pro.get_runs(
             flow=flow_id, after=range_start_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
         print(f"Fetched {len(raw_runs)} runs")
@@ -44,7 +44,7 @@ class RapidProClient(object):
         return raw_runs
 
     def get_raw_contacts(self):
-        print("Fetching raw contacts...")
+        print("Fetching all raw contacts...")
         raw_contacts = self.rapid_pro.get_contacts().all(retry_on_rate_exceed=True)
         assert len(set(c.uuid for c in raw_contacts)) == len(raw_contacts), "Non-unique contact UUID in RapidPro"
         print(f"Fetched {len(raw_contacts)} contacts")
@@ -97,10 +97,10 @@ class RapidProClient(object):
                 assert len(contact_urns) == 1, \
                     f"A non-test contact has multiple URNs (Rapid Pro Contact UUID: {run.contact.uuid})"
 
-            run_dict[f"created_on - {run.flow.name}"] = run.created_on.isoformat()
-            run_dict[f"modified_on - {run.flow.name}"] = run.modified_on.isoformat()
-            run_dict[f"exited_on - {run.flow.name}"] = None if run.exited_on is None else run.exited_on.isoformat()
-            run_dict[f"exit_type - {run.flow.name}"] = run.exit_type
+            # run_dict[f"created_on - {run.flow.name}"] = run.created_on.isoformat()
+            # run_dict[f"modified_on - {run.flow.name}"] = run.modified_on.isoformat()
+            # run_dict[f"exited_on - {run.flow.name}"] = None if run.exited_on is None else run.exited_on.isoformat()
+            # run_dict[f"exit_type - {run.flow.name}"] = run.exit_type
 
             traced_runs.append(
                 TracedData(run_dict, Metadata(user, Metadata.get_call_location(), TimeUtils.utc_now_as_iso_string())))
