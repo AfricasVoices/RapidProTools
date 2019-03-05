@@ -50,15 +50,11 @@ class RapidProClient(object):
         print(f"Fetched {len(raw_contacts)} contacts")
         return raw_contacts
 
-    def get_traced_runs_for_flow_id(self, user, flow_id, phone_uuids,
-                                    range_start_inclusive=None, range_end_exclusive=None,
-                                    test_contacts=None):
+    @staticmethod
+    def convert_runs_to_traced_data(user, raw_runs, raw_contacts, phone_uuids, test_contacts=None):
         if test_contacts is None:
             test_contacts = []
 
-        raw_runs = self.get_raw_runs_for_flow_id(flow_id, range_start_inclusive, range_end_exclusive)
-        raw_contacts = self.get_raw_contacts()
-        
         contacts_lut = {c.uuid: c for c in raw_contacts}
 
         traced_runs = []
@@ -107,7 +103,8 @@ class RapidProClient(object):
 
         return traced_runs
 
-    def coalesce_traced_runs_by_key(self, user, traced_runs, coalesce_key):
+    @staticmethod
+    def coalesce_traced_runs_by_key(user, traced_runs, coalesce_key):
         coalesced_runs = dict()
 
         for run in traced_runs:
