@@ -44,8 +44,6 @@ class RapidProClient(object):
         return raw_runs
 
     def get_raw_contacts(self, range_start_inclusive=None, range_end_exclusive=None):
-        # TODO: This implementation assumes the same after/before semantics as fetch_runs.
-        #       Need to test this properly.
         range_end_inclusive = None
         if range_end_exclusive is not None:
             range_end_inclusive = range_end_exclusive - datetime.timedelta(microseconds=1)
