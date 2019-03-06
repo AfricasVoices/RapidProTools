@@ -61,12 +61,6 @@ class RapidProClient(object):
         raw_contacts.reverse()
         
         return raw_contacts
-    
-    def something_raw_contacts(self, prev_raw_contacts=None):
-        if prev_raw_contacts is None or len(prev_raw_contacts) == 0:
-            pass
-        else:
-            pass
 
     @staticmethod
     def filter_latest_raw_contacts(raw_contacts):
@@ -75,6 +69,17 @@ class RapidProClient(object):
         for contact in raw_contacts:
             contacts_lut[contact.uuid] = contact
         return list(contacts_lut.values())
+    
+    def get_modified_raw_contacts(self, prev_raw_contacts=None):
+        range_start_inclusive = None
+        if prev_raw_contacts is not None and len(prev_raw_contacts) > 0:
+            prev_raw_contacts.sort(key=lambda contact: contact.modified_on)
+            range_start_inclusive = prev_raw_contacts[-1].modified_on + datetime.timedelta(microseconds=1)
+
+        all_raw_contacts = prev_raw_contacts
+        all_raw_contacts.extend(self.get_raw_contacts(range_start_inclusive=range_start_inclusive))
+        
+        return self.filter_latest_raw_contacts(all_raw_contacts)
 
     @staticmethod
     def convert_runs_to_traced_data(user, raw_runs, raw_contacts, phone_uuids, test_contacts=None):
