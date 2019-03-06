@@ -74,7 +74,7 @@ class RapidProClient(object):
         contacts_lut = dict()
         for contact in raw_contacts:
             contacts_lut[contact.uuid] = contact
-        return contacts_lut.values()
+        return list(contacts_lut.values())
 
     @staticmethod
     def convert_runs_to_traced_data(user, raw_runs, raw_contacts, phone_uuids, test_contacts=None):
