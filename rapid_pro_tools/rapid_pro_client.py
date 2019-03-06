@@ -68,7 +68,17 @@ class RapidProClient(object):
             contacts_lut[contact.uuid] = contact
         return list(contacts_lut.values())
     
-    def get_modified_raw_contacts(self, prev_raw_contacts=None):
+    def update_raw_contacts_with_latest_modified(self, prev_raw_contacts=None):
+        """
+        Updates a list of contacts previously downloaded from Rapid Pro, by only fetching contacts which have been 
+        updated since that previous export was performed.
+        
+        :param prev_raw_contacts: A list of Rapid Pro contact objects from a previous export, or None.
+                                  If None, all contacts will be downloaded.
+        :type prev_raw_contacts: list of temba_client.v2.types.Contact | None
+        :return: Updated list of Rapid Pro Contact objects.
+        :rtype: list of temba_client.v2.types.Contact
+        """
         range_start_inclusive = None
         if prev_raw_contacts is not None and len(prev_raw_contacts) > 0:
             prev_raw_contacts.sort(key=lambda contact: contact.modified_on)
