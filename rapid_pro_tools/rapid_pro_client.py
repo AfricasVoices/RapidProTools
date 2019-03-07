@@ -56,8 +56,12 @@ class RapidProClient(object):
         print(f"Fetched {len(raw_contacts)} contacts")
 
         if raw_export_log is not None:
+            print(f"Logging {len(raw_contacts)} fetched contacts...")
             json.dump([contact.serialize() for contact in raw_contacts], raw_export_log)
             raw_export_log.write("\n")
+            print(f"Logged fetched contacts")
+        else:
+            print("Not logging the raw export")
 
         # Sort in ascending order of modification date
         raw_contacts = list(raw_contacts)
