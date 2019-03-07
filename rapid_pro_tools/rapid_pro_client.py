@@ -81,6 +81,8 @@ class RapidProClient(object):
         :return: Updated list of Rapid Pro Contact objects.
         :rtype: list of temba_client.v2.types.Contact
         """
+        prev_raw_contacts = list(prev_raw_contacts)
+
         range_start_inclusive = None
         if prev_raw_contacts is not None and len(prev_raw_contacts) > 0:
             prev_raw_contacts.sort(key=lambda contact: contact.modified_on)
