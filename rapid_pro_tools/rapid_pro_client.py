@@ -1,4 +1,5 @@
 import datetime
+import json
 
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils
@@ -43,7 +44,7 @@ class RapidProClient(object):
 
         return raw_runs
 
-    def get_raw_contacts(self, range_start_inclusive=None, range_end_exclusive=None):
+    def get_raw_contacts(self, range_start_inclusive=None, range_end_exclusive=None, raw_export_log=None):
         range_end_inclusive = None
         if range_end_exclusive is not None:
             range_end_inclusive = range_end_exclusive - datetime.timedelta(microseconds=1)
@@ -53,7 +54,11 @@ class RapidProClient(object):
             after=range_start_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
         assert len(set(c.uuid for c in raw_contacts)) == len(raw_contacts), "Non-unique contact UUID in RapidPro"
         print(f"Fetched {len(raw_contacts)} contacts")
-        
+
+        if raw_export_log is not None:
+            json.dump([contact.serialize() for contact in raw_contacts], raw_export_log)
+            raw_export_log.write("\n")
+
         # Sort in ascending order of modification date
         raw_contacts = list(raw_contacts)
         raw_contacts.reverse()
@@ -70,7 +75,7 @@ class RapidProClient(object):
         print(f"Filtered contacts for the latest objects. {len(latest_contacts)}/{len(raw_contacts)} contacts remain.")
         return latest_contacts
     
-    def update_raw_contacts_with_latest_modified(self, prev_raw_contacts=None):
+    def update_raw_contacts_with_latest_modified(self, prev_raw_contacts=None, raw_export_log=None):
         """
         Updates a list of contacts previously downloaded from Rapid Pro, by only fetching contacts which have been 
         updated since that previous export was performed.
@@ -78,6 +83,8 @@ class RapidProClient(object):
         :param prev_raw_contacts: A list of Rapid Pro contact objects from a previous export, or None.
                                   If None, all contacts will be downloaded.
         :type prev_raw_contacts: list of temba_client.v2.types.Contact | None
+        :param raw_export_log: File to write the newly retrieved contacts to
+        :type raw_export_log: file-like | None
         :return: Updated list of Rapid Pro Contact objects.
         :rtype: list of temba_client.v2.types.Contact
         """
@@ -88,9 +95,11 @@ class RapidProClient(object):
             prev_raw_contacts.sort(key=lambda contact: contact.modified_on)
             range_start_inclusive = prev_raw_contacts[-1].modified_on + datetime.timedelta(microseconds=1)
 
+        new_contacts = self.get_raw_contacts(
+            range_start_inclusive=range_start_inclusive, raw_export_log=raw_export_log)
+
         all_raw_contacts = prev_raw_contacts
-        all_raw_contacts.extend(self.get_raw_contacts(range_start_inclusive=range_start_inclusive))
-        
+        all_raw_contacts.extend(new_contacts)
         return self.filter_latest_raw_contacts(all_raw_contacts)
 
     @staticmethod
