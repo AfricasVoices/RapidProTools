@@ -28,7 +28,8 @@ class RapidProClient(object):
     def get_flow_definitions_for_flow_ids(self, flow_ids):
         return self.rapid_pro.get_definitions(flows=flow_ids, dependencies="all")
 
-    def get_raw_runs_for_flow_id(self, flow_id, range_start_inclusive=None, range_end_exclusive=None):
+    def get_raw_runs_for_flow_id(self, flow_id, range_start_inclusive=None, range_end_exclusive=None,
+                                 raw_export_log=None):
         range_end_inclusive = None
         if range_end_exclusive is not None:
             range_end_inclusive = range_end_exclusive - datetime.timedelta(microseconds=1)
@@ -37,6 +38,14 @@ class RapidProClient(object):
         raw_runs = self.rapid_pro.get_runs(
             flow=flow_id, after=range_start_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
         print(f"Fetched {len(raw_runs)} runs")
+
+        if raw_export_log is not None:
+            print(f"Logging {len(raw_runs)} fetched runs...")
+            json.dump([contact.serialize() for contact in raw_runs], raw_export_log)
+            raw_export_log.write("\n")
+            print(f"Logged fetched contacts")
+        else:
+            print("Not logging the raw export")
 
         # Sort in ascending order of modification date
         raw_runs = list(raw_runs)
