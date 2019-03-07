@@ -82,7 +82,7 @@ if __name__ == "__main__":
 
         if len(matching_flows) == 0:
             raise KeyError("Requested flow not found on RapidPro (Available flows: {})".format(
-                           ",".join(list(map(lambda f: f.name, flows)))))
+                           ", ".join(list(map(lambda f: f.name, flows)))))
         if len(matching_flows) > 1:
             raise KeyError("Non-unique flow name")
 
@@ -117,17 +117,21 @@ if __name__ == "__main__":
             # Sometimes contact uuids which appear in `runs` do not appear in `contact_runs`.
             # I have only observed this happen for contacts which were created very recently.
             # This test skips the run in this case; it should be included next time this script is executed.
-            print("Warning: Run found with uuid '{}', but this id is not present in contacts".format(run.contact.uuid))
+            print(f"Warning: Run found with Rapid Pro Contact UUID '{run.contact.uuid}', "
+                  f"but this id is not present in the downloaded contacts")
             continue
 
         contact_urns = contact_runs[run.contact.uuid].urns
         
         if len(contact_urns) == 0:
-            print("Warning: Ignoring contact with no urn. URNs: {}, UUID: {}".format(contact_urns, run.contact.uuid))
+            print(f"Warning: Ignoring contact with no urn. URNs: {contact_urns} "
+                  f"(Rapid Pro Contact UUID: {run.contact.uuid})")
             continue
         
-        # assert len(contact_urns) == 1, "Contact has multiple URNs" TODO: Re-enable once AVF test runs are ignored.
-        run_dict = {"avf_phone_id": phone_uuids.add_phone(contact_urns[0])}
+        run_dict = {
+            "avf_phone_id": phone_uuids.add_phone(contact_urns[0]),
+            f"run_id - {run.flow.name}": run.id
+        }
 
         for category, response in run.values.items():
             run_dict[category.title() + " (Category) - " + run.flow.name] = response.category
@@ -140,6 +144,9 @@ if __name__ == "__main__":
 
         if run.contact.uuid in test_contacts:
             run_dict["test_run"] = True
+        else:
+            assert len(contact_urns) == 1, \
+                f"A non-test contact has multiple URNs (Rapid Pro Contact UUID: {run.contact.uuid})"
 
         if mode == "all":
             run_dict["created_on"] = run.created_on.isoformat()
