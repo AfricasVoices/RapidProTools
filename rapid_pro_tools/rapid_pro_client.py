@@ -98,8 +98,7 @@ class RapidProClient(object):
 
         new_data = get_fn(range_start_inclusive=range_start_inclusive, raw_export_log=raw_export_log)
 
-        all_raw_data = prev_raw_data
-        all_raw_data.extend(new_data)
+        all_raw_data = prev_raw_data + new_data
         return self.filter_latest(all_raw_data, filter_latest_key)
     
     def update_raw_contacts_with_latest_modified(self, prev_raw_contacts=None, raw_export_log=None):
