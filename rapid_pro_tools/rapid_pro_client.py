@@ -120,9 +120,9 @@ class RapidProClient(object):
             prev_raw_data=prev_raw_contacts, raw_export_log=raw_export_log
         )
     
-    def update_raw_runs_with_latest_modified(self, prev_raw_runs=None, raw_export_log=None):
+    def update_raw_runs_with_latest_modified(self, flow_id, prev_raw_runs=None, raw_export_log=None):
         return self.update_raw_data_with_latest_modified(
-            self.get_raw_contacts, lambda run: run.id,
+            lambda **kwargs: self.get_raw_runs_for_flow_id(flow_id, kwargs), lambda run: run.id,
             prev_raw_data=prev_raw_runs, raw_export_log=raw_export_log
         )
 
