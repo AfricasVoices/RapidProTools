@@ -79,14 +79,28 @@ class RapidProClient(object):
         return raw_contacts
 
     @staticmethod
-    def filter_latest_raw_contacts(raw_contacts):
-        raw_contacts.sort(key=lambda contact: contact.modified_on)
-        contacts_lut = dict()
-        for contact in raw_contacts:
-            contacts_lut[contact.uuid] = contact
-        latest_contacts = list(contacts_lut.values())
-        print(f"Filtered contacts for the latest objects. {len(latest_contacts)}/{len(raw_contacts)} contacts remain.")
-        return latest_contacts
+    def filter_latest(raw_data, key):
+        raw_data.sort(key=lambda contact: contact.modified_on)
+        data_lut = dict()
+        for x in raw_data:
+            data_lut[key(x)] = x
+        latest_data = list(data_lut.values())
+        print(f"Filtering raw data for the latest objects. {len(latest_data)}/{len(raw_data)} items remain.")
+        return latest_data
+
+    def update_raw_data_with_latest_modified(self, get_fn, filter_latest_key, prev_raw_data=None, raw_export_log=None):
+        prev_raw_data = list(prev_raw_data)
+
+        range_start_inclusive = None
+        if prev_raw_data is not None and len(prev_raw_data) > 0:
+            prev_raw_data.sort(key=lambda contact: contact.modified_on)
+            range_start_inclusive = prev_raw_data[-1].modified_on + datetime.timedelta(microseconds=1)
+
+        new_data = get_fn(range_start_inclusive=range_start_inclusive, raw_export_log=raw_export_log)
+
+        all_raw_data = prev_raw_data
+        all_raw_data.extend(new_data)
+        return self.filter_latest(all_raw_data, filter_latest_key)
     
     def update_raw_contacts_with_latest_modified(self, prev_raw_contacts=None, raw_export_log=None):
         """
@@ -101,19 +115,16 @@ class RapidProClient(object):
         :return: Updated list of Rapid Pro Contact objects.
         :rtype: list of temba_client.v2.types.Contact
         """
-        prev_raw_contacts = list(prev_raw_contacts)
-
-        range_start_inclusive = None
-        if prev_raw_contacts is not None and len(prev_raw_contacts) > 0:
-            prev_raw_contacts.sort(key=lambda contact: contact.modified_on)
-            range_start_inclusive = prev_raw_contacts[-1].modified_on + datetime.timedelta(microseconds=1)
-
-        new_contacts = self.get_raw_contacts(
-            range_start_inclusive=range_start_inclusive, raw_export_log=raw_export_log)
-
-        all_raw_contacts = prev_raw_contacts
-        all_raw_contacts.extend(new_contacts)
-        return self.filter_latest_raw_contacts(all_raw_contacts)
+        return self.update_raw_data_with_latest_modified(
+            self.get_raw_contacts, lambda contact: contact.uuid,
+            prev_raw_data=prev_raw_contacts, raw_export_log=raw_export_log
+        )
+    
+    def update_raw_runs_with_latest_modified(self, prev_raw_runs=None, raw_export_log=None):
+        return self.update_raw_data_with_latest_modified(
+            self.get_raw_contacts, lambda run: run.id,
+            prev_raw_data=prev_raw_runs, raw_export_log=raw_export_log
+        )
 
     @staticmethod
     def convert_runs_to_traced_data(user, raw_runs, raw_contacts, phone_uuids, test_contacts=None):
