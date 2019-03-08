@@ -85,7 +85,7 @@ class RapidProClient(object):
         for x in raw_data:
             data_lut[key(x)] = x
         latest_data = list(data_lut.values())
-        print(f"Filtering raw data for the latest objects. {len(latest_data)}/{len(raw_data)} items remain.")
+        print(f"Filtered raw data for the latest objects. {len(latest_data)}/{len(raw_data)} items remain.")
         return latest_data
 
     def update_raw_data_with_latest_modified(self, get_fn, filter_latest_key, prev_raw_data=None, raw_export_log=None):
