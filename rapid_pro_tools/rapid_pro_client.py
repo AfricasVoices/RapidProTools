@@ -233,7 +233,7 @@ class RapidProClient(object):
         if test_contacts is None:
             test_contacts = []
 
-        print(f"Converting {len(raw_runs)} raw runs to TracedData")
+        print(f"Converting {len(raw_runs)} raw runs to TracedData...")
 
         contacts_lut = {c.uuid: c for c in raw_contacts}
 
