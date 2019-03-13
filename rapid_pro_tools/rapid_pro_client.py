@@ -230,6 +230,23 @@ class RapidProClient(object):
 
     @staticmethod
     def convert_runs_to_traced_data(user, raw_runs, raw_contacts, phone_uuids, test_contacts=None):
+        """
+        Converts raw data fetched from Rapid Pro to TracedData.
+        
+        :param user: Identifier of the user running this program, for TracedData Metadata.
+        :type user: str
+        :param raw_runs: Raw run objects to convert to TracedData.
+        :type raw_runs: list of temba_client.v2.types.Run
+        :param raw_contacts: Raw contact objects to use when converting to TracedData.
+        :type raw_contacts: list of temba_client.v2.types.Contact
+        :param phone_uuids: Phone number <-> UUID table.
+        :type phone_uuids: core_data_modules.util.PhoneNumberUuidTable
+        :param test_contacts: Rapid Pro contact UUIDs of test contacts.
+                              Runs from any of those test contacts will be tagged with {'test_run': True}
+        :type test_contacts: list of str | None
+        :return: Raw data fetched from Rapid Pro converted to TracedData.
+        :rtype: list of TracedData
+        """
         if test_contacts is None:
             test_contacts = []
 
