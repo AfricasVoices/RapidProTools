@@ -280,16 +280,3 @@ class RapidProClient(object):
                 TracedData(run_dict, Metadata(user, Metadata.get_call_location(), TimeUtils.utc_now_as_iso_string())))
 
         return traced_runs
-
-    @staticmethod
-    def coalesce_traced_runs_by_key(user, traced_runs, coalesce_key):
-        coalesced_runs = dict()
-
-        for run in traced_runs:
-            if run[coalesce_key] not in coalesced_runs:
-                coalesced_runs[run[coalesce_key]] = run
-            else:
-                coalesced_runs[run[coalesce_key]].append_data(
-                    dict(run.items()), Metadata(user, Metadata.get_call_location(), TimeUtils.utc_now_as_iso_string()))
-
-        return list(coalesced_runs.values())
