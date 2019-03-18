@@ -290,10 +290,10 @@ class RapidProClient(object):
                 assert len(contact_urns) == 1, \
                     f"A non-test contact has multiple URNs (Rapid Pro Contact UUID: {run.contact.uuid})"
 
-            run_dict[f"created_on - {run.flow.name}"] = run.created_on.isoformat()
-            run_dict[f"modified_on - {run.flow.name}"] = run.modified_on.isoformat()
-            run_dict[f"exited_on - {run.flow.name}"] = None if run.exited_on is None else run.exited_on.isoformat()
-            run_dict[f"exit_type - {run.flow.name}"] = run.exit_type
+            run_dict[f"run_created_on - {run.flow.name}"] = run.created_on.isoformat()
+            run_dict[f"run_modified_on - {run.flow.name}"] = run.modified_on.isoformat()
+            run_dict[f"run_exited_on - {run.flow.name}"] = None if run.exited_on is None else run.exited_on.isoformat()
+            run_dict[f"run_exit_type - {run.flow.name}"] = run.exit_type
 
             traced_runs.append(
                 TracedData(run_dict, Metadata(user, Metadata.get_call_location(), TimeUtils.utc_now_as_iso_string())))
