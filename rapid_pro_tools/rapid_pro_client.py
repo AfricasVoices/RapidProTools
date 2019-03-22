@@ -19,7 +19,7 @@ class RapidProClient(object):
     def get_flow_id(self, flow_name):
         """
         Gets the id for the flow with the requested name.
-        
+
         :param flow_name: Name of flow to retrieve the id of.
         :type flow_name: str
         :return: The Rapid Pro id for the given flow name.
@@ -62,7 +62,7 @@ class RapidProClient(object):
                                  raw_export_log=None):
         """
         Gets the raw runs for the given flow_id from RapidPro.
-        
+
         :param flow_id: Id of the flow to download the runs of.
         :type flow_id: str
         :param range_start_inclusive: Start of the date-range to download runs from. If set, only downloads runs
@@ -75,13 +75,18 @@ class RapidProClient(object):
         :return: Raw runs downloaded from Rapid Pro.
         :rtype: list of temba_client.v2.types.Run
         """
+        all_time_log = "" if range_start_inclusive is not None or range_end_exclusive is not None else ", from all of time"
+        after_log = "" if range_start_inclusive is None else f", modified after {range_start_inclusive.isoformat()} inclusive"
+        before_log = "" if range_end_exclusive is None else f", modified before {range_end_exclusive.isoformat()} exclusive"
+        print(f"Fetching raw runs for flow with id '{flow_id}'{all_time_log}{after_log}{before_log}...")
+
         range_end_inclusive = None
         if range_end_exclusive is not None:
             range_end_inclusive = range_end_exclusive - datetime.timedelta(microseconds=1)
 
-        print(f"Fetching raw runs for flow with id '{flow_id}'...")
         raw_runs = self.rapid_pro.get_runs(
             flow=flow_id, after=range_start_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
+
         print(f"Fetched {len(raw_runs)} runs")
 
         if raw_export_log is not None:
@@ -101,7 +106,7 @@ class RapidProClient(object):
     def get_raw_contacts(self, range_start_inclusive=None, range_end_exclusive=None, raw_export_log=None):
         """
         Gets the raw contacts from RapidPro.
-        
+
         :param range_start_inclusive: Start of the date-range to download contacts from. If set, only downloads contacts
                                       last modified since that date, otherwise downloads from the beginning of time.
         :type range_start_inclusive: datetime.pyi | None
@@ -113,14 +118,19 @@ class RapidProClient(object):
         :return: Raw contacts downloaded from Rapid Pro.
         :rtype: list of temba_client.v2.types.Contact
         """
+        all_time_log = "" if range_start_inclusive is not None or range_end_exclusive is not None else " from all of time"
+        after_log = "" if range_start_inclusive is None else f", modified after {range_start_inclusive.isoformat()} inclusive"
+        before_log = "" if range_end_exclusive is None else f", modified before {range_end_exclusive.isoformat()} exclusive"
+        print(f"Fetching raw contacts{all_time_log}{after_log}{before_log}...")
+
         range_end_inclusive = None
         if range_end_exclusive is not None:
             range_end_inclusive = range_end_exclusive - datetime.timedelta(microseconds=1)
-            
-        print("Fetching raw contacts...")
+
         raw_contacts = self.rapid_pro.get_contacts(
             after=range_start_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
         assert len(set(c.uuid for c in raw_contacts)) == len(raw_contacts), "Non-unique contact UUID in RapidPro"
+
         print(f"Fetched {len(raw_contacts)} contacts")
 
         if raw_export_log is not None:
@@ -141,7 +151,7 @@ class RapidProClient(object):
     def filter_latest(raw_data, id_key):
         """
         Filters raw data for the latest version of each object only.
-        
+
         :param raw_data: Raw data to filter.
         :type raw_data: list of temba_client.serialization.TembaObject
         :param id_key: A function that returns an id for each object. Where multiple objects are found with the same id,
@@ -155,12 +165,12 @@ class RapidProClient(object):
         for x in raw_data:
             data_lut[id_key(x)] = x
         latest_data = list(data_lut.values())
-        print(f"Filtered raw data for the latest objects. {len(latest_data)}/{len(raw_data)} items remain.")
+        print(f"Filtered raw data for the latest objects.Returning {len(latest_data)}/{len(raw_data)} items.")
         return latest_data
 
     def update_raw_data_with_latest_modified(self, get_fn, id_key, prev_raw_data=None, raw_export_log=None):
         """
-        Updates a list of raw objects downloaded from Rapid Pro, by only downloading objects which have been 
+        Updates a list of raw objects downloaded from Rapid Pro, by only downloading objects which have been
         updated since that previous export was performed.
 
         :param get_fn: Function to call to retrieve the newer objects.
@@ -171,7 +181,7 @@ class RapidProClient(object):
         :param prev_raw_data: List of Rapid Pro objects from a previous export, or None.
                               If None, all objects will be downloaded.
         :type prev_raw_data: list of temba_client.serialization.TembaObject | None
-        :param raw_export_log: File to write raw data fetched during the export to. 
+        :param raw_export_log: File to write raw data fetched during the export to.
                                Data is written in the format it came out of Rapid Pro.
         :type raw_export_log: file-like
         :return: Updated list of Rapid Pro objects.
@@ -207,7 +217,7 @@ class RapidProClient(object):
             self.get_raw_contacts, lambda contact: contact.uuid,
             prev_raw_data=prev_raw_contacts, raw_export_log=raw_export_log
         )
-    
+
     def update_raw_runs_with_latest_modified(self, flow_id, prev_raw_runs=None, raw_export_log=None):
         """
         Updates a list of runs previously downloaded from Rapid Pro, by only fetching runs which have been
@@ -232,7 +242,7 @@ class RapidProClient(object):
     def convert_runs_to_traced_data(user, raw_runs, raw_contacts, phone_uuids, test_contacts=None):
         """
         Converts raw data fetched from Rapid Pro to TracedData.
-        
+
         :param user: Identifier of the user running this program, for TracedData Metadata.
         :type user: str
         :param raw_runs: Raw run objects to convert to TracedData.
