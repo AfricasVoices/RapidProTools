@@ -28,13 +28,17 @@ class RapidProClient(object):
         return self.rapid_pro.get_definitions(flows=flow_ids, dependencies="all")
 
     def get_raw_runs_for_flow_id(self, flow_id, range_start_inclusive=None, range_end_exclusive=None):
+        after_log = "" if range_start_inclusive is None else f", after {range_start_inclusive.isoformat()} inclusive"
+        before_log = "" if range_end_exclusive is None else f", before {range_end_exclusive.isoformat()} exclusive"
+        print(f"Fetching raw runs for flow with id '{flow_id}'{after_log}{before_log}...")
+
         range_end_inclusive = None
         if range_end_exclusive is not None:
             range_end_inclusive = range_end_exclusive - datetime.timedelta(microseconds=1)
 
-        print(f"Fetching raw runs for flow with id '{flow_id}'...")
         raw_runs = self.rapid_pro.get_runs(
             flow=flow_id, after=range_start_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
+
         print(f"Fetched {len(raw_runs)} runs")
 
         # Sort in ascending order of modification date
@@ -44,14 +48,18 @@ class RapidProClient(object):
         return raw_runs
 
     def get_raw_contacts(self, range_start_inclusive=None, range_end_exclusive=None):
+        after_log = "" if range_start_inclusive is None else f", after {range_start_inclusive.isoformat()} inclusive"
+        before_log = "" if range_end_exclusive is None else f", before {range_end_exclusive.isoformat()} exclusive"
+        print(f"Fetching raw contacts{after_log}{before_log}...")
+        
         range_end_inclusive = None
         if range_end_exclusive is not None:
             range_end_inclusive = range_end_exclusive - datetime.timedelta(microseconds=1)
-            
-        print("Fetching raw contacts...")
+
         raw_contacts = self.rapid_pro.get_contacts(
             after=range_start_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
         assert len(set(c.uuid for c in raw_contacts)) == len(raw_contacts), "Non-unique contact UUID in RapidPro"
+
         print(f"Fetched {len(raw_contacts)} contacts")
         
         # Sort in ascending order of modification date
