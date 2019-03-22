@@ -28,9 +28,10 @@ class RapidProClient(object):
         return self.rapid_pro.get_definitions(flows=flow_ids, dependencies="all")
 
     def get_raw_runs_for_flow_id(self, flow_id, range_start_inclusive=None, range_end_exclusive=None):
+        all_time_log = "" if range_start_inclusive is not None or range_end_exclusive is not None else " from all time"
         after_log = "" if range_start_inclusive is None else f", after {range_start_inclusive.isoformat()} inclusive"
         before_log = "" if range_end_exclusive is None else f", before {range_end_exclusive.isoformat()} exclusive"
-        print(f"Fetching raw runs for flow with id '{flow_id}'{after_log}{before_log}...")
+        print(f"Fetching raw runs for flow with id '{flow_id}'{all_time_log}{after_log}{before_log}...")
 
         range_end_inclusive = None
         if range_end_exclusive is not None:
@@ -48,9 +49,10 @@ class RapidProClient(object):
         return raw_runs
 
     def get_raw_contacts(self, range_start_inclusive=None, range_end_exclusive=None):
+        all_time_log = "" if range_start_inclusive is not None or range_end_exclusive is not None else " from all time"
         after_log = "" if range_start_inclusive is None else f", after {range_start_inclusive.isoformat()} inclusive"
         before_log = "" if range_end_exclusive is None else f", before {range_end_exclusive.isoformat()} exclusive"
-        print(f"Fetching raw contacts{after_log}{before_log}...")
+        print(f"Fetching raw contacts{all_time_log}{after_log}{before_log}...")
         
         range_end_inclusive = None
         if range_end_exclusive is not None:
