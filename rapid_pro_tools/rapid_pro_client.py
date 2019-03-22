@@ -77,8 +77,7 @@ class RapidProClient(object):
         for contact in raw_contacts:
             contacts_lut[contact.uuid] = contact
         latest_contacts = list(contacts_lut.values())
-        print(f"Filtered contacts for the latest objects. Returning {len(latest_contacts)} of the"
-              f"{len(raw_contacts)} contacts originally passed in")
+        print(f"Filtered contacts for the latest objects. {len(latest_contacts)}/{len(raw_contacts)} contacts returned")
         return latest_contacts
     
     def update_raw_contacts_with_latest_modified(self, prev_raw_contacts=None):
