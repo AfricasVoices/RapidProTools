@@ -28,13 +28,18 @@ class RapidProClient(object):
         return self.rapid_pro.get_definitions(flows=flow_ids, dependencies="all")
 
     def get_raw_runs_for_flow_id(self, flow_id, range_start_inclusive=None, range_end_exclusive=None):
+        all_time_log = "" if range_start_inclusive is not None or range_end_exclusive is not None else ", from all of time"
+        after_log = "" if range_start_inclusive is None else f", modified after {range_start_inclusive.isoformat()} inclusive"
+        before_log = "" if range_end_exclusive is None else f", modified before {range_end_exclusive.isoformat()} exclusive"
+        print(f"Fetching raw runs for flow with id '{flow_id}'{all_time_log}{after_log}{before_log}...")
+
         range_end_inclusive = None
         if range_end_exclusive is not None:
             range_end_inclusive = range_end_exclusive - datetime.timedelta(microseconds=1)
 
-        print(f"Fetching raw runs for flow with id '{flow_id}'...")
         raw_runs = self.rapid_pro.get_runs(
             flow=flow_id, after=range_start_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
+
         print(f"Fetched {len(raw_runs)} runs")
 
         # Sort in ascending order of modification date
@@ -43,22 +48,66 @@ class RapidProClient(object):
 
         return raw_runs
 
-    def get_raw_contacts(self):
-        print("Fetching all raw contacts...")
-        raw_contacts = self.rapid_pro.get_contacts().all(retry_on_rate_exceed=True)
+    def get_raw_contacts(self, range_start_inclusive=None, range_end_exclusive=None):
+        all_time_log = "" if range_start_inclusive is not None or range_end_exclusive is not None else " from all of time"
+        after_log = "" if range_start_inclusive is None else f", modified after {range_start_inclusive.isoformat()} inclusive"
+        before_log = "" if range_end_exclusive is None else f", modified before {range_end_exclusive.isoformat()} exclusive"
+        print(f"Fetching raw contacts{all_time_log}{after_log}{before_log}...")
+        
+        range_end_inclusive = None
+        if range_end_exclusive is not None:
+            range_end_inclusive = range_end_exclusive - datetime.timedelta(microseconds=1)
+
+        raw_contacts = self.rapid_pro.get_contacts(
+            after=range_start_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
         assert len(set(c.uuid for c in raw_contacts)) == len(raw_contacts), "Non-unique contact UUID in RapidPro"
+
         print(f"Fetched {len(raw_contacts)} contacts")
+        
+        # Sort in ascending order of modification date
+        raw_contacts = list(raw_contacts)
+        raw_contacts.reverse()
+        
         return raw_contacts
 
-    def get_traced_runs_for_flow_id(self, user, flow_id, phone_uuids,
-                                    range_start_inclusive=None, range_end_exclusive=None,
-                                    test_contacts=None):
+    @staticmethod
+    def filter_latest_raw_contacts(raw_contacts):
+        raw_contacts.sort(key=lambda contact: contact.modified_on)
+        contacts_lut = dict()
+        for contact in raw_contacts:
+            contacts_lut[contact.uuid] = contact
+        latest_contacts = list(contacts_lut.values())
+        print(f"Filtered contacts for the latest objects. Returning {len(latest_contacts)}/{len(raw_contacts)} contacts")
+        return latest_contacts
+    
+    def update_raw_contacts_with_latest_modified(self, prev_raw_contacts=None):
+        """
+        Updates a list of contacts previously downloaded from Rapid Pro, by only fetching contacts which have been 
+        updated since that previous export was performed.
+        
+        :param prev_raw_contacts: A list of Rapid Pro contact objects from a previous export, or None.
+                                  If None, all contacts will be downloaded.
+        :type prev_raw_contacts: list of temba_client.v2.types.Contact | None
+        :return: Updated list of Rapid Pro Contact objects.
+        :rtype: list of temba_client.v2.types.Contact
+        """
+        prev_raw_contacts = list(prev_raw_contacts)
+
+        range_start_inclusive = None
+        if prev_raw_contacts is not None and len(prev_raw_contacts) > 0:
+            prev_raw_contacts.sort(key=lambda contact: contact.modified_on)
+            range_start_inclusive = prev_raw_contacts[-1].modified_on + datetime.timedelta(microseconds=1)
+
+        all_raw_contacts = prev_raw_contacts
+        all_raw_contacts.extend(self.get_raw_contacts(range_start_inclusive=range_start_inclusive))
+        
+        return self.filter_latest_raw_contacts(all_raw_contacts)
+
+    @staticmethod
+    def convert_runs_to_traced_data(user, raw_runs, raw_contacts, phone_uuids, test_contacts=None):
         if test_contacts is None:
             test_contacts = []
 
-        raw_runs = self.get_raw_runs_for_flow_id(flow_id, range_start_inclusive, range_end_exclusive)
-        raw_contacts = self.get_raw_contacts()
-        
         contacts_lut = {c.uuid: c for c in raw_contacts}
 
         traced_runs = []
@@ -107,7 +156,8 @@ class RapidProClient(object):
 
         return traced_runs
 
-    def coalesce_traced_runs_by_key(self, user, traced_runs, coalesce_key):
+    @staticmethod
+    def coalesce_traced_runs_by_key(user, traced_runs, coalesce_key):
         coalesced_runs = dict()
 
         for run in traced_runs:
