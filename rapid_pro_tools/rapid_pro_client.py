@@ -1,6 +1,7 @@
 import datetime
 import json
 
+from core_data_modules.cleaners import PhoneCleaner
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils
 from temba_client.v2 import TembaClient
@@ -250,7 +251,7 @@ class RapidProClient(object):
         :param raw_contacts: Raw contact objects to use when converting to TracedData.
         :type raw_contacts: list of temba_client.v2.types.Contact
         :param phone_uuids: Phone number <-> UUID table.
-        :type phone_uuids: core_data_modules.util.PhoneNumberUuidTable
+        :type phone_uuids: id_infrastructure.firestore_uuid_table.FirestoreUuidTable
         :param test_contacts: Rapid Pro contact UUIDs of test contacts.
                               Runs from any of those test contacts will be tagged with {'test_run': True}
         :type test_contacts: list of str | None
@@ -281,7 +282,7 @@ class RapidProClient(object):
                 continue
 
             run_dict = {
-                "avf_phone_id": phone_uuids.add_phone(contact_urns[0]),
+                "avf_phone_id": phone_uuids.data_to_uuid(PhoneCleaner.normalise_phone(contact_urns[0])),
                 f"run_id - {run.flow.name}": run.id
             }
 
