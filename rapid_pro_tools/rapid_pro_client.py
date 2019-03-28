@@ -265,7 +265,8 @@ class RapidProClient(object):
 
         contacts_lut = {c.uuid: c for c in raw_contacts}
 
-        traced_runs = []
+        runs_with_uuids = []
+        phone_numbers = []
         for run in raw_runs:
             if run.contact.uuid not in contacts_lut:
                 # Sometimes contact uuids which appear in `runs` do not appear in `contact_runs`.
@@ -281,8 +282,17 @@ class RapidProClient(object):
                       f"(Rapid Pro Contact UUID: {run.contact.uuid})")
                 continue
 
+            phone_numbers.append(PhoneCleaner.normalise_phone(contact_urns[0]))
+            runs_with_uuids.append(run)
+
+        phone_uuid_lut = phone_uuids.data_to_uuid_batch(phone_numbers)
+        print(phone_uuid_lut)
+
+        traced_runs = []
+        for run in runs_with_uuids:
+            contact_urns = contacts_lut[run.contact.uuid].urns
             run_dict = {
-                "avf_phone_id": phone_uuids.data_to_uuid(PhoneCleaner.normalise_phone(contact_urns[0])),
+                "avf_phone_id": phone_uuid_lut[PhoneCleaner.normalise_phone(contact_urns[0])],
                 f"run_id - {run.flow.name}": run.id
             }
 
