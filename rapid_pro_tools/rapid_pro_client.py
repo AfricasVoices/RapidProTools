@@ -286,7 +286,6 @@ class RapidProClient(object):
             runs_with_uuids.append(run)
 
         phone_uuid_lut = phone_uuids.data_to_uuid_batch(phone_numbers)
-        print(phone_uuid_lut)
 
         traced_runs = []
         for run in runs_with_uuids:
