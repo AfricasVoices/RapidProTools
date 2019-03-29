@@ -285,13 +285,13 @@ class RapidProClient(object):
             phone_numbers.append(PhoneCleaner.normalise_phone(contact_urns[0]))
             runs_with_uuids.append(run)
 
-        phone_uuid_lut = phone_uuids.data_to_uuid_batch(phone_numbers)
+        phone_to_uuid_lut = phone_uuids.data_to_uuid_batch(phone_numbers)
 
         traced_runs = []
         for run in runs_with_uuids:
             contact_urns = contacts_lut[run.contact.uuid].urns
             run_dict = {
-                "avf_phone_id": phone_uuid_lut[PhoneCleaner.normalise_phone(contact_urns[0])],
+                "avf_phone_id": phone_to_uuid_lut[PhoneCleaner.normalise_phone(contact_urns[0])],
                 f"run_id - {run.flow.name}": run.id
             }
 
