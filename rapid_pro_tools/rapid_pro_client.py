@@ -168,7 +168,7 @@ class RapidProClient(object):
         print(f"Filtered raw data for the latest objects. Returning {len(latest_data)}/{len(raw_data)} items.")
         return latest_data
 
-    def update_raw_data_with_latest_modified(self, get_fn, id_key, prev_raw_data=None, raw_export_log=None):
+    def update_raw_data_with_latest_modified(self, get_fn, id_key, prev_raw_data=None, raw_export_log_file=None):
         """
         Updates a list of raw objects downloaded from Rapid Pro, by only downloading objects which have been
         updated since that previous export was performed.
@@ -181,9 +181,9 @@ class RapidProClient(object):
         :param prev_raw_data: List of Rapid Pro objects from a previous export, or None.
                               If None, all objects will be downloaded.
         :type prev_raw_data: list of temba_client.serialization.TembaObject | None
-        :param raw_export_log: File to write raw data fetched during the export to.
+        :param raw_export_log_file: File to write raw data fetched during the export to.
                                Data is written in the format it came out of Rapid Pro.
-        :type raw_export_log: file-like
+        :type raw_export_log_file: file-like
         :return: Updated list of Rapid Pro objects.
         :rtype: list of temba_client.serialization.TembaObject
         """
@@ -195,12 +195,12 @@ class RapidProClient(object):
             prev_raw_data.sort(key=lambda contact: contact.modified_on)
             range_start_inclusive = prev_raw_data[-1].modified_on + datetime.timedelta(microseconds=1)
 
-        new_data = get_fn(range_start_inclusive=range_start_inclusive, raw_export_log=raw_export_log)
+        new_data = get_fn(range_start_inclusive=range_start_inclusive, raw_export_log=raw_export_log_file)
 
         all_raw_data = prev_raw_data + new_data
         return self.filter_latest(all_raw_data, id_key)
     
-    def update_raw_contacts_with_latest_modified(self, prev_raw_contacts=None, raw_export_log=None):
+    def update_raw_contacts_with_latest_modified(self, prev_raw_contacts=None, raw_export_log_file=None):
         """
         Updates a list of contacts previously downloaded from Rapid Pro, by only fetching contacts which have been 
         updated since that previous export was performed.
@@ -208,14 +208,14 @@ class RapidProClient(object):
         :param prev_raw_contacts: A list of Rapid Pro contact objects from a previous export, or None.
                                   If None, all contacts will be downloaded.
         :type prev_raw_contacts: list of temba_client.v2.types.Contact | None
-        :param raw_export_log: File to write the newly retrieved contacts to.
-        :type raw_export_log: file-like | None
+        :param raw_export_log_file: File to write the newly retrieved contacts to.
+        :type raw_export_log_file: file-like | None
         :return: Updated list of Rapid Pro Contact objects.
         :rtype: list of temba_client.v2.types.Contact
         """
         return self.update_raw_data_with_latest_modified(
             self.get_raw_contacts, lambda contact: contact.uuid,
-            prev_raw_data=prev_raw_contacts, raw_export_log=raw_export_log
+            prev_raw_data=prev_raw_contacts, raw_export_log_file=raw_export_log_file
         )
 
     def update_raw_runs_with_latest_modified(self, flow_id, prev_raw_runs=None, raw_export_log=None):
@@ -235,7 +235,7 @@ class RapidProClient(object):
         """
         return self.update_raw_data_with_latest_modified(
             lambda **kwargs: self.get_raw_runs_for_flow_id(flow_id, **kwargs), lambda run: run.id,
-            prev_raw_data=prev_raw_runs, raw_export_log=raw_export_log
+            prev_raw_data=prev_raw_runs, raw_export_log_file=raw_export_log
         )
 
     @staticmethod
