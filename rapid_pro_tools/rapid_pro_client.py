@@ -59,7 +59,7 @@ class RapidProClient(object):
         return self.rapid_pro.get_definitions(flows=flow_ids, dependencies="all")
 
     def get_raw_runs_for_flow_id(self, flow_id, range_start_inclusive=None, range_end_exclusive=None,
-                                 raw_export_log=None):
+                                 raw_export_log_file=None):
         """
         Gets the raw runs for the given flow_id from RapidPro.
 
@@ -70,8 +70,9 @@ class RapidProClient(object):
         :type range_start_inclusive: datetime.pyi | None
         :param range_end_exclusive: End of the date-range to download runs from. If set, only downloads runs
                                     last modified before that date, otherwise downloads until the end of time.
-        :param raw_export_log: File to write the raw data downloaded during this function call to.
-        :type raw_export_log: file-like | None
+        :param raw_export_log_file: File to write the raw data downloaded during this function call to,
+                                    as serialised json.
+        :type raw_export_log_file: file-like | None
         :return: Raw runs downloaded from Rapid Pro.
         :rtype: list of temba_client.v2.types.Run
         """
@@ -89,13 +90,13 @@ class RapidProClient(object):
 
         print(f"Fetched {len(raw_runs)} runs")
 
-        if raw_export_log is not None:
+        if raw_export_log_file is not None:
             print(f"Logging {len(raw_runs)} fetched runs...")
-            json.dump([contact.serialize() for contact in raw_runs], raw_export_log)
-            raw_export_log.write("\n")
+            json.dump([contact.serialize() for contact in raw_runs], raw_export_log_file)
+            raw_export_log_file.write("\n")
             print(f"Logged fetched contacts")
         else:
-            print("Not logging the raw export (argument 'raw_export_log' was None)")
+            print("Not logging the raw export (argument 'raw_export_log_file' was None)")
 
         # Sort in ascending order of modification date
         raw_runs = list(raw_runs)
@@ -103,7 +104,7 @@ class RapidProClient(object):
 
         return raw_runs
 
-    def get_raw_contacts(self, range_start_inclusive=None, range_end_exclusive=None, raw_export_log=None):
+    def get_raw_contacts(self, range_start_inclusive=None, range_end_exclusive=None, raw_export_log_file=None):
         """
         Gets the raw contacts from RapidPro.
 
@@ -113,8 +114,8 @@ class RapidProClient(object):
         :param range_end_exclusive: End of the date-range to download contacts from. If set, only downloads contacts
                                     last modified before that date, otherwise downloads until the end of time.
         :type range_end_exclusive: datetime.pyi | None
-        :param raw_export_log: File to write the raw data downloaded during this function call to.
-        :type raw_export_log: file-like | None
+        :param raw_export_log_file: File to write the raw data downloaded during this function call to as json.
+        :type raw_export_log_file: file-like | None
         :return: Raw contacts downloaded from Rapid Pro.
         :rtype: list of temba_client.v2.types.Contact
         """
@@ -133,13 +134,13 @@ class RapidProClient(object):
 
         print(f"Fetched {len(raw_contacts)} contacts")
 
-        if raw_export_log is not None:
+        if raw_export_log_file is not None:
             print(f"Logging {len(raw_contacts)} fetched contacts...")
-            json.dump([contact.serialize() for contact in raw_contacts], raw_export_log)
-            raw_export_log.write("\n")
+            json.dump([contact.serialize() for contact in raw_contacts], raw_export_log_file)
+            raw_export_log_file.write("\n")
             print(f"Logged fetched contacts")
         else:
-            print("Not logging the raw export (argument 'raw_export_log' was None)")
+            print("Not logging the raw export (argument 'raw_export_log_file' was None)")
 
         # Sort in ascending order of modification date
         raw_contacts = list(raw_contacts)
@@ -174,15 +175,15 @@ class RapidProClient(object):
         updated since that previous export was performed.
 
         :param get_fn: Function to call to retrieve the newer objects.
-        :type get_fn: function of (range_start_inclusive, raw_export_log) -> list of temba_client.serialization.TembaObject
+        :type get_fn: function of (range_start_inclusive, raw_export_log_file) ->
+                          list of temba_client.serialization.TembaObject
         :param id_key: A function that returns an id for each object (needed to filter for only the most recently
                        modified version of duplicated objects).
         :type id_key: function of temba_client.serialization.TembaObject -> hashable
         :param prev_raw_data: List of Rapid Pro objects from a previous export, or None.
                               If None, all objects will be downloaded.
         :type prev_raw_data: list of temba_client.serialization.TembaObject | None
-        :param raw_export_log_file: File to write raw data fetched during the export to.
-                               Data is written in the format it came out of Rapid Pro.
+        :param raw_export_log_file: File to write raw data fetched during the export to as json.
         :type raw_export_log_file: file-like
         :return: Updated list of Rapid Pro objects.
         :rtype: list of temba_client.serialization.TembaObject
@@ -195,7 +196,7 @@ class RapidProClient(object):
             prev_raw_data.sort(key=lambda contact: contact.modified_on)
             range_start_inclusive = prev_raw_data[-1].modified_on + datetime.timedelta(microseconds=1)
 
-        new_data = get_fn(range_start_inclusive=range_start_inclusive, raw_export_log=raw_export_log_file)
+        new_data = get_fn(range_start_inclusive=range_start_inclusive, raw_export_log_file=raw_export_log_file)
 
         all_raw_data = prev_raw_data + new_data
         return self.filter_latest(all_raw_data, id_key)
@@ -208,7 +209,7 @@ class RapidProClient(object):
         :param prev_raw_contacts: A list of Rapid Pro contact objects from a previous export, or None.
                                   If None, all contacts will be downloaded.
         :type prev_raw_contacts: list of temba_client.v2.types.Contact | None
-        :param raw_export_log_file: File to write the newly retrieved contacts to.
+        :param raw_export_log_file: File to write the newly retrieved contacts to as json.
         :type raw_export_log_file: file-like | None
         :return: Updated list of Rapid Pro Contact objects.
         :rtype: list of temba_client.v2.types.Contact
@@ -218,7 +219,7 @@ class RapidProClient(object):
             prev_raw_data=prev_raw_contacts, raw_export_log_file=raw_export_log_file
         )
 
-    def update_raw_runs_with_latest_modified(self, flow_id, prev_raw_runs=None, raw_export_log=None):
+    def update_raw_runs_with_latest_modified(self, flow_id, prev_raw_runs=None, raw_export_log_file=None):
         """
         Updates a list of runs previously downloaded from Rapid Pro, by only fetching runs which have been
         updated since that previous export was performed.
@@ -228,14 +229,14 @@ class RapidProClient(object):
         :param prev_raw_runs: A list of Rapid Pro run objects from a previous export, or None.
                               If None, all runs for the specified flow will be downloaded.
         :type prev_raw_runs: list of temba_client.v2.types.Run | None
-        :param raw_export_log: File to write the newly retrieved runs to.
-        :type raw_export_log: file-like | None
+        :param raw_export_log_file: File to write the newly retrieved runs to as json.
+        :type raw_export_log_file: file-like | None
         :return: Updated list of Rapid Pro Run objects.
         :rtype: list of temba_client.v2.types.Run
         """
         return self.update_raw_data_with_latest_modified(
             lambda **kwargs: self.get_raw_runs_for_flow_id(flow_id, **kwargs), lambda run: run.id,
-            prev_raw_data=prev_raw_runs, raw_export_log_file=raw_export_log
+            prev_raw_data=prev_raw_runs, raw_export_log_file=raw_export_log_file
         )
 
     @staticmethod
