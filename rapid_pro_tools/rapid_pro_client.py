@@ -67,7 +67,7 @@ class RapidProClient(object):
         :type flow_id: str
         :param range_start_inclusive: Start of the date-range to download runs from. If set, only downloads runs
                                       last modified since that date, otherwise downloads from the beginning of time.
-        :type range_start_inclusive: datetime.pyi | None
+        :type range_start_inclusive: datetime.datetime | None
         :param range_end_exclusive: End of the date-range to download runs from. If set, only downloads runs
                                     last modified before that date, otherwise downloads until the end of time.
         :param raw_export_log_file: File to write the raw data downloaded during this function call to,
@@ -110,10 +110,10 @@ class RapidProClient(object):
 
         :param range_start_inclusive: Start of the date-range to download contacts from. If set, only downloads contacts
                                       last modified since that date, otherwise downloads from the beginning of time.
-        :type range_start_inclusive: datetime.pyi | None
+        :type range_start_inclusive: datetime.datetime | None
         :param range_end_exclusive: End of the date-range to download contacts from. If set, only downloads contacts
                                     last modified before that date, otherwise downloads until the end of time.
-        :type range_end_exclusive: datetime.pyi | None
+        :type range_end_exclusive: datetime.datetime | None
         :param raw_export_log_file: File to write the raw data downloaded during this function call to as json.
         :type raw_export_log_file: file-like | None
         :return: Raw contacts downloaded from Rapid Pro.
