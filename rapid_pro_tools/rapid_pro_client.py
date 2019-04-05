@@ -58,35 +58,37 @@ class RapidProClient(object):
         """
         return self.rapid_pro.get_definitions(flows=flow_ids, dependencies="all")
 
-    def get_raw_runs_for_flow_id(self, flow_id, range_start_inclusive=None, range_end_exclusive=None,
+    def get_raw_runs_for_flow_id(self, flow_id, last_modified_after_inclusive=None, last_modified_before_exclusive=None,
                                  raw_export_log_file=None):
         """
         Gets the raw runs for the given flow_id from RapidPro.
 
         :param flow_id: Id of the flow to download the runs of.
         :type flow_id: str
-        :param range_start_inclusive: Start of the date-range to download runs from. If set, only downloads runs
-                                      last modified since that date, otherwise downloads from the beginning of time.
-        :type range_start_inclusive: datetime.datetime | None
-        :param range_end_exclusive: End of the date-range to download runs from. If set, only downloads runs
-                                    last modified before that date, otherwise downloads until the end of time.
+        :param last_modified_after_inclusive: Start of the date-range to download runs from.
+                                              If set, only downloads runs last modified since that date,
+                                              otherwise downloads from the beginning of time.
+        :type last_modified_after_inclusive: datetime.datetime | None
+        :param last_modified_before_exclusive: End of the date-range to download runs from.
+                                               If set, only downloads runs last modified before that date,
+                                               otherwise downloads until the end of time.
         :param raw_export_log_file: File to write the raw data downloaded during this function call to,
                                     as serialised json.
         :type raw_export_log_file: file-like | None
         :return: Raw runs downloaded from Rapid Pro.
         :rtype: list of temba_client.v2.types.Run
         """
-        all_time_log = "" if range_start_inclusive is not None or range_end_exclusive is not None else ", from all of time"
-        after_log = "" if range_start_inclusive is None else f", modified after {range_start_inclusive.isoformat()} inclusive"
-        before_log = "" if range_end_exclusive is None else f", modified before {range_end_exclusive.isoformat()} exclusive"
+        all_time_log = "" if last_modified_after_inclusive is not None or last_modified_before_exclusive is not None else ", from all of time"
+        after_log = "" if last_modified_after_inclusive is None else f", modified after {last_modified_after_inclusive.isoformat()} inclusive"
+        before_log = "" if last_modified_before_exclusive is None else f", modified before {last_modified_before_exclusive.isoformat()} exclusive"
         print(f"Fetching raw runs for flow with id '{flow_id}'{all_time_log}{after_log}{before_log}...")
 
         range_end_inclusive = None
-        if range_end_exclusive is not None:
-            range_end_inclusive = range_end_exclusive - datetime.timedelta(microseconds=1)
+        if last_modified_before_exclusive is not None:
+            range_end_inclusive = last_modified_before_exclusive - datetime.timedelta(microseconds=1)
 
         raw_runs = self.rapid_pro.get_runs(
-            flow=flow_id, after=range_start_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
+            flow=flow_id, after=last_modified_after_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
 
         print(f"Fetched {len(raw_runs)} runs")
 
@@ -104,32 +106,35 @@ class RapidProClient(object):
 
         return raw_runs
 
-    def get_raw_contacts(self, range_start_inclusive=None, range_end_exclusive=None, raw_export_log_file=None):
+    def get_raw_contacts(self, last_modified_after_inclusive=None, last_modified_before_exclusive=None,
+                         raw_export_log_file=None):
         """
         Gets the raw contacts from RapidPro.
 
-        :param range_start_inclusive: Start of the date-range to download contacts from. If set, only downloads contacts
-                                      last modified since that date, otherwise downloads from the beginning of time.
-        :type range_start_inclusive: datetime.datetime | None
-        :param range_end_exclusive: End of the date-range to download contacts from. If set, only downloads contacts
-                                    last modified before that date, otherwise downloads until the end of time.
-        :type range_end_exclusive: datetime.datetime | None
+        :param last_modified_after_inclusive: Start of the date-range to download contacts from.
+                                              If set, only downloads contacts last modified since that date,
+                                              otherwise downloads from the beginning of time.
+        :type last_modified_after_inclusive: datetime.datetime | None
+        :param last_modified_before_exclusive: End of the date-range to download contacts from.
+                                               If set, only downloads contacts last modified before that date,
+                                               otherwise downloads until the end of time.
+        :type last_modified_before_exclusive: datetime.datetime | None
         :param raw_export_log_file: File to write the raw data downloaded during this function call to as json.
         :type raw_export_log_file: file-like | None
         :return: Raw contacts downloaded from Rapid Pro.
         :rtype: list of temba_client.v2.types.Contact
         """
-        all_time_log = "" if range_start_inclusive is not None or range_end_exclusive is not None else " from all of time"
-        after_log = "" if range_start_inclusive is None else f", modified after {range_start_inclusive.isoformat()} inclusive"
-        before_log = "" if range_end_exclusive is None else f", modified before {range_end_exclusive.isoformat()} exclusive"
+        all_time_log = "" if last_modified_after_inclusive is not None or last_modified_before_exclusive is not None else " from all of time"
+        after_log = "" if last_modified_after_inclusive is None else f", modified after {last_modified_after_inclusive.isoformat()} inclusive"
+        before_log = "" if last_modified_before_exclusive is None else f", modified before {last_modified_before_exclusive.isoformat()} exclusive"
         print(f"Fetching raw contacts{all_time_log}{after_log}{before_log}...")
 
         range_end_inclusive = None
-        if range_end_exclusive is not None:
-            range_end_inclusive = range_end_exclusive - datetime.timedelta(microseconds=1)
+        if last_modified_before_exclusive is not None:
+            range_end_inclusive = last_modified_before_exclusive - datetime.timedelta(microseconds=1)
 
         raw_contacts = self.rapid_pro.get_contacts(
-            after=range_start_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
+            after=last_modified_after_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
         assert len(set(c.uuid for c in raw_contacts)) == len(raw_contacts), "Non-unique contact UUID in RapidPro"
 
         print(f"Fetched {len(raw_contacts)} contacts")
