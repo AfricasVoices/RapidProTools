@@ -83,12 +83,12 @@ class RapidProClient(object):
         before_log = "" if last_modified_before_exclusive is None else f", modified before {last_modified_before_exclusive.isoformat()} exclusive"
         print(f"Fetching raw runs for flow with id '{flow_id}'{all_time_log}{after_log}{before_log}...")
 
-        range_end_inclusive = None
+        last_modified_before_inclusive = None
         if last_modified_before_exclusive is not None:
-            range_end_inclusive = last_modified_before_exclusive - datetime.timedelta(microseconds=1)
+            last_modified_before_inclusive = last_modified_before_exclusive - datetime.timedelta(microseconds=1)
 
         raw_runs = self.rapid_pro.get_runs(
-            flow=flow_id, after=last_modified_after_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
+            flow=flow_id, after=last_modified_after_inclusive, before=last_modified_before_inclusive).all(retry_on_rate_exceed=True)
 
         print(f"Fetched {len(raw_runs)} runs")
 
@@ -129,12 +129,12 @@ class RapidProClient(object):
         before_log = "" if last_modified_before_exclusive is None else f", modified before {last_modified_before_exclusive.isoformat()} exclusive"
         print(f"Fetching raw contacts{all_time_log}{after_log}{before_log}...")
 
-        range_end_inclusive = None
+        last_modified_before_inclusive = None
         if last_modified_before_exclusive is not None:
-            range_end_inclusive = last_modified_before_exclusive - datetime.timedelta(microseconds=1)
+            last_modified_before_inclusive = last_modified_before_exclusive - datetime.timedelta(microseconds=1)
 
         raw_contacts = self.rapid_pro.get_contacts(
-            after=last_modified_after_inclusive, before=range_end_inclusive).all(retry_on_rate_exceed=True)
+            after=last_modified_after_inclusive, before=last_modified_before_inclusive).all(retry_on_rate_exceed=True)
         assert len(set(c.uuid for c in raw_contacts)) == len(raw_contacts), "Non-unique contact UUID in RapidPro"
 
         print(f"Fetched {len(raw_contacts)} contacts")
@@ -196,12 +196,12 @@ class RapidProClient(object):
         if prev_raw_data is not None:
             prev_raw_data = list(prev_raw_data)
 
-        range_start_inclusive = None
+        last_modified_after_inclusive = None
         if prev_raw_data is not None and len(prev_raw_data) > 0:
             prev_raw_data.sort(key=lambda contact: contact.modified_on)
-            range_start_inclusive = prev_raw_data[-1].modified_on + datetime.timedelta(microseconds=1)
+            last_modified_after_inclusive = prev_raw_data[-1].modified_on + datetime.timedelta(microseconds=1)
 
-        new_data = get_fn(range_start_inclusive=range_start_inclusive, raw_export_log_file=raw_export_log_file)
+        new_data = get_fn(range_start_inclusive=last_modified_after_inclusive, raw_export_log_file=raw_export_log_file)
 
         all_raw_data = prev_raw_data + new_data
         return self.filter_latest(all_raw_data, id_key)
