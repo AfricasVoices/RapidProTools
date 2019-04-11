@@ -19,7 +19,7 @@ class RapidProClient(object):
         
     @staticmethod
     def set_max_retries(max_retries):
-        temba_client.client.MAX_RETRIES = max_retries
+        temba_client.clients.MAX_RETRIES = max_retries
         
     def get_flow_id(self, flow_name):
         """
