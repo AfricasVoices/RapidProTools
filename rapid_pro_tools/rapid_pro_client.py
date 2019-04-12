@@ -216,7 +216,7 @@ class RapidProClient(object):
             prev_raw_data.sort(key=lambda contact: contact.modified_on)
             last_modified_after_inclusive = prev_raw_data[-1].modified_on + datetime.timedelta(microseconds=1)
 
-        new_data = get_fn(range_start_inclusive=last_modified_after_inclusive, raw_export_log_file=raw_export_log_file)
+        new_data = get_fn(last_modified_after_inclusive=last_modified_after_inclusive, raw_export_log_file=raw_export_log_file)
 
         all_raw_data = prev_raw_data + new_data
         return self.filter_latest(all_raw_data, id_key)
