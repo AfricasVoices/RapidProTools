@@ -58,6 +58,16 @@ class RapidProClient(object):
         """
         return self.rapid_pro.get_definitions(flows=flow_ids, dependencies="all")
 
+    def get_raw_messages(self, created_after_inclusive=None, created_before_exclusive=None,
+                         raw_export_log_file=None):
+        created_before_inclusive = None
+        if created_before_exclusive is not None:
+            created_before_inclusive = created_before_exclusive - datetime.timedelta(microseconds=1)
+
+        raw_messages = self.rapid_pro.get_messages(after=created_after_inclusive, before=created_before_inclusive)
+
+        return raw_messages
+
     def get_raw_runs_for_flow_id(self, flow_id, last_modified_after_inclusive=None, last_modified_before_exclusive=None,
                                  raw_export_log_file=None):
         """
