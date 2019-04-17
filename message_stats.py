@@ -1,4 +1,5 @@
 import argparse
+import json
 
 from core_data_modules.cleaners import PhoneCleaner
 from core_data_modules.logging import Logger
@@ -59,3 +60,36 @@ for operator, count in operator_counts.items():
 
 # sample_message = messages_today[0]
 # print(json.dumps(sample_message.serialize(), indent=2))
+
+
+operator_counts = dict()  # of operator -> category -> count
+for msg in raw_messages:
+    phone_number = msg.urn.replace("tel:", "")
+    operator = PhoneCleaner.clean_operator(phone_number)
+
+    if operator not in operator_counts:
+        operator_counts[operator] = {
+            "incoming": 0,
+            "outgoing": 0,
+            "outgoing failures": 0
+        }
+
+    if msg.direction == "in":
+        operator_counts[operator]["incoming"] += 1
+    elif msg.direction == "out":
+        if msg.status == "errored":
+            operator_counts[operator]["outgoing failures"] += 1
+        elif msg.status == "wired":
+            operator_counts[operator]["outgoing"] += 1
+        else:
+            print(json.dumps(msg.serialize(), indent=2))
+    else:
+        print(json.dumps(msg.serialize(), indent=2))
+
+for operator, counts in operator_counts.items():
+    print(f"{operator}:")
+
+    for k, v in counts.items():
+        print(f"{k}: {v}")
+
+    print("")
