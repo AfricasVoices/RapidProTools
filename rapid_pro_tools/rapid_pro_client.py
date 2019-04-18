@@ -1,9 +1,12 @@
 import datetime
 import json
 
+from core_data_modules.logging import Logger
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils
 from temba_client.v2 import TembaClient
+
+log = Logger(__name__)
 
 
 class RapidProClient(object):
@@ -81,7 +84,7 @@ class RapidProClient(object):
         all_time_log = "" if last_modified_after_inclusive is not None or last_modified_before_exclusive is not None else ", from all of time"
         after_log = "" if last_modified_after_inclusive is None else f", modified after {last_modified_after_inclusive.isoformat()} inclusive"
         before_log = "" if last_modified_before_exclusive is None else f", modified before {last_modified_before_exclusive.isoformat()} exclusive"
-        print(f"Fetching raw runs for flow with id '{flow_id}'{all_time_log}{after_log}{before_log}...")
+        log.info(f"Fetching raw runs for flow with id '{flow_id}'{all_time_log}{after_log}{before_log}...")
 
         last_modified_before_inclusive = None
         if last_modified_before_exclusive is not None:
@@ -90,15 +93,15 @@ class RapidProClient(object):
         raw_runs = self.rapid_pro.get_runs(
             flow=flow_id, after=last_modified_after_inclusive, before=last_modified_before_inclusive).all(retry_on_rate_exceed=True)
 
-        print(f"Fetched {len(raw_runs)} runs")
+        log.info(f"Fetched {len(raw_runs)} runs")
 
         if raw_export_log_file is not None:
-            print(f"Logging {len(raw_runs)} fetched runs...")
+            log.info(f"Logging {len(raw_runs)} fetched runs...")
             json.dump([contact.serialize() for contact in raw_runs], raw_export_log_file)
             raw_export_log_file.write("\n")
-            print(f"Logged fetched contacts")
+            log.info(f"Logged fetched contacts")
         else:
-            print("Not logging the raw export (argument 'raw_export_log_file' was None)")
+            log.debug("Not logging the raw export (argument 'raw_export_log_file' was None)")
 
         # Sort in ascending order of modification date
         raw_runs = list(raw_runs)
