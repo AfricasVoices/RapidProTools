@@ -130,7 +130,7 @@ class RapidProClient(object):
         all_time_log = "" if last_modified_after_inclusive is not None or last_modified_before_exclusive is not None else " from all of time"
         after_log = "" if last_modified_after_inclusive is None else f", modified after {last_modified_after_inclusive.isoformat()} inclusive"
         before_log = "" if last_modified_before_exclusive is None else f", modified before {last_modified_before_exclusive.isoformat()} exclusive"
-        print(f"Fetching raw contacts{all_time_log}{after_log}{before_log}...")
+        log.info(f"Fetching raw contacts{all_time_log}{after_log}{before_log}...")
 
         last_modified_before_inclusive = None
         if last_modified_before_exclusive is not None:
@@ -140,15 +140,15 @@ class RapidProClient(object):
             after=last_modified_after_inclusive, before=last_modified_before_inclusive).all(retry_on_rate_exceed=True)
         assert len(set(c.uuid for c in raw_contacts)) == len(raw_contacts), "Non-unique contact UUID in RapidPro"
 
-        print(f"Fetched {len(raw_contacts)} contacts")
+        log.info(f"Fetched {len(raw_contacts)} contacts")
 
         if raw_export_log_file is not None:
-            print(f"Logging {len(raw_contacts)} fetched contacts...")
+            log.info(f"Logging {len(raw_contacts)} fetched contacts...")
             json.dump([contact.serialize() for contact in raw_contacts], raw_export_log_file)
             raw_export_log_file.write("\n")
-            print(f"Logged fetched contacts")
+            log.info(f"Logged fetched contacts")
         else:
-            print("Not logging the raw export (argument 'raw_export_log_file' was None)")
+            log.debug("Not logging the raw export (argument 'raw_export_log_file' was None)")
 
         # Sort in ascending order of modification date
         raw_contacts = list(raw_contacts)
@@ -174,7 +174,7 @@ class RapidProClient(object):
         for x in raw_data:
             data_lut[id_key(x)] = x
         latest_data = list(data_lut.values())
-        print(f"Filtered raw data for the latest objects. Returning {len(latest_data)}/{len(raw_data)} items.")
+        log.info(f"Filtered raw data for the latest objects. Returning {len(latest_data)}/{len(raw_data)} items.")
         return latest_data
 
     def update_raw_data_with_latest_modified(self, get_fn, id_key, prev_raw_data=None, raw_export_log_file=None):
@@ -269,7 +269,7 @@ class RapidProClient(object):
         if test_contacts is None:
             test_contacts = []
 
-        print(f"Converting {len(raw_runs)} raw runs to TracedData...")
+        log.info(f"Converting {len(raw_runs)} raw runs to TracedData...")
 
         contacts_lut = {c.uuid: c for c in raw_contacts}
 
@@ -279,14 +279,14 @@ class RapidProClient(object):
                 # Sometimes contact uuids which appear in `runs` do not appear in `contact_runs`.
                 # I have only observed this happen for contacts which were created very recently.
                 # This test skips the run in this case; it should be included next time this script is executed.
-                print(f"Warning: Run found with Rapid Pro Contact UUID '{run.contact.uuid}', "
-                      f"but this id is not present in the downloaded contacts")
+                log.warning(f"Run found with Rapid Pro Contact UUID '{run.contact.uuid}', "
+                            f"but this id is not present in the downloaded contacts")
                 continue
 
             contact_urns = contacts_lut[run.contact.uuid].urns
             if len(contact_urns) == 0:
-                print(f"Warning: Ignoring contact with no urn. URNs: {contact_urns} "
-                      f"(Rapid Pro Contact UUID: {run.contact.uuid})")
+                log.warning(f"Ignoring contact with no urn. URNs: {contact_urns} "
+                            f"(Rapid Pro Contact UUID: {run.contact.uuid})")
                 continue
 
             run_dict = {
@@ -317,6 +317,6 @@ class RapidProClient(object):
             traced_runs.append(
                 TracedData(run_dict, Metadata(user, Metadata.get_call_location(), TimeUtils.utc_now_as_iso_string())))
 
-        print(f"Converted {len(traced_runs)} raw runs to TracedData")
+        log.info(f"Converted {len(traced_runs)} raw runs to TracedData")
 
         return traced_runs
