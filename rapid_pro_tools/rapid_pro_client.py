@@ -1,7 +1,6 @@
 import datetime
 import json
 
-import temba_client
 from core_data_modules.logging import Logger
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils
@@ -19,10 +18,6 @@ class RapidProClient(object):
         :type token: str
         """
         self.rapid_pro = TembaClient(server, token)
-        
-    @staticmethod
-    def set_max_retries(max_retries):
-        temba_client.clients.MAX_RETRIES = max_retries
         
     def get_flow_id(self, flow_name):
         """
