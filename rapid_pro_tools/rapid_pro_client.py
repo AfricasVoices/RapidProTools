@@ -63,11 +63,45 @@ class RapidProClient(object):
 
     def get_raw_messages(self, created_after_inclusive=None, created_before_exclusive=None,
                          raw_export_log_file=None):
+        """
+        Gets the raw messages from RapidPro.
+
+        :param created_after_inclusive: Start of the date-range to download contacts from.
+                                        If set, only downloads messages created on Rapid Pro since that date,
+                                        otherwise downloads from the beginning of time.
+        :type created_after_inclusive: datetime.datetime | None
+        :param created_before_exclusive: End of the date-range to download contacts from.
+                                         If set, only downloads messages created on Rapid Pro before that date,
+                                         otherwise downloads until the end of time.
+        :type created_before_exclusive: datetime.datetime | None
+        :param raw_export_log_file: File to write the raw data downloaded during this function call to as json.
+        :type raw_export_log_file: file-like | None
+        :return: Raw contacts downloaded from Rapid Pro.
+        :rtype: list of temba_client.v2.types.Message
+        """
+        all_time_log = "" if created_after_inclusive is not None or created_before_exclusive is not None else " from all of time"
+        after_log = "" if created_after_inclusive is None else f", modified after {created_after_inclusive.isoformat()} inclusive"
+        before_log = "" if created_before_exclusive is None else f", modified before {created_before_exclusive.isoformat()} exclusive"
+        log.info(f"Fetching raw contacts{all_time_log}{after_log}{before_log}...")
+        
         created_before_inclusive = None
         if created_before_exclusive is not None:
             created_before_inclusive = created_before_exclusive - datetime.timedelta(microseconds=1)
 
-        raw_messages = self.rapid_pro.get_messages(after=created_after_inclusive, before=created_before_inclusive)
+        raw_messages = self.rapid_pro.get_messages(after=created_after_inclusive, before=created_before_inclusive)\
+            .all(retry_on_rate_exceed=True)
+
+        if raw_export_log_file is not None:
+            log.info(f"Logging {len(raw_messages)} fetched messages...")
+            json.dump([contact.serialize() for contact in raw_messages], raw_export_log_file)
+            raw_export_log_file.write("\n")
+            log.info(f"Logged fetched messages")
+        else:
+            log.debug("Not logging the raw export (argument 'raw_export_log_file' was None)")
+
+        # Sort in ascending order of creation date
+        raw_messages = list(raw_messages)
+        raw_messages.reverse()
 
         return raw_messages
 

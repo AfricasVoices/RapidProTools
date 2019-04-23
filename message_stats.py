@@ -26,9 +26,7 @@ rapid_pro = RapidProClient(server, token)
 start_date = date
 end_date = start_date + datetime.timedelta(days=1)
 log.info(f"Fetching messages created between {start_date.isoformat()} and {end_date.isoformat()}...")
-raw_messages = rapid_pro \
-    .get_raw_messages(created_after_inclusive=start_date, created_before_exclusive=end_date)\
-    .all(retry_on_rate_exceed=True)
+raw_messages = rapid_pro.get_raw_messages(created_after_inclusive=start_date, created_before_exclusive=end_date)
 log.info(f"Fetched {len(raw_messages)} messages created between {start_date.isoformat()} and {end_date.isoformat()}")
 
 log.info("Counting the number of messages in/out/failed per operator...")
