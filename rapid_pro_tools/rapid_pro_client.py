@@ -4,7 +4,7 @@ import json
 from core_data_modules.logging import Logger
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils
-from temba_client.v2 import TembaClient
+from temba_client.v2 import TembaClient, Broadcast
 
 log = Logger(__name__)
 
@@ -60,6 +60,25 @@ class RapidProClient(object):
         :rtype: temba_client.v2.types.Export
         """
         return self.rapid_pro.get_definitions(flows=flow_ids, dependencies="all")
+
+    def send_message_to_urn(self, message, target_urn):
+        """
+        Sends a message to the given urn.
+
+        :param message: Text of the message to send.
+        :type message: str
+        :param target_urn: URN to send the message to.
+        :type target_urn: str
+        :return: Id of the Rapid Pro broadcast created for this send request.
+        :rtype: int
+        """
+        log.info(f"Sending to {target_urn} the message {message}...")
+        response: Broadcast = self.rapid_pro.create_broadcast(message, urns=[target_urn])
+        log.info(f"Message to {target_urn} created with broadcast id {response.id}")
+        return response.id
+
+    def get_broadcast_for_broadcast_id(self, broadcast_id):
+        return self.rapid_pro.get_broadcasts(broadcast_id).all(retry_on_rate_exceed=True)[0]
 
     def get_raw_runs_for_flow_id(self, flow_id, last_modified_after_inclusive=None, last_modified_before_exclusive=None,
                                  raw_export_log_file=None):
