@@ -78,7 +78,18 @@ class RapidProClient(object):
         return response.id
 
     def get_broadcast_for_broadcast_id(self, broadcast_id):
-        return self.rapid_pro.get_broadcasts(broadcast_id).all(retry_on_rate_exceed=True)[0]
+        """
+        Gets the broadcast with the requested id from Rapid Pro.
+
+        :param broadcast_id: Id of broadcast to download from Rapid Pro
+        :type broadcast_id: int
+        :return: Broadcast with id 'broadcast_id'
+        :rtype: temba_client.v2.Broadcast
+        """
+        matching_broadcasts = self.rapid_pro.get_broadcasts(broadcast_id).all(retry_on_rate_exceed=True)
+        assert len(matching_broadcasts) == 1, f"{len(matching_broadcasts)} broadcasts have id {broadcast_id} " \
+            f"(expected exactly 1)"
+        return matching_broadcasts[0]
 
     def get_raw_runs_for_flow_id(self, flow_id, last_modified_after_inclusive=None, last_modified_before_exclusive=None,
                                  raw_export_log_file=None):
