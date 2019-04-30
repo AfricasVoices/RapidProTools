@@ -31,6 +31,7 @@ log.info(f"Fetched {len(raw_messages)} messages created between {start_date.isof
 
 log.info("Counting the number of messages in/out/failed per operator...")
 operator_counts = dict()  # of operator -> category -> count
+unexpected_status_counts = 0
 for msg in raw_messages:
     phone_number = msg.urn.replace("tel:", "")
     operator = PhoneCleaner.clean_operator(phone_number)
@@ -50,8 +51,10 @@ for msg in raw_messages:
         elif msg.status == "wired":
             operator_counts[operator]["outgoing"] += 1
         else:
+            unexpected_status_counts += 1
             log.warning(f"Unexpected message status '{msg.status}'")
     else:
+        unexpected_status_counts += 1
         log.warning(f"Unexpected message direction '{msg.direction}'")
 
 log.info("Outputting counts for each operator...")
@@ -62,3 +65,5 @@ for operator, counts in operator_counts.items():
         print(f"{k}: {v}")
 
     print("")
+
+print(f"Messages with an unexpected message status or direction: {unexpected_status_counts}")
