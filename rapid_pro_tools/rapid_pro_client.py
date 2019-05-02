@@ -4,7 +4,7 @@ import json
 from core_data_modules.logging import Logger
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils
-from temba_client.v2 import TembaClient
+from temba_client.v2 import TembaClient, Broadcast
 
 log = Logger(__name__)
 
@@ -60,6 +60,39 @@ class RapidProClient(object):
         :rtype: temba_client.v2.types.Export
         """
         return self.rapid_pro.get_definitions(flows=flow_ids, dependencies="all")
+
+    def send_message_to_urn(self, message, target_urn):
+        """
+        Sends a message to the given URN.
+
+        :param message: Text of the message to send.
+        :type message: str
+        :param target_urn: URN to send the message to.
+        :type target_urn: str
+        :return: Id of the Rapid Pro broadcast created for this send request.
+                 This id may be used to check on the status of the broadcast by making further requests to Rapid Pro.
+                 Note that this is a broadcast (to one person) because Rapid Pro does not support unicasting.
+        :rtype: int
+        """
+        log.info("Sending a message to an individual...")
+        log.debug(f"Sending to '{target_urn}' the message '{message}'...")
+        response: Broadcast = self.rapid_pro.create_broadcast(message, urns=[target_urn])
+        log.info(f"Message send request created with broadcast id {response.id}")
+        return response.id
+
+    def get_broadcast_for_broadcast_id(self, broadcast_id):
+        """
+        Gets the broadcast with the requested id from Rapid Pro.
+
+        :param broadcast_id: Id of broadcast to download from Rapid Pro
+        :type broadcast_id: int
+        :return: Broadcast with id 'broadcast_id'
+        :rtype: temba_client.v2.Broadcast
+        """
+        matching_broadcasts = self.rapid_pro.get_broadcasts(broadcast_id).all(retry_on_rate_exceed=True)
+        assert len(matching_broadcasts) == 1, f"{len(matching_broadcasts)} broadcasts have id {broadcast_id} " \
+            f"(expected exactly 1)"
+        return matching_broadcasts[0]
 
     def get_raw_runs_for_flow_id(self, flow_id, last_modified_after_inclusive=None, last_modified_before_exclusive=None,
                                  raw_export_log_file=None):
