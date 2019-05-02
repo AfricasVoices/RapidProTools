@@ -132,7 +132,7 @@ class RapidProClient(object):
             log.info(f"Logging {len(raw_runs)} fetched runs...")
             json.dump([contact.serialize() for contact in raw_runs], raw_export_log_file)
             raw_export_log_file.write("\n")
-            log.info(f"Logged fetched contacts")
+            log.info(f"Logged fetched runs")
         else:
             log.debug("Not logging the raw export (argument 'raw_export_log_file' was None)")
 
