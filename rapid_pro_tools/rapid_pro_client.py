@@ -82,7 +82,7 @@ class RapidProClient(object):
         all_time_log = "" if created_after_inclusive is not None or created_before_exclusive is not None else " from all of time"
         after_log = "" if created_after_inclusive is None else f", modified after {created_after_inclusive.isoformat()} inclusive"
         before_log = "" if created_before_exclusive is None else f", modified before {created_before_exclusive.isoformat()} exclusive"
-        log.info(f"Fetching raw contacts{all_time_log}{after_log}{before_log}...")
+        log.info(f"Fetching raw messages{all_time_log}{after_log}{before_log}...")
 
         created_before_inclusive = None
         if created_before_exclusive is not None:
