@@ -72,9 +72,10 @@ class RapidProClient(object):
         :return: Id of the Rapid Pro broadcast created for this send request.
         :rtype: int
         """
-        log.info(f"Sending to '{target_urn}' the message '{message}'...")
+        log.info("Sending a message to an individual...")
+        log.debug(f"Sending to '{target_urn}' the message '{message}'...")
         response: Broadcast = self.rapid_pro.create_broadcast(message, urns=[target_urn])
-        log.info(f"Message to '{target_urn} created with broadcast id {response.id}")
+        log.info(f"Message send request created with broadcast id {response.id}")
         return response.id
 
     def get_broadcast_for_broadcast_id(self, broadcast_id):
