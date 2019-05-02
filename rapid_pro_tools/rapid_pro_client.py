@@ -63,13 +63,15 @@ class RapidProClient(object):
 
     def send_message_to_urn(self, message, target_urn):
         """
-        Sends a message to the given urn.
+        Sends a message to the given URN.
 
         :param message: Text of the message to send.
         :type message: str
         :param target_urn: URN to send the message to.
         :type target_urn: str
         :return: Id of the Rapid Pro broadcast created for this send request.
+                 This id may be used to check on the status of the broadcast by making further requests to Rapid Pro.
+                 Note that this is a broadcast (to one person) because Rapid Pro does not support unicasting.
         :rtype: int
         """
         log.info("Sending a message to an individual...")
