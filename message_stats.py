@@ -46,7 +46,7 @@ for msg in raw_messages:
     if msg.direction == "in":
         operator_counts[operator]["incoming"] += 1
     elif msg.direction == "out":
-        if msg.status == "errored":
+        if msg.status == "errored" or msg.status == "failed":
             operator_counts[operator]["outgoing failures"] += 1
         elif msg.status == "wired":
             operator_counts[operator]["outgoing"] += 1
