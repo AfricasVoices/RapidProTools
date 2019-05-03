@@ -91,6 +91,8 @@ class RapidProClient(object):
         raw_messages = self.rapid_pro.get_messages(after=created_after_inclusive, before=created_before_inclusive)\
             .all(retry_on_rate_exceed=True)
 
+        log.info(f"Fetched {len(raw_messages)} messages")
+
         if raw_export_log_file is not None:
             log.info(f"Logging {len(raw_messages)} fetched messages...")
             json.dump([contact.serialize() for contact in raw_messages], raw_export_log_file)
