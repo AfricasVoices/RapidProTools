@@ -2,6 +2,7 @@ import datetime
 import json
 
 from core_data_modules.logging import Logger
+from core_data_modules.cleaners import PhoneCleaner
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils
 from temba_client.v2 import TembaClient, Broadcast
@@ -338,7 +339,7 @@ class RapidProClient(object):
         :param raw_contacts: Raw contact objects to use when converting to TracedData.
         :type raw_contacts: list of temba_client.v2.types.Contact
         :param phone_uuids: Phone number <-> UUID table.
-        :type phone_uuids: core_data_modules.util.PhoneNumberUuidTable
+        :type phone_uuids: id_infrastructure.firestore_uuid_table.FirestoreUuidTable
         :param test_contacts: Rapid Pro contact UUIDs of test contacts.
                               Runs from any of those test contacts will be tagged with {'test_run': True}
         :type test_contacts: list of str | None
@@ -352,7 +353,8 @@ class RapidProClient(object):
 
         contacts_lut = {c.uuid: c for c in raw_contacts}
 
-        traced_runs = []
+        runs_with_uuids = []
+        phone_numbers = []
         for run in raw_runs:
             if run.contact.uuid not in contacts_lut:
                 # Sometimes contact uuids which appear in `runs` do not appear in `contact_runs`.
@@ -368,8 +370,16 @@ class RapidProClient(object):
                             f"(Rapid Pro Contact UUID: {run.contact.uuid})")
                 continue
 
+            phone_numbers.append(PhoneCleaner.normalise_phone(contact_urns[0]))
+            runs_with_uuids.append(run)
+
+        phone_to_uuid_lut = phone_uuids.data_to_uuid_batch(phone_numbers)
+
+        traced_runs = []
+        for run in runs_with_uuids:
+            contact_urns = contacts_lut[run.contact.uuid].urns
             run_dict = {
-                "avf_phone_id": phone_uuids.add_phone(contact_urns[0]),
+                "avf_phone_id": phone_to_uuid_lut[PhoneCleaner.normalise_phone(contact_urns[0])],
                 f"run_id - {run.flow.name}": run.id
             }
 
