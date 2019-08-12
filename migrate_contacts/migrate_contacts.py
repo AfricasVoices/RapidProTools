@@ -60,6 +60,5 @@ if __name__ == "__main__":
     # Language, groups, blocked, and stopped properties are not touched.
     for i, contact in enumerate(contacts):
         log.debug(f"Updating contact {i + 1}/{len(contacts)}...")
-        print(contact.serialize())
         assert len(contact.urns) == 1
         target_instance.update_contact(contact.urns[0], contact.name, contact.fields)
