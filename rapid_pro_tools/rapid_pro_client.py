@@ -1,16 +1,22 @@
 import datetime
 import json
+import random
+import time
 
 from core_data_modules.cleaners import PhoneCleaner
 from core_data_modules.logging import Logger
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils
+from temba_client.exceptions import TembaRateExceededError
 from temba_client.v2 import TembaClient, Broadcast
 
 log = Logger(__name__)
 
 
 class RapidProClient(object):
+    MAX_RETRIES = 5
+    MAX_BACKOFF_POWER = 6
+    
     def __init__(self, server, token):
         """
         :param server: Server hostname, e.g. 'rapidpro.io'
@@ -339,7 +345,7 @@ class RapidProClient(object):
                                Keys present on the server contact but not in this dictionary are left unchanged.
         :type contact_fields: (dict of str -> str) | None
         """
-        self.rapid_pro.update_contact(urn, name=name, fields=contact_fields)
+        self._retry_on_rate_exceed(lambda: self.rapid_pro.update_contact(urn, name=name, fields=contact_fields))
 
     def get_fields(self):
         """
@@ -363,7 +369,26 @@ class RapidProClient(object):
         :rtype: temba_client.v2.types.Field
         """
         log.info(f"Creating field '{label}'...")
-        return self.rapid_pro.create_field(label, "text")
+        return self._retry_on_rate_exceed(lambda: self.rapid_pro.create_field(label, "text"))
+
+    @classmethod
+    def _retry_on_rate_exceed(cls, request):
+        retries = 0
+        while True:
+            try:
+                return request()
+            except TembaRateExceededError as ex:
+                retries += 1
+
+                if retries < cls.MAX_RETRIES and ex.retry_after:
+                    server_wait_time = ex.retry_after
+                    backoff_wait_time = random.uniform(0, 2 ** (min(retries, cls.MAX_BACKOFF_POWER)))
+                    
+                    log.debug(f"Rate exceeded. Sleeping for {server_wait_time + backoff_wait_time} seconds")
+
+                    time.sleep(server_wait_time + backoff_wait_time)
+                else:
+                    raise ex
 
     @staticmethod
     def convert_runs_to_traced_data(user, raw_runs, raw_contacts, phone_uuids, test_contacts=None):
