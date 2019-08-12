@@ -373,6 +373,18 @@ class RapidProClient(object):
 
     @classmethod
     def _retry_on_rate_exceed(cls, request):
+        """
+        Calls the given request function. If the Rapid Pro server fails with a rate exceeded error, retries up to 
+        cls.MAX_RETRIES times using binary exponential backoff.
+        
+        This function is needed because while the Rapid Pro API supports auto-retrying on get requests,
+        it does not for create/update/delete requests.
+        
+        :param request: Function which runs the request when called.
+        :type request: function
+        :return: Result of the request.
+        :rtype: any
+        """
         retries = 0
         while True:
             try:
