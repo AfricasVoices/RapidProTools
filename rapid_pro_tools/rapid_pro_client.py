@@ -327,7 +327,7 @@ class RapidProClient(object):
             prev_raw_data=prev_raw_runs, raw_export_log_file=raw_export_log_file
         )
 
-    def set_contact_fields(self, urn, contact_fields):
+    def update_contact(self, urn, name=None, contact_fields=None):
         """
 
         :param urn:
@@ -335,7 +335,7 @@ class RapidProClient(object):
         :param contact_fields:
         :type contact_fields: dict of str -> str
         """
-        self.rapid_pro.update_contact(urn, fields=contact_fields)
+        self.rapid_pro.update_contact(urn, name=name, fields=contact_fields)
 
     def get_fields(self):
         log.info("Fetching all fields...")
