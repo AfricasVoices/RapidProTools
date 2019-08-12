@@ -329,23 +329,41 @@ class RapidProClient(object):
 
     def update_contact(self, urn, name=None, contact_fields=None):
         """
+        Updates a contact on the server.
 
-        :param urn:
+        :param urn: URN of the contact to update.
         :type urn: str
-        :param contact_fields:
-        :type contact_fields: dict of str -> str
+        :param name: Name to update to or None. If None, the contact's name is not updated.
+        :type name: str | None
+        :param contact_fields: Dictionary of field key to new field value | None. If None, no keys are updated.
+                               Keys present on the server contact but not in this dictionary are left unchanged.
+        :type contact_fields: (dict of str -> str) | None
         """
         self.rapid_pro.update_contact(urn, name=name, fields=contact_fields)
 
     def get_fields(self):
+        """
+        Fetches all the contact fields.
+
+        :return: All contact fields.
+        :rtype: list of temba_client.v2.types.Field
+        """
         log.info("Fetching all fields...")
         fields = self.rapid_pro.get_fields().all(retry_on_rate_exceed=True)
         log.info(f"Downloaded {len(fields)} fields")
         return fields
 
     def create_field(self, label):
+        """
+        Creates a contact field with the given label.
+
+        :param label: The name of the contact field to create.
+        :type label: str
+        :return: The contact field that was just created.
+        :rtype: temba_client.v2.types.Field
+        """
         log.info(f"Creating field '{label}'...")
-        self.rapid_pro.create_field(label, "text")
+        return self.rapid_pro.create_field(label, "text")
 
     @staticmethod
     def convert_runs_to_traced_data(user, raw_runs, raw_contacts, phone_uuids, test_contacts=None):
