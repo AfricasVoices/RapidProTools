@@ -1,8 +1,8 @@
 import datetime
 import json
 
-from core_data_modules.logging import Logger
 from core_data_modules.cleaners import PhoneCleaner
+from core_data_modules.logging import Logger
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils
 from temba_client.v2 import TembaClient, Broadcast
@@ -22,11 +22,11 @@ class RapidProClient(object):
         
     def get_flow_id(self, flow_name):
         """
-        Gets the id for the flow with the requested name.
+        Gets the id for the flow with the requested label.
 
         :param flow_name: Name of flow to retrieve the id of.
         :type flow_name: str
-        :return: The Rapid Pro id for the given flow name.
+        :return: The Rapid Pro id for the given flow label.
         :rtype: str
         """
         flows = self.rapid_pro.get_flows().all(retry_on_rate_exceed=True)
@@ -36,7 +36,7 @@ class RapidProClient(object):
             available_flow_names = [f.name for f in flows]
             raise KeyError(f"Requested flow not found on RapidPro (Available flows: {', '.join(available_flow_names)})")
         if len(matching_flows) > 1:
-            raise KeyError("Non-unique flow name")
+            raise KeyError("Non-unique flow label")
 
         return matching_flows[0].uuid
 
@@ -326,6 +326,26 @@ class RapidProClient(object):
             lambda **kwargs: self.get_raw_runs_for_flow_id(flow_id, **kwargs), lambda run: run.id,
             prev_raw_data=prev_raw_runs, raw_export_log_file=raw_export_log_file
         )
+
+    def set_contact_fields(self, urn, contact_fields):
+        """
+
+        :param urn:
+        :type urn: str
+        :param contact_fields:
+        :type contact_fields: dict of str -> str
+        """
+        self.rapid_pro.update_contact(urn, fields=contact_fields)
+
+    def get_fields(self):
+        log.info("Fetching all fields...")
+        fields = self.rapid_pro.get_fields().all(retry_on_rate_exceed=True)
+        log.info(f"Downloaded {len(fields)} fields")
+        return fields
+
+    def create_field(self, label):
+        log.info(f"Creating field '{label}'...")
+        self.rapid_pro.create_field(label, "text")
 
     @staticmethod
     def convert_runs_to_traced_data(user, raw_runs, raw_contacts, phone_uuids, test_contacts=None):
