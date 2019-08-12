@@ -28,11 +28,11 @@ class RapidProClient(object):
         
     def get_flow_id(self, flow_name):
         """
-        Gets the id for the flow with the requested label.
+        Gets the id for the flow with the requested name.
 
         :param flow_name: Name of flow to retrieve the id of.
         :type flow_name: str
-        :return: The Rapid Pro id for the given flow label.
+        :return: The Rapid Pro id for the given flow name.
         :rtype: str
         """
         flows = self.rapid_pro.get_flows().all(retry_on_rate_exceed=True)
@@ -42,7 +42,7 @@ class RapidProClient(object):
             available_flow_names = [f.name for f in flows]
             raise KeyError(f"Requested flow not found on RapidPro (Available flows: {', '.join(available_flow_names)})")
         if len(matching_flows) > 1:
-            raise KeyError("Non-unique flow label")
+            raise KeyError("Non-unique flow name")
 
         return matching_flows[0].uuid
 
