@@ -59,8 +59,6 @@ if __name__ == "__main__":
     instance_1_contacts = instance_1.get_raw_contacts()
     instance_2_contacts = instance_2.get_raw_contacts()
 
-    instance_1_contacts = [c for c in instance_1_contacts if c.urns[0] != "tel:o2uk"]
-
     for contact in instance_1_contacts + instance_2_contacts:
         assert len(contact.urns) == 1
 
