@@ -1,16 +1,22 @@
 import datetime
 import json
+import random
+import time
 
-from core_data_modules.logging import Logger
 from core_data_modules.cleaners import PhoneCleaner
+from core_data_modules.logging import Logger
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils
+from temba_client.exceptions import TembaRateExceededError
 from temba_client.v2 import TembaClient, Broadcast
 
 log = Logger(__name__)
 
 
 class RapidProClient(object):
+    MAX_RETRIES = 5
+    MAX_BACKOFF_POWER = 6
+    
     def __init__(self, server, token):
         """
         :param server: Server hostname, e.g. 'rapidpro.io'
@@ -326,6 +332,75 @@ class RapidProClient(object):
             lambda **kwargs: self.get_raw_runs_for_flow_id(flow_id, **kwargs), lambda run: run.id,
             prev_raw_data=prev_raw_runs, raw_export_log_file=raw_export_log_file
         )
+
+    def update_contact(self, urn, name=None, contact_fields=None):
+        """
+        Updates a contact on the server.
+
+        :param urn: URN of the contact to update.
+        :type urn: str
+        :param name: Name to update to or None. If None, the contact's name is not updated.
+        :type name: str | None
+        :param contact_fields: Dictionary of field key to new field value | None. If None, no keys are updated.
+                               Keys present on the server contact but not in this dictionary are left unchanged.
+        :type contact_fields: (dict of str -> str) | None
+        """
+        self._retry_on_rate_exceed(lambda: self.rapid_pro.update_contact(urn, name=name, fields=contact_fields))
+
+    def get_fields(self):
+        """
+        Fetches all the contact fields.
+
+        :return: All contact fields.
+        :rtype: list of temba_client.v2.types.Field
+        """
+        log.info("Fetching all fields...")
+        fields = self.rapid_pro.get_fields().all(retry_on_rate_exceed=True)
+        log.info(f"Downloaded {len(fields)} fields")
+        return fields
+
+    def create_field(self, label):
+        """
+        Creates a contact field with the given label.
+
+        :param label: The name of the contact field to create.
+        :type label: str
+        :return: The contact field that was just created.
+        :rtype: temba_client.v2.types.Field
+        """
+        log.info(f"Creating field '{label}'...")
+        return self._retry_on_rate_exceed(lambda: self.rapid_pro.create_field(label, "text"))
+
+    @classmethod
+    def _retry_on_rate_exceed(cls, request):
+        """
+        Calls the given request function. If the Rapid Pro server fails with a rate exceeded error, retries up to 
+        cls.MAX_RETRIES times using binary exponential backoff.
+        
+        This function is needed because while the Rapid Pro API supports auto-retrying on get requests,
+        it does not for create/update/delete requests.
+        
+        :param request: Function which runs the request when called.
+        :type request: function
+        :return: Result of the request.
+        :rtype: any
+        """
+        retries = 0
+        while True:
+            try:
+                return request()
+            except TembaRateExceededError as ex:
+                retries += 1
+
+                if retries < cls.MAX_RETRIES and ex.retry_after:
+                    server_wait_time = ex.retry_after
+                    backoff_wait_time = random.uniform(0, 2 ** (min(retries, cls.MAX_BACKOFF_POWER)))
+                    
+                    log.debug(f"Rate exceeded. Sleeping for {server_wait_time + backoff_wait_time} seconds")
+
+                    time.sleep(server_wait_time + backoff_wait_time)
+                else:
+                    raise ex
 
     @staticmethod
     def convert_runs_to_traced_data(user, raw_runs, raw_contacts, phone_uuids, test_contacts=None):
