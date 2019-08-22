@@ -6,10 +6,10 @@ from storage.google_cloud import google_cloud_utils
 from rapid_pro_tools.rapid_pro_client import RapidProClient
 
 log = Logger(__name__)
-log.set_project_name("MigrateContacts")
+log.set_project_name("CopyContacts")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Migrates contacts from one Rapid Pro instance to another")
+    parser = argparse.ArgumentParser(description="Copies contacts from one Rapid Pro instance to another")
 
     parser.add_argument("google_cloud_credentials_file_path", metavar="google-cloud-credentials-file-path",
                         help="Path to a Google Cloud service account credentials file to use to access the "
@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     # For each contact field in the source instance, create a matching contact field in the target instance if it
     # does not already exist
-    log.info("Migrating contact fields...")
+    log.info("Copying contact fields...")
     source_fields = source_instance.get_fields()
     target_field_keys = {f.key for f in target_instance.get_fields()}
     for field in source_fields:

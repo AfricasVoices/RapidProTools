@@ -19,4 +19,4 @@ ADD Pipfile.lock /app
 RUN pipenv sync
 
 # Copy the rest of the project
-ADD migrate_contacts.py /app
+ADD copy_contacts.py /app
