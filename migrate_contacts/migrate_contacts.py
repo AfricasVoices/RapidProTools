@@ -50,7 +50,7 @@ if __name__ == "__main__":
     for field in source_fields:
         if field.key not in target_field_keys:
             target_instance.create_field(field.label)
-    log.info("Contact fields synchronised")
+    log.info("Contact fields copied")
 
     log.info("Fetching all contacts from the source instance...")
     contacts = source_instance.get_raw_contacts()
