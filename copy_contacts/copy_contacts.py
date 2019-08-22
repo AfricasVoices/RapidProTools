@@ -60,5 +60,8 @@ if __name__ == "__main__":
     # Language, groups, blocked, and stopped properties are not touched.
     for i, contact in enumerate(contacts):
         log.debug(f"Updating contact {i + 1}/{len(contacts)}...")
-        assert len(contact.urns) == 1
+        if len(contact.urns) != 1:
+            log.warning(f"Found a contact in the source instance with multiple URNS. "
+                        f"The RapidPro UUID is '{contact.uuid}'")
+            continue
         target_instance.update_contact(contact.urns[0], contact.name, contact.fields)
