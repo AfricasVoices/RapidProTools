@@ -2,11 +2,11 @@
 
 set -e
 
-IMAGE_NAME=migrate-contacts
+IMAGE_NAME=copy-contacts
 
 # Check that the correct number of arguments were provided.
 if [[ $# -ne 5 ]]; then
-    echo "Usage: ./docker-run-migrate-contacts.sh
+    echo "Usage: ./docker-run-copy-contacts.sh
     <google-cloud-credentials-file-path> <source-domain> <source-credentials-url> <target-domain>
     <target-credentials-url>"
     exit
