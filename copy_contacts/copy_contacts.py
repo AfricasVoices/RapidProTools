@@ -64,4 +64,6 @@ if __name__ == "__main__":
             log.warning(f"Found a contact in the source instance with multiple URNS. "
                         f"The RapidPro UUID is '{contact.uuid}'")
             continue
+        if contact.name == "":
+            contact.name = None
         target_instance.update_contact(contact.urns[0], contact.name, contact.fields)
