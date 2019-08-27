@@ -31,7 +31,7 @@ if __name__ == "__main__":
     instance_2_domain = args.instance_2_domain
     instance_2_credentials_url = args.instance_2_credentials_url
 
-    # Initialise the source/target instances
+    # Initialise the two instances
     log.info("Downloading the access token for instance 1...")
     instance_1_token = google_cloud_utils.download_blob_to_string(
         google_cloud_credentials_file_path, instance_1_credentials_url).strip()
