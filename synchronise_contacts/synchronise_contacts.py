@@ -59,8 +59,14 @@ if __name__ == "__main__":
     instance_1_contacts = instance_1.get_raw_contacts()
     instance_2_contacts = instance_2.get_raw_contacts()
 
-    for contact in instance_1_contacts + instance_2_contacts:
-        assert len(contact.urns) == 1
+    for contact in instance_1_contacts:
+        if len(contact.urns != 1):
+            log.warning(f"Found a contact in the source instance with multiple URNS. "
+                        f"The RapidPro UUID is '{contact.uuid}' in instance 1")
+    for contact in instance_2_contacts:
+        if len(contact.urns != 1):
+            log.warning(f"Found a contact in the source instance with multiple URNS. "
+                        f"The RapidPro UUID is '{contact.uuid}' in instance 2")
 
     instance_1_contacts_lut = {c.urns[0].split("#")[0]: c for c in instance_1_contacts}
     instance_2_contacts_lut = {c.urns[0].split("#")[0]: c for c in instance_2_contacts}
@@ -112,6 +118,15 @@ if __name__ == "__main__":
                 del fields[f]
             if fields[f] is None:
                 del fields[f]
+
+        if urn.startswith("tel:") and not urn.startswith("tel:+"):
+            log.warning(f"Found a contact in the source instance without a telephone number without a country "
+                        f"code; skipping. The RapidPro UUID is '{contact_v1.uuid}' in instance 1;"
+                        f"'{contact_v2.uuid}' in instance 2")
+            continue
+
+        if name == "":
+            name = None
 
         log.info(f"Synchronising contacts in both instances: {i + 1}/{len(urns_in_both_instances)} (contacts differ)")
         instance_1.update_contact(urn, name, fields)
