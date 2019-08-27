@@ -103,6 +103,15 @@ if __name__ == "__main__":
             fields = contact_v1.fields
             fields.update(contact_v2.fields)
 
+        # Drop unnecessary field updates.
+        # This reduces traffic, and the risk of overwriting fields which have been updated in Rapid Pro since the
+        # contacts were fetched (large syncs can take hours to days)
+        for f in list(fields):
+            if contact_v1.fields[f] == contact_v2.fields[f]:
+                del fields[f]
+            if fields[f] is None:
+                del fields[f]
+
         log.info(f"Synchronising contacts in both instances: {i + 1}/{len(urns_in_both_instances)} (contacts differ)")
         instance_1.update_contact(urn, name, fields)
         instance_2.update_contact(urn, name, fields)
