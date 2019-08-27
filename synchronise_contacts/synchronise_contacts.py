@@ -92,6 +92,7 @@ if __name__ == "__main__":
         # Contacts differ. Assume the most recent contact is correct.
         # IMPORTANT: If the same contact has been changed on both Rapid Pro instances since the last sync was performed,
         #            the older changes will be overwritten.
+        #            If contacts differ in each instance, interim updates on Rapid Pro may be overwritten.
         name = None
         fields = None
         if contact_v1.modified_on > contact_v2.modified_on:
