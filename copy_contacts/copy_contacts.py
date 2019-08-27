@@ -6,10 +6,10 @@ from storage.google_cloud import google_cloud_utils
 from rapid_pro_tools.rapid_pro_client import RapidProClient
 
 log = Logger(__name__)
-log.set_project_name("MigrateContacts")
+log.set_project_name("CopyContacts")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Migrates contacts from one Rapid Pro instance to another")
+    parser = argparse.ArgumentParser(description="Copies contacts from one Rapid Pro instance to another")
 
     parser.add_argument("google_cloud_credentials_file_path", metavar="google-cloud-credentials-file-path",
                         help="Path to a Google Cloud service account credentials file to use to access the "
@@ -44,13 +44,13 @@ if __name__ == "__main__":
 
     # For each contact field in the source instance, create a matching contact field in the target instance if it
     # does not already exist
-    log.info("Migrating contact fields...")
+    log.info("Copying contact fields...")
     source_fields = source_instance.get_fields()
     target_field_keys = {f.key for f in target_instance.get_fields()}
     for field in source_fields:
         if field.key not in target_field_keys:
             target_instance.create_field(field.label)
-    log.info("Contact fields synchronised")
+    log.info("Contact fields copied")
 
     log.info("Fetching all contacts from the source instance...")
     contacts = source_instance.get_raw_contacts()
@@ -60,5 +60,10 @@ if __name__ == "__main__":
     # Language, groups, blocked, and stopped properties are not touched.
     for i, contact in enumerate(contacts):
         log.debug(f"Updating contact {i + 1}/{len(contacts)}...")
-        assert len(contact.urns) == 1
+        if len(contact.urns) != 1:
+            log.warning(f"Found a contact in the source instance with multiple URNS. "
+                        f"The RapidPro UUID is '{contact.uuid}'")
+            continue
+        if contact.name == "":
+            contact.name = None
         target_instance.update_contact(contact.urns[0], contact.name, contact.fields)

@@ -2,11 +2,11 @@
 
 set -e
 
-IMAGE_NAME=migrate-contacts
+IMAGE_NAME=copy-contacts
 
 # Check that the correct number of arguments were provided.
 if [[ $# -ne 5 ]]; then
-    echo "Usage: ./docker-run-migrate-contacts.sh
+    echo "Usage: ./docker-run-copy-contacts.sh
     <google-cloud-credentials-file-path> <source-domain> <source-credentials-url> <target-domain>
     <target-credentials-url>"
     exit
@@ -22,7 +22,7 @@ TARGET_DOMAIN_URL=$5
 # Build an image for this pipeline stage.
 docker build -t "$IMAGE_NAME" .
 
-CMD="pipenv run python -u migrate_contacts.py \
+CMD="pipenv run python -u copy_contacts.py \
     /credentials/google-cloud-credentials.json \
     \"$SOURCE_DOMAIN\" \"$SOURCE_CREDENTIALS_URL\" \
     \"$TARGET_DOMAIN\" \"$TARGET_DOMAIN_URL\"
