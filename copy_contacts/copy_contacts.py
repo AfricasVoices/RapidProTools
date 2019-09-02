@@ -54,16 +54,30 @@ if __name__ == "__main__":
 
     log.info("Fetching all contacts from the source instance...")
     contacts = source_instance.get_raw_contacts()
+    log.info(f"Fetched {len(contacts)} contacts")
 
     log.info("Updating contacts in the target instance...")
     # Update each contact's name and fields.
     # Language, groups, blocked, and stopped properties are not touched.
+    multiple_urns_count = 0
+    telephone_with_no_country_code_count = 0
+    updated_count = 0
     for i, contact in enumerate(contacts):
         log.debug(f"Updating contact {i + 1}/{len(contacts)}...")
         if len(contact.urns) != 1:
             log.warning(f"Found a contact in the source instance with multiple URNS. "
                         f"The RapidPro UUID is '{contact.uuid}'")
+            multiple_urns_count += 1
+            continue
+        if contact.urns[0].startswith("tel:") and not contact.urns[0].startswith("tel:+"):
+            log.warning(f"Found a contact in the source instance with a telephone number that has no country "
+                        f"code; skipping. The RapidPro UUID is '{contact.uuid}'")
+            telephone_with_no_country_code_count += 1
             continue
         if contact.name == "":
             contact.name = None
         target_instance.update_contact(contact.urns[0], contact.name, contact.fields)
+        updated_count += 1
+
+    log.info(f"Done. Copied {updated_count} contacts. Failed to copy {multiple_urns_count} contacts with multiple "
+             f"URNS, and {telephone_with_no_country_code_count} contacts with a telephone number but no country code")
