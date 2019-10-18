@@ -345,7 +345,7 @@ class RapidProClient(object):
                                Keys present on the server contact but not in this dictionary are left unchanged.
         :type contact_fields: (dict of str -> str) | None
         """
-        self._retry_on_rate_exceed(lambda: self.rapid_pro.update_contact(urn, name=name, fields=contact_fields))
+        return self._retry_on_rate_exceed(lambda: self.rapid_pro.update_contact(urn, name=name, fields=contact_fields))
 
     def get_fields(self):
         """
