@@ -86,8 +86,8 @@ if __name__ == "__main__":
     instance_1_contacts_lut = {c.urns[0].split("#")[0]: c for c in instance_1_contacts}
     instance_2_contacts_lut = {c.urns[0].split("#")[0]: c for c in instance_2_contacts}
     
-    # Set blank names to None, because while RapidPro can return empty string contact names, it doesn't accept them 
-    # when uploading
+    # Set names that are empty string to None, because while RapidPro can return empty string contact names,
+    # it doesn't accept them when uploading
     for contact in instance_1_contacts:
         if contact.name == "":
             contact.name = None
