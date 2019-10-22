@@ -85,6 +85,15 @@ if __name__ == "__main__":
     # Trim URN metadata because although Rapid Pro sometimes provides some in its get APIs, it refuses them when setting
     instance_1_contacts_lut = {c.urns[0].split("#")[0]: c for c in instance_1_contacts}
     instance_2_contacts_lut = {c.urns[0].split("#")[0]: c for c in instance_2_contacts}
+    
+    # Set blank names to None, because while RapidPro can return empty string contact names, it doesn't accept them 
+    # when uploading
+    for contact in instance_1_contacts:
+        if contact.name == "":
+            contact.name = None
+    for contact in instance_2_contacts:
+        if contact.name == "":
+            contact.name = None
 
     # Update contacts present in instance 1 but not in instance 2
     urns_unique_to_instance_1 = instance_1_contacts_lut.keys() - instance_2_contacts_lut.keys()
