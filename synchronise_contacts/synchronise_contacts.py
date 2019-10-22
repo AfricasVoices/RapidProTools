@@ -89,26 +89,29 @@ if __name__ == "__main__":
     # Update contacts present in instance 1 but not in instance 2
     urns_unique_to_instance_1 = instance_1_contacts_lut.keys() - instance_2_contacts_lut.keys()
     for i, urn in enumerate(urns_unique_to_instance_1):
-        log.info(f"Adding new contacts to instance 2: {i + 1}/{len(urns_unique_to_instance_1)}")
         contact = instance_1_contacts_lut[urn]
+        log.info(f"Adding new contacts to instance 2: {i + 1}/{len(urns_unique_to_instance_1)} "
+                 f"(Rapid Pro UUID '{contact.uuid}' in instance 1)")
         instance_2.update_contact(contact.urns[0], contact.name, contact.fields)
 
     # Update contacts present in instance 2 but not in instance 1
     urns_unique_to_instance_2 = instance_2_contacts_lut.keys() - instance_1_contacts_lut.keys()
     for i, urn in enumerate(urns_unique_to_instance_2):
-        log.info(f"Adding new contacts to instance 1: {i + 1}/{len(urns_unique_to_instance_2)}")
         contact = instance_2_contacts_lut[urn]
+        log.info(f"Adding new contacts to instance 1: {i + 1}/{len(urns_unique_to_instance_2)} "
+                 f"(Rapid Pro UUID '{contact.uuid}' in instance 2)")
         instance_1.update_contact(contact.urns[0], contact.name, contact.fields)
 
     # Update contacts present in both instances
     urns_in_both_instances = instance_1_contacts_lut.keys() & instance_2_contacts_lut.keys()
-    for i, urn in enumerate(urns_in_both_instances):
+    for i, urn in enumerate(sorted(urns_in_both_instances)):
         contact_v1 = instance_1_contacts_lut[urn]
         contact_v2 = instance_2_contacts_lut[urn]
 
         if contact_v1.name == contact_v2.name and contact_v1.fields == contact_v2.fields:
             log.info(f"Synchronising contacts in both instances {i + 1}/{len(urns_in_both_instances)}: "
-                     f"Contacts identical")
+                     f"Contacts identical."
+                     f"Rapid Pro UUIDs are '{contact_v1.uuid}' in instance 1; '{contact_v2.uuid}' in instance 2")
             continue
 
         # Contacts differ
@@ -123,9 +126,11 @@ if __name__ == "__main__":
         #            the older changes will be overwritten.
         if contact_v1.modified_on > contact_v2.modified_on:
             log.info(f"Synchronising contacts in both instances {i + 1}/{len(urns_in_both_instances)}: "
-                     f"Contacts differ, overwriting the contact in instance 2 with the more recent one in instance 1")
+                     f"Contacts differ, overwriting the contact in instance 2 with the more recent one in instance 1. "
+                     f"Rapid Pro UUIDs are '{contact_v1.uuid}' in instance 1; '{contact_v2.uuid}' in instance 2")
             instance_2.update_contact(urn, contact_v1.name, contact_v1.fields)
         else:
             log.info(f"Synchronising contacts in both instances {i + 1}/{len(urns_in_both_instances)}: "
-                     f"Contacts differ, overwriting the contact in instance 1 with the more recent one in instance 2")
+                     f"Contacts differ, overwriting the contact in instance 1 with the more recent one in instance 2. "
+                     f"Rapid Pro UUIDs are '{contact_v1.uuid}' in instance 1; '{contact_v2.uuid}' in instance 2")
             instance_1.update_contact(urn, contact_v2.name, contact_v2.fields)
