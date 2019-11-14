@@ -57,6 +57,9 @@ class RapidProClient(object):
         """
         return [self.get_flow_id(name) for name in flow_names]
 
+    def get_all_flow_ids(self):
+        return self.rapid_pro.get_flows()
+
     def get_flow_definitions_for_flow_ids(self, flow_ids):
         """
         Gets the definitions for the flows with the requested ids from Rapid Pro.
