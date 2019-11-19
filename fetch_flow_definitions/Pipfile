@@ -1,0 +1,15 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+coredatamodules = {editable = true,git = "https://www.github.com/AfricasVoices/CoreDataModules",ref = "v0.11.2"}
+rapidprotools = {editable = true,git = "https://www.github.com/AfricasVoices/RapidProTools",ref = "get-all-flow-ids"}
+pipelineinfrastructure = {editable = true,git = "https://www.github.com/AfricasVoices/Pipeline-Infrastructure",ref = "v0.0.3"}
+rapidpro-python = "*"
+
+[requires]
+python_version = "3.6"
