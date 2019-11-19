@@ -57,6 +57,15 @@ class RapidProClient(object):
         """
         return [self.get_flow_id(name) for name in flow_names]
 
+    def get_all_flow_ids(self):
+        """
+        Gets all the flow ids currently available on the Rapid Pro instance.
+        
+        :return: Ids of all flows on Rapid Pro instance.
+        :rtype: list of str
+        """
+        return [f.uuid for f in self.rapid_pro.get_flows().all(retry_on_rate_exceed=True)]
+
     def get_flow_definitions_for_flow_ids(self, flow_ids):
         """
         Gets the definitions for the flows with the requested ids from Rapid Pro.
