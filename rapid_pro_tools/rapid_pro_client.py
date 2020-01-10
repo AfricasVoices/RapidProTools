@@ -2,13 +2,16 @@ import datetime
 import json
 import random
 import time
+import urllib
+import gzip
+from io import BytesIO
 
 from core_data_modules.cleaners import PhoneCleaner
 from core_data_modules.logging import Logger
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils
 from temba_client.exceptions import TembaRateExceededError
-from temba_client.v2 import TembaClient, Broadcast
+from temba_client.v2 import TembaClient, Broadcast, Run
 
 log = Logger(__name__)
 
@@ -26,6 +29,68 @@ class RapidProClient(object):
         """
         self.rapid_pro = TembaClient(server, token)
         
+    def list_archives(self, archive_type=None):
+        """
+        Lists all of the available archives on this instance.
+
+        Returns a list of objects with archive metadata. Pass one of these metadata objects into
+        `RapidProClient.get_archive` to download the archive itself. Note that the download links in the returned
+        metadata are only valid for a short period of time. From experimentation as at January 2020,
+        links are valid for 1 day after this call is made.
+        
+        :param archive_type: The type of archives to list (either 'message' or 'run') or None.
+                             If None, lists both types of archive.
+        :type archive_type: str | None
+        :return: List of available archives on this instance.
+        :rtype: list of temba_client.v2.types.Archive
+        """
+        assert archive_type in {"message", "run"}
+
+        return self.rapid_pro.get_archives(archive_type=archive_type).all(retry_on_rate_exceed=True)
+
+    def get_archive(self, archive_metadata):
+        """
+        Downloads the archive specified by an archive metadata object, and converts it into a valid list of Message
+        or Run objects.
+        
+        Note: Deserializing to message objects is not yet implemented, so requests for message archives will fail
+        with an assertion error.
+        TODO: Support deserializing messages
+
+        :param archive_metadata: Metadata for the archive. To obtain these, see `RapidProClient.list_archives`.
+        :type archive_metadata: temba_client.v2.types.Archive
+        :return: Data downloaded from the archive.
+        :rtype: list of temba_client.v2.Message | list of temba_client.v2.Run
+        """
+        # Download the archive, which is in a gzipped JSONL format, and decompress.
+        log.info(f"Downloading archive from {archive_metadata.download_url}")
+        archive_response = urllib.request.urlopen(archive_metadata.download_url)
+        raw_file = BytesIO(archive_response.read())
+        decompressed_file = gzip.GzipFile(fileobj=raw_file)
+
+        # Convert each of the decompressed results to a Run or Message object, depending on what the archive contains.
+        results = []
+        if archive_metadata.archive_type == "run":
+            for line in decompressed_file.readlines():
+                serialized_run = json.loads(line)
+
+                # Set the 'start' field to null if it doesn't exist.
+                # This field is required to be present in order to be able to deserialize runs, but is often not
+                # present in the downloaded data (possibly because the archiving process removes null fields, but
+                # I haven't verified this). Since this field is often null in the data that comes out of the runs
+                # API directly, and we don't use this in the pipelines, just set missing entries to None.
+                if "start" not in serialized_run:
+                    serialized_run["start"] = None
+                    
+                results.append(Run.deserialize(serialized_run))
+        else:
+            # TODO: Support deserializing messages
+            assert False, "Deserializing messages archives is not implemented yet"
+
+        assert len(results) == archive_metadata.record_count
+
+        return results
+
     def get_flow_id(self, flow_name):
         """
         Gets the id for the flow with the requested name.
