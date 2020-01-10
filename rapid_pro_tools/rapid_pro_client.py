@@ -87,7 +87,7 @@ class RapidProClient(object):
             # TODO: Support deserializing messages
             assert False, "Deserializing messages archives is not implemented yet"
 
-        assert len(results) == len(archive_metadata.record_count)
+        assert len(results) == archive_metadata.record_count
 
         return results
 
