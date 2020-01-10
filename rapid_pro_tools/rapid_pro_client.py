@@ -1,15 +1,16 @@
 import datetime
+import gzip
 import json
 import random
 import time
 import urllib
-import gzip
 from io import BytesIO
 
 from core_data_modules.cleaners import PhoneCleaner
 from core_data_modules.logging import Logger
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils
+from dateutil.relativedelta import relativedelta
 from temba_client.exceptions import TembaRateExceededError
 from temba_client.v2 import TembaClient, Broadcast, Run
 
@@ -63,7 +64,7 @@ class RapidProClient(object):
         :rtype: list of temba_client.v2.Message | list of temba_client.v2.Run
         """
         # Download the archive, which is in a gzipped JSONL format, and decompress.
-        log.info(f"Downloading archive from {archive_metadata.download_url}")
+        log.info(f"Downloading {archive_metadata.record_count} records from archive {archive_metadata.download_url}...")
         archive_response = urllib.request.urlopen(archive_metadata.download_url)
         raw_file = BytesIO(archive_response.read())
         decompressed_file = gzip.GzipFile(fileobj=raw_file)
@@ -221,6 +222,37 @@ class RapidProClient(object):
             f"(expected exactly 1)"
         return matching_broadcasts[0]
 
+    def _get_archived_runs_for_flow_id(self, flow_id, last_modified_after_inclusive=None,
+                                       last_modified_before_exclusive=None):
+        runs = []
+        for archive_metadata in self.list_archives("run"):
+            archive_start_range = archive_metadata.start_date
+            if archive_metadata.period == "daily":
+                archive_end_range = archive_start_range + relativedelta(days=1, microseconds=-1)
+            else:
+                assert archive_metadata.period == "monthly"
+                archive_end_range = archive_start_range + relativedelta(months=1, microseconds=-1)
+
+            if (last_modified_after_inclusive is not None and archive_end_range < last_modified_after_inclusive) or \
+                    (last_modified_before_exclusive is not None and archive_start_range >= last_modified_before_exclusive):
+                log.debug(f"Skipping archive with start date {archive_metadata.start_date} and period "
+                          f"'{archive_metadata.period}' (derived end date for this archive was {archive_end_range})")
+                continue
+
+            for run in self.get_archive(archive_metadata):
+                # Skip runs from flows other than the flow of interest
+                if run.flow.uuid != flow_id:
+                    continue
+
+                # Skip runs from a datetime that is outside the date range of interest
+                if (last_modified_after_inclusive is not None and run.modified_on < last_modified_after_inclusive) or \
+                        (last_modified_before_exclusive is not None and run.modified_on >= last_modified_before_exclusive):
+                    continue
+
+                runs.append(run)
+
+        return runs
+
     def get_raw_runs_for_flow_id(self, flow_id, last_modified_after_inclusive=None, last_modified_before_exclusive=None,
                                  raw_export_log_file=None):
         """
@@ -250,8 +282,14 @@ class RapidProClient(object):
         if last_modified_before_exclusive is not None:
             last_modified_before_inclusive = last_modified_before_exclusive - datetime.timedelta(microseconds=1)
 
-        raw_runs = self.rapid_pro.get_runs(
-            flow=flow_id, after=last_modified_after_inclusive, before=last_modified_before_inclusive).all(retry_on_rate_exceed=True)
+        archived_runs = self._get_archived_runs_for_flow_id(
+            flow_id, last_modified_after_inclusive=last_modified_after_inclusive,
+            last_modified_before_exclusive=last_modified_before_exclusive
+        )
+
+        raw_runs = archived_runs + self.rapid_pro.get_runs(
+            flow=flow_id, after=last_modified_after_inclusive, before=last_modified_before_inclusive
+        ).all(retry_on_rate_exceed=True)
 
         log.info(f"Fetched {len(raw_runs)} runs")
 
@@ -265,7 +303,7 @@ class RapidProClient(object):
 
         # Sort in ascending order of modification date
         raw_runs = list(raw_runs)
-        raw_runs.reverse()
+        raw_runs.sort(key=lambda run: run.modified_on)
 
         return raw_runs
 
