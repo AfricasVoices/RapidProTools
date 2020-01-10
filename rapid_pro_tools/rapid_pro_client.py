@@ -64,7 +64,8 @@ class RapidProClient(object):
         :rtype: list of temba_client.v2.Message | list of temba_client.v2.Run
         """
         # Download the archive, which is in a gzipped JSONL format, and decompress.
-        log.info(f"Downloading {archive_metadata.record_count} records from archive {archive_metadata.download_url}...")
+        log.info(f"Downloading {archive_metadata.record_count} records from {archive_metadata.period} archive "
+                 f"{archive_metadata.start_date} ({archive_metadata.download_url})...")
         archive_response = urllib.request.urlopen(archive_metadata.download_url)
         raw_file = BytesIO(archive_response.read())
         decompressed_file = gzip.GzipFile(fileobj=raw_file)
