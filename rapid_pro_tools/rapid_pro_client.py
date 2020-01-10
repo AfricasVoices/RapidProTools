@@ -287,11 +287,19 @@ class RapidProClient(object):
             last_modified_before_exclusive=last_modified_before_exclusive
         )
 
-        raw_runs = archived_runs + self.rapid_pro.get_runs(
+        live_runs = self.rapid_pro.get_runs(
             flow=flow_id, after=last_modified_after_inclusive, before=last_modified_before_inclusive
         ).all(retry_on_rate_exceed=True)
 
-        log.info(f"Fetched {len(raw_runs)} runs")
+        raw_runs = archived_runs + live_runs
+        log.info(f"Fetched {len(raw_runs)} runs ({len(archived_runs)} from archives, {len(live_runs)} from production)")
+
+        # Check that we only see each run once. This shouldn't be possible, due to
+        # https://github.com/nyaruka/rp-archiver/blob/7d3430b5260fa92abb62d828fc526af8e9d9d50a/archiver.go#L624,
+        # but this check exists to be safe.
+        assert len(raw_runs) == len({run.id for run in raw_runs}), "Duplicate run found in the downloaded data. " \
+                                                                   "This could be because a run with this id exists " \
+                                                                   "in both the archives and live database."
 
         if raw_export_log_file is not None:
             log.info(f"Logging {len(raw_runs)} fetched runs...")
