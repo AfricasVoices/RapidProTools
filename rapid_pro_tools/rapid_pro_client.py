@@ -316,9 +316,12 @@ class RapidProClient(object):
         # Check that we only see each run once. This shouldn't be possible, due to
         # https://github.com/nyaruka/rp-archiver/blob/7d3430b5260fa92abb62d828fc526af8e9d9d50a/archiver.go#L624,
         # but this check exists to be safe.
-        assert len(raw_runs) == len({run.id for run in raw_runs}), "Duplicate run found in the downloaded data. " \
-                                                                   "This could be because a run with this id exists " \
-                                                                   "in both the archives and live database."
+        seen_run_ids = set()
+        for run in raw_runs:
+            assert run.id not in seen_run_ids, f"Duplicate run {run.id} found in the downloaded data. This could be " \
+                                               f"because a run with this id exists in both the archives and the live " \
+                                               f"database."
+            seen_run_ids.add(run.id)
 
         if raw_export_log_file is not None:
             log.info(f"Logging {len(raw_runs)} fetched runs...")
