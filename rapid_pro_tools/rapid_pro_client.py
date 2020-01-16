@@ -11,7 +11,7 @@ from core_data_modules.logging import Logger
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils
 from temba_client.exceptions import TembaRateExceededError
-from temba_client.v2 import TembaClient, Broadcast, Run
+from temba_client.v2 import TembaClient, Broadcast, Run, Message
 
 log = Logger(__name__)
 
@@ -53,10 +53,6 @@ class RapidProClient(object):
         Downloads the archive specified by an archive metadata object, and converts it into a valid list of Message
         or Run objects.
         
-        Note: Deserializing to message objects is not yet implemented, so requests for message archives will fail
-        with an assertion error.
-        TODO: Support deserializing messages
-
         :param archive_metadata: Metadata for the archive. To obtain these, see `RapidProClient.list_archives`.
         :type archive_metadata: temba_client.v2.types.Archive
         :return: Data downloaded from the archive.
@@ -83,9 +79,12 @@ class RapidProClient(object):
                     serialized_run["start"] = None
                     
                 results.append(Run.deserialize(serialized_run))
-        else:
-            # TODO: Support deserializing messages
-            assert False, "Deserializing messages archives is not implemented yet"
+        
+        if archive_metadata.archive_type == "message":
+            for line in decompressed_file.readlines():
+                serialized_msg = json.loads(line)
+
+                results.append(Message.deserialize(serialized_msg))
 
         assert len(results) == archive_metadata.record_count
 
