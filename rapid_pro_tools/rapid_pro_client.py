@@ -80,7 +80,8 @@ class RapidProClient(object):
                     
                 results.append(Run.deserialize(serialized_run))
         
-        if archive_metadata.archive_type == "message":
+        else:
+            assert archive_metadata.archive_type == "message", "Unsupported archive type, must be either 'run' or 'message'"
             for line in decompressed_file.readlines():
                 serialized_msg = json.loads(line)
 
