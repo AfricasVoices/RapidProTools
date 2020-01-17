@@ -1,15 +1,16 @@
 import datetime
+import gzip
 import json
 import random
 import time
 import urllib
-import gzip
 from io import BytesIO
 
 from core_data_modules.cleaners import PhoneCleaner
 from core_data_modules.logging import Logger
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils
+from dateutil.relativedelta import relativedelta
 from temba_client.exceptions import TembaRateExceededError
 from temba_client.v2 import TembaClient, Broadcast, Run, Message
 
@@ -59,7 +60,8 @@ class RapidProClient(object):
         :rtype: list of temba_client.v2.Message | list of temba_client.v2.Run
         """
         # Download the archive, which is in a gzipped JSONL format, and decompress.
-        log.info(f"Downloading archive from {archive_metadata.download_url}")
+        log.info(f"Downloading {archive_metadata.record_count} records from {archive_metadata.period} archive "
+                 f"{archive_metadata.start_date} ({archive_metadata.download_url})...")
         archive_response = urllib.request.urlopen(archive_metadata.download_url)
         raw_file = BytesIO(archive_response.read())
         decompressed_file = gzip.GzipFile(fileobj=raw_file)
@@ -221,10 +223,59 @@ class RapidProClient(object):
             f"(expected exactly 1)"
         return matching_broadcasts[0]
 
+    def _get_archived_runs_for_flow_id(self, flow_id, last_modified_after_inclusive=None,
+                                       last_modified_before_exclusive=None):
+        """
+        Gets the raw runs for the given flow_id from Rapid Pro's archives.
+        
+        Uses the last_modified dates to determine which archives to download.
+
+        :param flow_id: Id of the flow to download the runs of.
+        :type flow_id: str
+        :param last_modified_after_inclusive: Start of the date-range to download runs from.
+                                              If set, only downloads runs last modified since that date,
+                                              otherwise downloads from the beginning of time.
+        :type last_modified_after_inclusive: datetime.datetime | None
+        :param last_modified_before_exclusive: End of the date-range to download runs from.
+                                               If set, only downloads runs last modified before that date,
+                                               otherwise downloads until the end of time.
+        :return: Raw runs downloaded from Rapid Pro's archives.
+        :rtype: list of temba_client.v2.types.Run
+        """
+        runs = []
+        for archive_metadata in self.list_archives("run"):
+            # Determine the start and end dates for this archive
+            archive_start_date = archive_metadata.start_date
+            if archive_metadata.period == "daily":
+                archive_end_date = archive_start_date + relativedelta(days=1, microseconds=-1)
+            else:
+                assert archive_metadata.period == "monthly"
+                archive_end_date = archive_start_date + relativedelta(months=1, microseconds=-1)
+
+            if (last_modified_after_inclusive is not None and archive_end_date < last_modified_after_inclusive) or \
+                    (last_modified_before_exclusive is not None and archive_start_date >= last_modified_before_exclusive):
+                log.debug(f"Skipping {archive_metadata.period} archive with date range {archive_start_date} - "
+                          f"{archive_end_date}")
+                continue
+
+            for run in self.get_archive(archive_metadata):
+                # Skip runs from flows other than the flow of interest
+                if run.flow.uuid != flow_id:
+                    continue
+
+                # Skip runs from a datetime that is outside the date range of interest
+                if (last_modified_after_inclusive is not None and run.modified_on < last_modified_after_inclusive) or \
+                        (last_modified_before_exclusive is not None and run.modified_on >= last_modified_before_exclusive):
+                    continue
+
+                runs.append(run)
+
+        return runs
+
     def get_raw_runs_for_flow_id(self, flow_id, last_modified_after_inclusive=None, last_modified_before_exclusive=None,
                                  raw_export_log_file=None):
         """
-        Gets the raw runs for the given flow_id from RapidPro.
+        Gets the raw runs for the given flow_id from Rapid Pro's live database and, if needed, from its archives.
 
         :param flow_id: Id of the flow to download the runs of.
         :type flow_id: str
@@ -250,10 +301,27 @@ class RapidProClient(object):
         if last_modified_before_exclusive is not None:
             last_modified_before_inclusive = last_modified_before_exclusive - datetime.timedelta(microseconds=1)
 
-        raw_runs = self.rapid_pro.get_runs(
-            flow=flow_id, after=last_modified_after_inclusive, before=last_modified_before_inclusive).all(retry_on_rate_exceed=True)
+        archived_runs = self._get_archived_runs_for_flow_id(
+            flow_id, last_modified_after_inclusive=last_modified_after_inclusive,
+            last_modified_before_exclusive=last_modified_before_exclusive
+        )
 
-        log.info(f"Fetched {len(raw_runs)} runs")
+        live_runs = self.rapid_pro.get_runs(
+            flow=flow_id, after=last_modified_after_inclusive, before=last_modified_before_inclusive
+        ).all(retry_on_rate_exceed=True)
+
+        raw_runs = archived_runs + live_runs
+        log.info(f"Fetched {len(raw_runs)} runs ({len(archived_runs)} from archives, {len(live_runs)} from production)")
+
+        # Check that we only see each run once. This shouldn't be possible, due to
+        # https://github.com/nyaruka/rp-archiver/blob/7d3430b5260fa92abb62d828fc526af8e9d9d50a/archiver.go#L624,
+        # but this check exists to be safe.
+        seen_run_ids = set()
+        for run in raw_runs:
+            assert run.id not in seen_run_ids, f"Duplicate run {run.id} found in the downloaded data. This could be " \
+                                               f"because a run with this id exists in both the archives and the live " \
+                                               f"database."
+            seen_run_ids.add(run.id)
 
         if raw_export_log_file is not None:
             log.info(f"Logging {len(raw_runs)} fetched runs...")
@@ -265,7 +333,7 @@ class RapidProClient(object):
 
         # Sort in ascending order of modification date
         raw_runs = list(raw_runs)
-        raw_runs.reverse()
+        raw_runs.sort(key=lambda run: run.modified_on)
 
         return raw_runs
 
