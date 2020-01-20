@@ -480,7 +480,7 @@ class RapidProClient(object):
         :rtype: list of temba_client.v2.types.Run
         """
         return self.update_raw_data_with_latest_modified(
-            lambda **kwargs: self.get_raw_runs_for_flow_id(flow_id, ignore_archives=ignore_archives **kwargs),
+            lambda **kwargs: self.get_raw_runs_for_flow_id(flow_id, ignore_archives=ignore_archives, **kwargs),
             lambda run: run.id, prev_raw_data=prev_raw_runs, raw_export_log_file=raw_export_log_file
         )
 
