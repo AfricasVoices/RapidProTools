@@ -289,7 +289,7 @@ class RapidProClient(object):
         :param raw_export_log_file: File to write the raw data downloaded during this function call to,
                                     as serialised json.
         :type raw_export_log_file: file-like | None
-        :param ignore_archives: Whether to ignore any runs in Rapid Pro's archives.
+        :param ignore_archives: If True, skips downloading runs from Rapid Pro's archives.
         :type ignore_archives: bool
         :return: Raw runs downloaded from Rapid Pro.
         :rtype: list of temba_client.v2.types.Run
@@ -474,7 +474,7 @@ class RapidProClient(object):
         :type prev_raw_runs: list of temba_client.v2.types.Run | None
         :param raw_export_log_file: File to write the newly retrieved runs to as json.
         :type raw_export_log_file: file-like | None
-        :param ignore_archives: Whether to ignore any runs in Rapid Pro's archives.
+        :param ignore_archives: If True, skips downloading runs from Rapid Pro's archives.
         :type ignore_archives: bool
         :return: Updated list of Rapid Pro Run objects.
         :rtype: list of temba_client.v2.types.Run
