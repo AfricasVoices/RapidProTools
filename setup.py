@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="RapidProTools",
-    version="0.3.1",
+    version="0.3.2",
     url="https://github.com/AfricasVoices/RapidProTools",
     packages=["rapid_pro_tools"],
     install_requires=["CoreDataModules", "PipelineInfrastructure", "rapidpro-python", "python-dateutil"],
