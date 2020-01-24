@@ -273,7 +273,7 @@ class RapidProClient(object):
         return runs
 
     def get_raw_runs_for_flow_id(self, flow_id, last_modified_after_inclusive=None, last_modified_before_exclusive=None,
-                                 raw_export_log_file=None):
+                                 raw_export_log_file=None, ignore_archives=False):
         """
         Gets the raw runs for the given flow_id from Rapid Pro's live database and, if needed, from its archives.
 
@@ -289,6 +289,8 @@ class RapidProClient(object):
         :param raw_export_log_file: File to write the raw data downloaded during this function call to,
                                     as serialised json.
         :type raw_export_log_file: file-like | None
+        :param ignore_archives: If True, skips downloading runs from Rapid Pro's archives.
+        :type ignore_archives: bool
         :return: Raw runs downloaded from Rapid Pro.
         :rtype: list of temba_client.v2.types.Run
         """
@@ -301,10 +303,14 @@ class RapidProClient(object):
         if last_modified_before_exclusive is not None:
             last_modified_before_inclusive = last_modified_before_exclusive - datetime.timedelta(microseconds=1)
 
-        archived_runs = self._get_archived_runs_for_flow_id(
-            flow_id, last_modified_after_inclusive=last_modified_after_inclusive,
-            last_modified_before_exclusive=last_modified_before_exclusive
-        )
+        if ignore_archives:
+            log.debug(f"Ignoring runs in archives (because `ignore_archives` argument was set to True)")
+            archived_runs = []
+        else:
+            archived_runs = self._get_archived_runs_for_flow_id(
+                flow_id, last_modified_after_inclusive=last_modified_after_inclusive,
+                last_modified_before_exclusive=last_modified_before_exclusive
+            )
 
         live_runs = self.rapid_pro.get_runs(
             flow=flow_id, after=last_modified_after_inclusive, before=last_modified_before_inclusive
@@ -455,7 +461,8 @@ class RapidProClient(object):
             prev_raw_data=prev_raw_contacts, raw_export_log_file=raw_export_log_file
         )
 
-    def update_raw_runs_with_latest_modified(self, flow_id, prev_raw_runs=None, raw_export_log_file=None):
+    def update_raw_runs_with_latest_modified(self, flow_id, prev_raw_runs=None, raw_export_log_file=None,
+                                             ignore_archives=False):
         """
         Updates a list of runs previously downloaded from Rapid Pro, by only fetching runs which have been
         updated since that previous export was performed.
@@ -467,12 +474,14 @@ class RapidProClient(object):
         :type prev_raw_runs: list of temba_client.v2.types.Run | None
         :param raw_export_log_file: File to write the newly retrieved runs to as json.
         :type raw_export_log_file: file-like | None
+        :param ignore_archives: If True, skips downloading runs from Rapid Pro's archives.
+        :type ignore_archives: bool
         :return: Updated list of Rapid Pro Run objects.
         :rtype: list of temba_client.v2.types.Run
         """
         return self.update_raw_data_with_latest_modified(
-            lambda **kwargs: self.get_raw_runs_for_flow_id(flow_id, **kwargs), lambda run: run.id,
-            prev_raw_data=prev_raw_runs, raw_export_log_file=raw_export_log_file
+            lambda **kwargs: self.get_raw_runs_for_flow_id(flow_id, ignore_archives=ignore_archives, **kwargs),
+            lambda run: run.id, prev_raw_data=prev_raw_runs, raw_export_log_file=raw_export_log_file
         )
 
     def update_contact(self, urn, name=None, contact_fields=None):
