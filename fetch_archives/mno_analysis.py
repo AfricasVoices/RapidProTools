@@ -90,3 +90,7 @@ def no_msg():
 # no_msg()
 # window_of_downtime()
 
+# Messages received per time over the period of the project.
+# Add Total incoming or Outgoing, Operator to the generated output => Total incoming + Outgoing / Operator
+# Write function to generate data when either of the two functions run
+# Draw the graphs
