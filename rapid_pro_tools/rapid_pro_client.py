@@ -144,19 +144,19 @@ class RapidProClient(object):
         """
         return self.rapid_pro.get_definitions(flows=flow_ids, dependencies="all")
     
-    def _get_archived_messages(self, last_modified_after_inclusive=None,
-                                       last_modified_before_exclusive=None):
+    def _get_archived_messages(self, created_after_inclusive=None,
+                                       created_before_exclusive=None):
         """
         Gets the raw messages from Rapid Pro's archives.
         
-        Uses the last_modified dates to determine which archives to download.
+        Uses the created dates to determine which archives to download.
 
-        :param last_modified_after_inclusive: Start of the date-range to download messages from.
-                                              If set, only downloads messages last modified since that date,
+        :param created_after_inclusive: Start of the date-range to download messages from.
+                                              If set, only downloads messages created since that date,
                                               otherwise downloads from the beginning of time.
-        :type last_modified_after_inclusive: datetime.datetime | None
-        :param last_modified_before_exclusive: End of the date-range to download messages from.
-                                               If set, only downloads messages last modified before that date,
+        :type created_after_inclusive: datetime.datetime | None
+        :param created_before_exclusive: End of the date-range to download messages from.
+                                               If set, only downloads messages created before that date,
                                                otherwise downloads until the end of time.
         :return: Raw messages downloaded from Rapid Pro's archives.
         :rtype: list of temba_client.v2.types.Message
@@ -171,8 +171,8 @@ class RapidProClient(object):
                 assert archive_metadata.period == "monthly"
                 archive_end_date = archive_start_date + relativedelta(months=1, microseconds=-1)
 
-            if (last_modified_after_inclusive is not None and archive_end_date < last_modified_after_inclusive) or \
-                    (last_modified_before_exclusive is not None and archive_start_date >= last_modified_before_exclusive):
+            if (created_after_inclusive is not None and archive_end_date < created_after_inclusive) or \
+                    (created_before_exclusive is not None and archive_start_date >= created_before_exclusive):
                 log.debug(f"Skipping {archive_metadata.period} archive with date range {archive_start_date} - "
                           f"{archive_end_date}")
                 continue
@@ -180,8 +180,8 @@ class RapidProClient(object):
             for message in self.get_archive(archive_metadata):
 
                 # Skip messages from a datetime that is outside the date range of interest
-                if (last_modified_after_inclusive is not None and message.modified_on < last_modified_after_inclusive) or \
-                        (last_modified_before_exclusive is not None and message.modified_on >= last_modified_before_exclusive):
+                if (created_after_inclusive is not None and message.modified_on < created_after_inclusive) or \
+                        (created_before_exclusive is not None and message.modified_on >= created_before_exclusive):
                     continue
 
                 messages.append(message)
