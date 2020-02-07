@@ -230,7 +230,7 @@ class RapidProClient(object):
         raw_messages = archived_messages + live_messages
         log.info(f"Fetched {len(raw_messages)} messages ({len(archived_messages)} from archives, {len(live_messages)} from production)")
 
-        # Check that we only see each run once. 
+        # Check that we only see each message once. 
         seen_message_ids = set()
         for message in raw_messages:
             assert message.id not in seen_message_ids,  f"Duplicate message {message.id} found in the downloaded data. This could be " \
