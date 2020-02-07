@@ -189,7 +189,7 @@ class RapidProClient(object):
         return messages
 
     def get_raw_messages(self, created_after_inclusive=None, created_before_exclusive=None,
-                         raw_export_log_file=None):
+                         raw_export_log_file=None, ignore_archives=False):
         """
         Gets the raw messages from RapidPro.
 
@@ -215,10 +215,28 @@ class RapidProClient(object):
         if created_before_exclusive is not None:
             created_before_inclusive = created_before_exclusive - datetime.timedelta(microseconds=1)
 
-        raw_messages = self.rapid_pro.get_messages(after=created_after_inclusive, before=created_before_inclusive)\
+        if ignore_archives:
+            log.debug(f"Ignoring messages in archives (because `ignore_archives` argument was set to True)")
+            archived_messages = []
+        else:
+            archived_messages = self._get_archived_messages(
+                created_after_inclusive=created_after_inclusive,
+                created_before_exclusive=created_before_exclusive
+            )
+
+        live_messages = self.rapid_pro.get_messages(after=created_after_inclusive, before=created_before_inclusive)\
             .all(retry_on_rate_exceed=True)
 
-        log.info(f"Fetched {len(raw_messages)} messages")
+        raw_messages = archived_messages + live_messages
+        log.info(f"Fetched {len(raw_messages)} messages ({len(archived_messages)} from archives, {len(live_messages)} from production)")
+
+        # Check that we only see each run once. 
+        seen_message_ids = set()
+        for message in raw_messages:
+            assert message.id not in seen_message_ids,  f"Duplicate message {message.id} found in the downloaded data. This could be " \
+                                                        f"because a message with this id exists in both the archives and the live " \
+                                                        f"database."
+            seen_message_ids.add(message.id)
 
         if raw_export_log_file is not None:
             log.info(f"Logging {len(raw_messages)} fetched messages...")
