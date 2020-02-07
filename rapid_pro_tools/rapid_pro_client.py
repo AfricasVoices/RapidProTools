@@ -226,12 +226,12 @@ class RapidProClient(object):
     def _get_archived_messages(self, last_modified_after_inclusive=None,
                                        last_modified_before_exclusive=None):
         """
-        Gets the raw rmessages from Rapid Pro's archives.
+        Gets the raw messages from Rapid Pro's archives.
         
         Uses the last_modified dates to determine which archives to download.
 
         :param last_modified_after_inclusive: Start of the date-range to download messages from.
-                                              If set, only downloads runs last modified since that date,
+                                              If set, only downloads messages last modified since that date,
                                               otherwise downloads from the beginning of time.
         :type last_modified_after_inclusive: datetime.datetime | None
         :param last_modified_before_exclusive: End of the date-range to download messages from.
