@@ -178,7 +178,6 @@ class RapidProClient(object):
                 continue
 
             for message in self.get_archive(archive_metadata):
-
                 # Skip messages from a datetime that is outside the date range of interest
                 if (created_after_inclusive is not None and message.modified_on < created_after_inclusive) or \
                         (created_before_exclusive is not None and message.modified_on >= created_before_exclusive):
