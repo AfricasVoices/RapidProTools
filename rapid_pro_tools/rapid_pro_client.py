@@ -144,20 +144,20 @@ class RapidProClient(object):
         """
         return self.rapid_pro.get_definitions(flows=flow_ids, dependencies="all")
     
-    def _get_archived_messages(self, created_after_inclusive=None,
-                                       created_before_exclusive=None):
+    def _get_archived_messages(self, created_after_inclusive=None, created_before_exclusive=None):
         """
         Gets the raw messages from Rapid Pro's archives.
         
         Uses the created dates to determine which archives to download.
+        Filtering is done on creation date because this is the only timestamp metadata field Rapid Pro supports filtering
 
         :param created_after_inclusive: Start of the date-range to download messages from.
                                         If set, only downloads messages created since that date,
-                                              otherwise downloads from the beginning of time.
+                                        otherwise downloads from the beginning of time.
         :type created_after_inclusive: datetime.datetime | None
         :param created_before_exclusive: End of the date-range to download messages from.
-                                               If set, only downloads messages created before that date,
-                                               otherwise downloads until the end of time.
+                                        If set, only downloads messages created before that date,
+                                        otherwise downloads until the end of time.
         :return: Raw messages downloaded from Rapid Pro's archives.
         :rtype: list of temba_client.v2.types.Message
         """
