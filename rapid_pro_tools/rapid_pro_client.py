@@ -152,7 +152,7 @@ class RapidProClient(object):
         Uses the created dates to determine which archives to download.
 
         :param created_after_inclusive: Start of the date-range to download messages from.
-                                              If set, only downloads messages created since that date,
+                                        If set, only downloads messages created since that date,
                                               otherwise downloads from the beginning of time.
         :type created_after_inclusive: datetime.datetime | None
         :param created_before_exclusive: End of the date-range to download messages from.
