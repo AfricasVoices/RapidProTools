@@ -1,22 +1,15 @@
 [[source]]
+name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
-name = "pypi"
-
-[packages]
-rapidpro-python = "*"
 
 [dev-packages]
 
+[packages]
+coredatamodules = {editable = true,git = "https://github.com/AfricasVoices/CoreDataModules",ref = "v0.13.0"}
+pipelineinfrastructure = {editable = true,git = "https://www.github.com/AfricasVoices/Pipeline-Infrastructure",ref = "v0.0.4"}
+rapidpro-python = "*"
+python-dateutil = "*"
+
 [requires]
 python_version = "3.6"
-
-[packages.coredatamodules]
-git = "https://www.github.com/AfricasVoices/CoreDataModules"
-editable = true
-ref = "v0.12.1"
-
-[packages.pipelineinfrastructure]
-git = "https://www.github.com/AfricasVoices/Pipeline-Infrastructure"
-editable = true
-ref = "v0.0.3"
