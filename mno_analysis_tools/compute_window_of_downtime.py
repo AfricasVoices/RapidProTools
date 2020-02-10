@@ -63,19 +63,19 @@ if __name__ == "__main__":
         log.debug(
             f"Computing window of time without messages {index + 1}/{len(period_with_msg)}..."
         )
+        
         max_allowable_index = len(period_with_msg) - 1
-        if (index + 1) <=  max_allowable_index:
-            time_diff = period_with_msg[index + 1] - period_with_msg[index]
-            end = str(period_with_msg[index + 1])
+        if index <  max_allowable_index:
+            next_index = index + 1
         else:
-            time_diff = period_with_msg[-1] - period_with_msg[index]
-            end = str(period_with_msg[-1])
+            next_index = index 
 
+        time_diff = period_with_msg[next_index] - period_with_msg[index]
         generated_outputs.append({
             "communication_medium" : communication_medium,
             "direction" : direction,
             "start" : str(period_with_msg[index]),
-            "end" : end,
+            "end" : str(period_with_msg[next_index]),
             "delta" : str(abs(time_diff.total_seconds()))
         })
              
