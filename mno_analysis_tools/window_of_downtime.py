@@ -28,7 +28,7 @@ if __name__ == "__main__":
         output = json.loads(file_content)
         f.close()
 
-    data = [Message.deserialize(val) for val in output]
+    messages = [Message.deserialize(val) for val in output]
     period_with_msg = []
     generated_outputs = []
     generated_data = []
