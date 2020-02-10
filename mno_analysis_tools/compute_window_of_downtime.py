@@ -30,7 +30,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("end_date", metavar="end date",
         type=lambda s: datetime.strptime(s, '%Y-%m-%d').astimezone(pytz.UTC),
-        help="The end date (yyyy-mm-dd) to which the window of downtime computation will end",
+        help="The end date (yyy-mm-dd) to which the window of downtime computation will end",
     )
 
     args = parser.parse_args()
@@ -45,9 +45,9 @@ if __name__ == "__main__":
     with input_file as file:
         file_content = file.readline()
         output = json.loads(file_content)
+        messages = [Message.deserialize(val) for val in output]
+        log.info(f"Read {len(messages)} messages...")
 
-    messages = [Message.deserialize(val) for val in output]
-    log.info(f"Fetched {len(messages)} messages...")
     period_with_msg = []
     generated_outputs = []
 
