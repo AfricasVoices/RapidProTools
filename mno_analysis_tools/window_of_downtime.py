@@ -1,70 +1,89 @@
-# Compute maximum window of time with 0 messages
 import json
 import pytz
-import iso8601
+import argparse
 from datetime import datetime
+
 from temba_client.v2 import Message
 from core_data_modules.logging import Logger
 
 
-def group(lst, n):
-    """group([0,3,4,10,2,3], 2) => [(0,3), (4,10), (2,3)]
-    
-    Group a list into consecutive n-tuples. Incomplete tuples are
-    discarded e.g.
-    
-    >>> group(range(10), 3)
-    [(0, 1, 2), (3, 4, 5), (6, 7, 8)]
-    """
-    return zip(*[lst[i::n] for i in range(n)])
-
-
 log = Logger(__name__)
-log.set_project_name("WindowOfDowntime")
+log.set_project_name("ComputeWindowOfDowntime")
 
 if __name__ == "__main__":
-    with open("data.txt", mode="r") as f:
-        file_content = f.readline()
-        output = json.loads(file_content)
-        f.close()
+    parser = argparse.ArgumentParser(description="Compute maximum window of time with 0 messages")
+    parser.add_argument("input_file", metavar="input file", type=argparse.FileType(mode="r"),
+        help="File to read the raw data downloaded as json.",
+    )
+    parser.add_argument("output_file", metavar="output file", type=argparse.FileType(mode="w"),
+        help="File to write the raw data downloaded as json.",
+    )
+    parser.add_argument("communication_medium", metavar="operator",
+        help="Operator that you'll need to analyze",
+    )
+    parser.add_argument("direction", metavar="direction of message",
+        help="Direction of the message either sent or received by the operator",
+    )
+    parser.add_argument("start_date", metavar="start date", 
+        type=lambda s: datetime.strptime(s, '%Y-%m-%d').astimezone(pytz.UTC),
+        help="The start date (yyyy-mm-dd) from which the window of downtime will be computed.",
+    )
+    parser.add_argument("end_date", metavar="end date",
+        type=lambda s: datetime.strptime(s, '%Y-%m-%d').astimezone(pytz.UTC),
+        help="The end date (yyyy-mm-dd) to which the window of downtime computation will end",
+    )
 
-    data = [Message.deserialize(val) for val in output]
+    args = parser.parse_args()
+
+    input_file = args.input_file
+    output_file = args.output_file
+    operator = args.communication_medium
+    msg_direction = args.direction
+    start_date = args.start_date
+    end_date = args.end_date
+
+    with input_file as file:
+        file_content = file.readline()
+        output = json.loads(file_content)
+
+    messages = [Message.deserialize(val) for val in output]
+    log.info(f"Fetched {len(messages)} messages...")
     period_with_msg = []
     generated_outputs = []
-    generated_data = []
-    output_keys = ["traffic", "direction", "start", "end", "delta"]
-    for msg in data:
-        traffic = msg.urn.split(":")[0]
+
+    period_with_msg.insert(0, start_date)
+    for msg in messages:
+        communication_medium = msg.urn.split(":")[0]
         direction = msg.direction
-        if traffic == "telegram" and direction == "in":
+        if communication_medium == operator and direction == msg_direction:
             period_with_msg.append(msg.sent_on)
-        # print(period_with_msg)
-    for index, time_in_range in enumerate(period_with_msg, start=0):
+    period_with_msg.insert(len(period_with_msg), end_date)
+    
+    for index, time_in_range in enumerate(period_with_msg):
         log.debug(
             f"Computing window of time without messages {index + 1}/{len(period_with_msg)}..."
         )
-        for msg in data:
-            traffic = msg.urn.split(":")[0]
-            direction = msg.direction
+        max_allowable_index = len(period_with_msg) - 1
+        if (index + 1) <=  max_allowable_index:
+            time_diff = period_with_msg[index + 1] - period_with_msg[index]
+            end = str(period_with_msg[index + 1])
+        else:
+            time_diff = period_with_msg[-1] - period_with_msg[index]
+            end = str(period_with_msg[-1])
 
-            if traffic == "telegram" and direction == "in":
-                try:
-                    if period_with_msg[index] == msg.sent_on:
-                        time_diff = period_with_msg[index + 1] - period_with_msg[index]
-                        generated_outputs.append(traffic)
-                        generated_outputs.append(direction)
-                        generated_outputs.append(str(period_with_msg[index]))
-                        generated_outputs.append(str(abs(time_diff.total_seconds())))
-                except IndexError:
-                    pass
-    # group the list into 5 items
-    # confirm if the last time is a time delta
-    generated_outputs = list(group(generated_outputs, 5))
-    #  print(generated_outputs)
-    for output in generated_outputs:
-        data_dict = dict(zip(output_keys, list(output)))
-        generated_data.append(data_dict)
-    # print(generated_data)
-    with open("downtime.txt", mode="w") as f:
-        f.write(json.dumps(generated_data))
-        f.close()
+        generated_outputs.append({
+            "communication_medium" : communication_medium,
+            "direction" : direction,
+            "start" : str(period_with_msg[index]),
+            "end" : end,
+            "delta" : str(abs(time_diff.total_seconds()))
+        })
+             
+    if output_file is not None:
+        log.info(f"Logging {len(generated_outputs)} generated messages...")
+        json.dump(generated_outputs, output_file)
+        output_file.write("\n")
+        log.info(f"Logged generated messages")
+    else:
+        log.debug("Not logging, the output file was not specified")
+   
