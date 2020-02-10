@@ -16,7 +16,7 @@ if __name__ == "__main__":
         help="Token for authenticating to the instance",
     )
     parser.add_argument("output_file", metavar="file", type=argparse.FileType(mode="w"),
-        help="File to write the raw data downloaded as json.",
+        help="Path to the JSON file to write the downloaded messages to",
     )
 
     args = parser.parse_args()
