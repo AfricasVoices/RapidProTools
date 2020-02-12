@@ -39,7 +39,7 @@ if __name__ == "__main__":
     start_date = args.start_date
     end_date = args.end_date
 
-    with open(input_file) as f:
+    with open(input_file, mode="r") as f:
         output = json.loads(f.read())
         messages = [Message.deserialize(val) for val in output]
         log.info("Loading messages from file {file_name}...")
