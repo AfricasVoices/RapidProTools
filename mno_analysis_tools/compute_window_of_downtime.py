@@ -36,6 +36,8 @@ if __name__ == "__main__":
 
     input_file = args.input_file
     output_file = args.output_file
+    target_operator = args.operator 
+    target_direction = args.direction
     start_date = args.start_date
     end_date = args.end_date
 
@@ -51,8 +53,7 @@ if __name__ == "__main__":
     msg_sent_on_timestamps.insert(0, start_date)
     for msg in messages:
         operator = msg.urn.split(":")[0]
-        direction = msg.direction
-        if operator == args.operator and direction == args.direction:
+        if operator == target_operator and msg.direction == target_direction:
             msg_sent_on_timestamps.append(msg.sent_on)
     msg_sent_on_timestamps.append(end_date)
     
@@ -69,11 +70,11 @@ if __name__ == "__main__":
 
         time_diff = msg_sent_on_timestamps[next_index] - msg_sent_on_timestamps[index]
         generated_outputs.append({
-            "operator" : args.operator,
-            "direction" : args.direction,
+            "operator" : target_operator,
+            "direction" : target_direction,
             "start" : str(msg_sent_on_timestamps[index]),
             "end" : str(msg_sent_on_timestamps[next_index]),
-            "delta" : str(abs(time_diff.total_seconds()))
+            "SecondsSinceLastMessage" : str(abs(time_diff.total_seconds()))
         })
              
     if output_file is not None:
