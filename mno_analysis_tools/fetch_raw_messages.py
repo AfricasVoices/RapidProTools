@@ -1,3 +1,4 @@
+import json
 import argparse
 
 from core_data_modules.logging import Logger
@@ -15,17 +16,17 @@ if __name__ == "__main__":
     parser.add_argument("token", metavar="token",
         help="Token for authenticating to the instance",
     )
-    parser.add_argument("output_file", metavar="file", type=argparse.FileType(mode="w"),
-        help="Path to the JSON file to write the downloaded messages to",
+    parser.add_argument("output_file_path", metavar="output file path",
+        help="File to write the raw data downloaded as json.",
     )
 
     args = parser.parse_args()
-  
     source_domain = args.domain
     source_token = args.token
     output_file = args.output_file
 
     source_instance = RapidProClient(source_domain, source_token)
-
-    log.info("fetch raw messages...")
-    source_instance.get_raw_messages(raw_export_log_file=output_file)
+    log.info("fetching raw messages...")
+    raw_messages = source_instance.get_raw_messages()
+    with open(output_file_path, mode="w") as f:
+        json.dump([message.serialize() for message in raw_messages], f)
