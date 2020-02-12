@@ -1,7 +1,7 @@
 import argparse
 
 from core_data_modules.logging import Logger
-from rapid_pro_tools import RapidProClient
+from rapid_pro_tools.rapid_pro_client import RapidProClient
 
 log = Logger(__name__)
 log.set_project_name("FetchRawMessages")
