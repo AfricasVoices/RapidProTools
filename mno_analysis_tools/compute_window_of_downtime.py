@@ -19,7 +19,7 @@ if __name__ == "__main__":
     parser.add_argument("output_file", metavar="output file",
         help="File to write the raw data downloaded as json.",
     )
-    parser.add_argument("communication_medium", metavar="operator",
+    parser.add_argument("operator", metavar="operator",
         help="Operator that you'll need to analyze",
     )
     parser.add_argument("direction", metavar="direction of message",
@@ -33,12 +33,9 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    print(type(args.start_date))
 
     input_file = args.input_file
     output_file = args.output_file
-    operator = args.communication_medium
-    msg_direction = args.direction
     start_date = args.start_date
     end_date = args.end_date
 
@@ -48,34 +45,34 @@ if __name__ == "__main__":
         log.info("Loading messages from file {file_name}...")
         log.info(f"Loaded {len(messages)} messages")
 
-    period_with_msg = []
+    msg_sent_on_timestamps = []
     generated_outputs = []
 
-    period_with_msg.insert(0, start_date)
+    msg_sent_on_timestamps.insert(0, start_date)
     for msg in messages:
-        communication_medium = msg.urn.split(":")[0]
+        operator = msg.urn.split(":")[0]
         direction = msg.direction
-        if communication_medium == operator and direction == msg_direction:
-            period_with_msg.append(msg.sent_on)
-    period_with_msg.append(end_date)
+        if operator == args.operator and direction == args.direction:
+            msg_sent_on_timestamps.append(msg.sent_on)
+    msg_sent_on_timestamps.append(end_date)
     
-    for index, time_in_range in enumerate(period_with_msg):
+    for index, time_in_range in enumerate(msg_sent_on_timestamps):
         log.debug(
-            f"Computing window of time without messages {index + 1}/{len(period_with_msg)}..."
+            f"Computing window of time without messages {index + 1}/{len(msg_sent_on_timestamps)}..."
         )
         
-        max_allowable_index = len(period_with_msg) - 1
+        max_allowable_index = len(msg_sent_on_timestamps) - 1
         if index <  max_allowable_index:
             next_index = index + 1
         else:
             next_index = index 
 
-        time_diff = period_with_msg[next_index] - period_with_msg[index]
+        time_diff = msg_sent_on_timestamps[next_index] - msg_sent_on_timestamps[index]
         generated_outputs.append({
-            "communication_medium" : operator,
-            "direction" : msg_direction,
-            "start" : str(period_with_msg[index]),
-            "end" : str(period_with_msg[next_index]),
+            "operator" : args.operator,
+            "direction" : args.direction,
+            "start" : str(msg_sent_on_timestamps[index]),
+            "end" : str(msg_sent_on_timestamps[next_index]),
             "delta" : str(abs(time_diff.total_seconds()))
         })
              
