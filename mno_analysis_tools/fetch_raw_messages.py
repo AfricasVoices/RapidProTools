@@ -16,8 +16,8 @@ if __name__ == "__main__":
     parser.add_argument("token", metavar="token",
         help="Token for authenticating to the instance",
     )
-    parser.add_argument("output_file_path", metavar="output file path",
-        help="File to write the raw data downloaded as json.",
+    parser.add_argument("output_file_path", metavar="output-file-path",
+        help="File to write the raw data downloaded as json",
     )
 
     args = parser.parse_args()
