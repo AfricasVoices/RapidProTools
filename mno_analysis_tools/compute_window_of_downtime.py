@@ -3,9 +3,10 @@ import pytz
 import argparse
 from datetime import datetime
 
-from temba_client.v2 import Message
-from core_data_modules.logging import Logger
 from dateutil.parser import isoparse
+from temba_client.v2 import Message
+from core_data_modules.cleaners import PhoneCleaner
+from core_data_modules.logging import Logger
 
 
 log = Logger(__name__)
@@ -52,7 +53,10 @@ if __name__ == "__main__":
 
     msg_sent_on_timestamps.insert(0, start_date)
     for msg in messages:
-        operator = msg.urn.split(":")[0]
+        if msg.urn.startswith("tel:"):
+            operator = PhoneCleaner.clean_operator(msg.urn.split(":")[1])
+        else:
+            operator = msg.urn.split(":")[0]
         if operator == target_operator and msg.direction == target_direction:
             msg_sent_on_timestamps.append(msg.sent_on)
     msg_sent_on_timestamps.append(end_date)
