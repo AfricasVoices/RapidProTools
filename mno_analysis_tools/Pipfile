@@ -8,7 +8,7 @@ verify_ssl = true
 [packages]
 coredatamodules = {editable = true,git = "https://github.com/AfricasVoices/CoreDataModules",ref = "v0.13.0"}
 pipelineinfrastructure = {editable = true,git = "https://www.github.com/AfricasVoices/Pipeline-Infrastructure",ref = "v0.0.4"}
-rapidprotools = {editable = true,git = "https://github.com/AfricasVoices/RapidProTools",ref = "ef22b48db054a49b428f454174e2f58085cf9767"}
+rapidprotools = {editable = true,git = "https://github.com/AfricasVoices/RapidProTools",ref = "update_rapid_pro_client.get_messages"}
 rapidpro-python = "*"
 python-dateutil = "*"
 
