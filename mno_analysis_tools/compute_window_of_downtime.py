@@ -15,7 +15,7 @@ log.set_project_name("ComputeWindowOfDowntime")
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Compute maximum window of time with 0 messages")
     parser.add_argument("input_file_path", metavar="input file", 
-        help="File to read the raw data downloaded as json.",
+        help="File to read the raw data downloaded as json",
     )
     parser.add_argument("output_file_path", metavar="output file",
         help="File to write the raw data downloaded as json.",
