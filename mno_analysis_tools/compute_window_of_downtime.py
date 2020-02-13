@@ -21,7 +21,7 @@ if __name__ == "__main__":
         help="File to write the raw data downloaded as json.",
     )
     parser.add_argument("operator", metavar="operator",
-        help="Operator that you'll need to analyze",
+        help="Operator to analyze for downtime",
     )
     parser.add_argument("direction", metavar="direction of message",
         help="Direction of the message either sent or received by the operator",
