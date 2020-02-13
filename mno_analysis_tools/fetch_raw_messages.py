@@ -23,7 +23,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     source_domain = args.domain
     source_token = args.token
-    output_file = args.output_file
+    output_file_path = args.output_file_path
 
     source_instance = RapidProClient(source_domain, source_token)
     log.info("fetching raw messages...")

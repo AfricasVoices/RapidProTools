@@ -14,10 +14,10 @@ log.set_project_name("ComputeWindowOfDowntime")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Compute maximum window of time with 0 messages")
-    parser.add_argument("input_file", metavar="input file", 
+    parser.add_argument("input_file_path", metavar="input file", 
         help="File to read the raw data downloaded as json.",
     )
-    parser.add_argument("output_file", metavar="output file",
+    parser.add_argument("output_file_path", metavar="output file",
         help="File to write the raw data downloaded as json.",
     )
     parser.add_argument("operator", metavar="operator",
@@ -35,14 +35,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    input_file = args.input_file
-    output_file = args.output_file
+    input_file_path = args.input_file_path
+    output_file_path = args.output_file_path
     target_operator = args.operator 
     target_direction = args.direction
     start_date = args.start_date
     end_date = args.end_date
 
-    with open(input_file, mode="r") as f:
+    with open(input_file_path, mode="r") as f:
         output = json.loads(f.read())
         messages = [Message.deserialize(val) for val in output]
         log.info("Loading messages from file {file_name}...")
@@ -81,9 +81,9 @@ if __name__ == "__main__":
             "SecondsSinceLastMessage" : str(abs(time_diff.total_seconds()))
         })
              
-    if output_file is not None:
+    if output_file_path is not None:
         log.info(f"Logging {len(generated_outputs)} generated messages...")
-        with open(output_file, mode="w") as f:
+        with open(output_file_path, mode="w") as f:
             json.dump(generated_outputs, f)
         log.info(f"Logged generated messages")
     else:
