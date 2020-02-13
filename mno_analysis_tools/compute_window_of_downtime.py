@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
         time_diff = msg_sent_on_timestamps[next_index] - msg_sent_on_timestamps[index]
         generated_outputs.append({
-            "operator" : target_operator,
+            "Operator": target_operator,
             "direction" : target_direction,
             "start" : str(msg_sent_on_timestamps[index]),
             "end" : str(msg_sent_on_timestamps[next_index]),
