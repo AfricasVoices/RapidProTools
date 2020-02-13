@@ -26,7 +26,7 @@ if __name__ == "__main__":
     output_file_path = args.output_file_path
 
     source_instance = RapidProClient(source_domain, source_token)
-    log.info("fetching raw messages...")
+    log.info("Fetching raw messages...")
     raw_messages = source_instance.get_raw_messages()
     with open(output_file_path, mode="w") as f:
         json.dump([message.serialize() for message in raw_messages], f)
