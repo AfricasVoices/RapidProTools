@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
     computed_number_of_messages = []
     for index, date_time_bound in enumerate(date_time_bounds):
-        msg_number = 0
+        number_of_messages = 0
 
         max_allowable_index = len(date_time_bounds) - 1
         if index < max_allowable_index:
@@ -85,7 +85,7 @@ if __name__ == "__main__":
 
         for msg in filtered_messages:
             if date_time_bounds[index] <= msg.sent_on < date_time_bounds[next_index]:
-                msg_number += 1
+                number_of_messages += 1
 
         computed_number_of_messages.append({
             "Operator": target_operator,
