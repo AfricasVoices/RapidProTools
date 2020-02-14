@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
     msg_sent_on_timestamps = []
     msg_sent_on_timestamps.append(start_date)
-    # Append `sent_on `timestamps to `msg_sent_on_timestamps` list
+    # Append `sent_on` timestamps to `msg_sent_on_timestamps` list
     # based on the target operator and target direction of the message
     for msg in messages:
         if msg.urn.startswith("tel:"):
