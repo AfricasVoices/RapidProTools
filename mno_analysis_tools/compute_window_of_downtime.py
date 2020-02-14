@@ -71,7 +71,7 @@ if __name__ == "__main__":
         )
         
         max_allowable_index = len(msg_sent_on_timestamps) - 1
-        if index <  max_allowable_index:
+        if index < max_allowable_index:
             next_index = index + 1
         else:
             next_index = index 
