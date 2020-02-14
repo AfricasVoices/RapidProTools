@@ -59,6 +59,7 @@ if __name__ == "__main__":
         log.info(f"Loaded {len(messages)} messages")
 
     filtered_messages = []
+    # filter messages based on the target operator and target direction of the message
     for msg in messages:
         if msg.urn.startswith("tel:"):
             operator = PhoneCleaner.clean_operator(msg.urn.split(":")[1])
@@ -74,6 +75,9 @@ if __name__ == "__main__":
         start_date,  end_date, time_interval)]
 
     computed_number_of_messages = []
+    # Compute number of messages between two datetime bounds i.e `PreviousMessageTimestamp` and
+    # `NextMessageTimestamp` to get number of mesages per period and relate each quantity
+    #  with the operator and the message direction.
     for index, date_time_bound in enumerate(date_time_bounds):
         number_of_messages = 0
 
