@@ -22,7 +22,7 @@ if __name__ == "__main__":
     parser.add_argument("operator", metavar="operator",
                         help="Operator to analyze for downtime",
                         )
-    parser.add_argument("message_direction", metavar="direction-of-message", choices=('in', 'out'),
+    parser.add_argument("target_message_direction", metavar="direction-of-message", choices=('in', 'out'),
                         help="Direction of messages to limit the search for downtime to"
                         )
     parser.add_argument("start_date", metavar="start-date", type=lambda s: isoparse(s),
