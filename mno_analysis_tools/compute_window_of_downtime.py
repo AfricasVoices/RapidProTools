@@ -61,7 +61,7 @@ if __name__ == "__main__":
     msg_sent_on_timestamps.append(end_date)
 
     computed_windows_of_downtime = []
-    # Compute time difference between two consecutive messages i.e `PreviousMessageTimestamp` and
+    # Compute the time difference between two consecutive messages i.e `PreviousMessageTimestamp` and
     # `NextMessageTimestamp` to get window of time without message and relate each time difference
     #  with the operator and the message direction.
     for index, time_in_range in enumerate(msg_sent_on_timestamps):
