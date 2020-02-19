@@ -13,13 +13,13 @@ log.set_project_name("ComputeWindowOfDowntime")
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Compute maximum window of time with 0 messages")
-    parser.add_argument("input_file_path", metavar="input-file",
+    parser.add_argument("raw_messages_file_path", metavar="input-file",
                         help="File to read the raw data downloaded as json",
                         )
-    parser.add_argument("output_file_path", metavar="output-file",
+    parser.add_argument("window_of_downtimes_output_file_path", metavar="output-file",
                         help="File to write the raw data downloaded as json.",
                         )
-    parser.add_argument("operator", metavar="operator",
+    parser.add_argument("target_operator", metavar="operator",
                         help="Operator to analyze for downtime",
                         )
     parser.add_argument("target_message_direction", metavar="direction-of-message", choices=('in', 'out'),
@@ -34,15 +34,15 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    input_file_path = args.input_file_path
-    output_file_path = args.output_file_path
-    target_operator = args.operator
-    target_direction = args.message_direction
+    raw_messages_file_path = args.raw_messages_file_path
+    window_of_downtimes_output_file_path = args.window_of_downtimes_output_file_path
+    target_operator = args.target_operator
+    target_message_direction = args.target_message_direction
     start_date = args.start_date
     end_date = args.end_date
 
-    with open(input_file_path, mode="r") as f:
-        log.info("Loading messages from {input_file_path}...")
+    with open(raw_messages_file_path, mode="r") as f:
+        log.info("Loading messages from {raw_messages_file_path}...")
         output = json.loads(f.read())
         messages = [Message.deserialize(val) for val in output]
         log.info(f"Loaded {len(messages)} messages")
@@ -56,7 +56,7 @@ if __name__ == "__main__":
             operator = PhoneCleaner.clean_operator(msg.urn.split(":")[1])
         else:
             operator = msg.urn.split(":")[0]
-        if operator == target_operator and msg.direction == target_direction:
+        if operator == target_operator and msg.direction == target_message_direction:
             msg_sent_on_timestamps.append(msg.sent_on)
     msg_sent_on_timestamps.append(end_date)
 
@@ -79,7 +79,7 @@ if __name__ == "__main__":
             msg_sent_on_timestamps[index]
         computed_windows_of_downtime.append({
             "Operator": target_operator,
-            "MessageDirection": target_direction,
+            "MessageDirection": target_message_direction,
             "PreviousMessageTimestamp": str(msg_sent_on_timestamps[index]),
             "NextMessageTimeTimestamp": str(msg_sent_on_timestamps[next_index]),
             "DownTimeDurationSeconds": str(abs(time_diff.total_seconds()))
@@ -87,6 +87,6 @@ if __name__ == "__main__":
 
     log.info(
         f"Logging {len(computed_windows_of_downtime)} generated messages...")
-    with open(output_file_path, mode="w") as f:
+    with open(window_of_downtimes_output_file_path, mode="w") as f:
         json.dump(computed_windows_of_downtime, f)
     log.info(f"Logged generated messages")
