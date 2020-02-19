@@ -20,16 +20,16 @@ log.set_project_name("ComputeNumberofMessages")
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Number of messages between two firebase time periods ")
-    parser.add_argument("input_file_path", metavar="input-file",
+    parser.add_argument("raw_messages_file_path", metavar="input-file",
                         help="File to read the raw data downloaded as json",
                         )
-    parser.add_argument("output_file_path", metavar="output-file",
+    parser.add_argument("window_of_downtimes_output_file_path", metavar="output-file",
                         help="File to write the raw data downloaded as json",
                         )
-    parser.add_argument("operator", metavar="operator",
+    parser.add_argument("target_operator", metavar="operator",
                         help="Operator to analyze for downtime",
                         )
-    parser.add_argument("message_direction", metavar="direction-of-message", choices=('in', 'out'),
+    parser.add_argument("target_message_direction", metavar="direction-of-message", choices=('in', 'out'),
                         help="Direction of messages to limit the search for downtime to",
                         )
     parser.add_argument("start_date", metavar="start date", type=lambda s: isoparse(s),
@@ -44,16 +44,17 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    input_file_path = args.input_file_path
-    output_file_path = args.output_file_path
-    target_operator = args.operator
-    target_direction = args.message_direction
+    raw_messages_file_path = args.raw_messages_file_path
+    window_of_downtimes_output_file_path = args.window_of_downtimes_output_file_path
+    target_operator = args.target_operator
+    target_message_direction = args.target_message_direction
     start_date = args.start_date
     end_date = args.end_date
     time_frame = args.time_frame
 
-    with open(input_file_path, mode="r") as f:
-        log.info("Loading messages from {input_file_path}...")
+    with open(raw_messages_file_path, mode="r") as f:
+        log.info(
+            "Loading messages from {raw_messages_file_path}...")
         output = json.loads(f.read())
         messages = [Message.deserialize(val) for val in output]
         log.info(f"Loaded {len(messages)} messages")
@@ -65,7 +66,7 @@ if __name__ == "__main__":
             operator = PhoneCleaner.clean_operator(msg.urn.split(":")[1])
         else:
             operator = msg.urn.split(":")[0]
-        if operator == target_operator and msg.direction == target_direction:
+        if operator == target_operator and msg.direction == target_message_direction:
             filtered_messages.append(msg)
 
     time_interval = timedelta(hours=time_frame.hour,
@@ -93,14 +94,14 @@ if __name__ == "__main__":
 
         computed_number_of_messages.append({
             "Operator": target_operator,
-            "MessageDirection": target_direction,
+            "MessageDirection": target_message_direction,
             "PreviousMessageTimestamp": str(date_time_bounds[index]),
             "NextMessageTimestamp": str(date_time_bounds[next_index]),
-            "NumberOfMessages": msg_number
+            "NumberOfMessages": number_of_messages
         })
 
         log.info(
             f"Logging {len(computed_number_of_messages)} generated messages...")
-        with open(output_file_path, mode="w") as f:
+        with open(window_of_downtimes_output_file_path, mode="w") as f:
             json.dump(computed_number_of_messages, f)
         log.info(f"Logged generated messages")
