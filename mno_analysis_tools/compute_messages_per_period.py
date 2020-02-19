@@ -21,7 +21,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Number of messages between two firebase time periods ")
     parser.add_argument("raw_messages_file_path", metavar="input-file",
-                        help="File to read the raw data downloaded as json",
+                        help="File to read the seralized Rapid Pro message data from",
                         )
     parser.add_argument("window_of_downtimes_output_file_path", metavar="output-file",
                         help="File to write the raw data downloaded as json",
