@@ -15,7 +15,7 @@ def date_time_range(start, end, delta):
 
 
 log = Logger(__name__)
-log.set_project_name("ComputeNumberofMessages")
+log.set_project_name("ComputeMessagesPerPeriod")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
