@@ -26,7 +26,7 @@ if __name__ == "__main__":
                         help="File to read the seralized Rapid Pro message data from",
                         )
     parser.add_argument("window_of_downtimes_output_file_path", metavar="output-file",
-                        help="File to write the raw data downloaded as json",
+                        help="File to write the computed messages per period data downloaded as json",
                         )
     parser.add_argument("target_operator", metavar="operator",
                         help="Operator to analyze for downtime",
