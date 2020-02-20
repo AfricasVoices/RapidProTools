@@ -60,6 +60,9 @@ if __name__ == "__main__":
         log.info(f"Loaded {len(messages)} messages")
 
     # Filter messages based on the target operator and target direction of the message
+    log.info(f"Filter messages based on operator {target_operator} and\
+        message direction as {target_message_direction}")
+    log.info(f"{len(messages)} messages before filtering")
     filtered_messages = []
     for msg in messages:
         if msg.urn.startswith("tel:"):
@@ -67,7 +70,9 @@ if __name__ == "__main__":
         else:
             operator = msg.urn.split(":")[0]
         if operator == target_operator and msg.direction == target_message_direction:
+            log.info(f"Filtering messages...")
             filtered_messages.append(msg)
+    log.info(f"{len(filtered_messages)} messages after filtering")
 
     time_interval = timedelta(hours=time_frame.hour,
                               minutes=time_frame.minute, seconds=time_frame.second)
