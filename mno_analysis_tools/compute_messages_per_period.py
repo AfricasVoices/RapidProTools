@@ -78,7 +78,7 @@ if __name__ == "__main__":
     # Compute number of messages between two datetime bounds i.e `PreviousMessageTimestamp` and
     # `NextMessageTimestamp` to get number of mesages per period and relate each quantity
     #  with the operator and the message direction.
-    computed_number_of_messages = []
+    messages_per_period = []
     for index, date_time_bound in enumerate(date_time_bounds):
         number_of_messages = 0
 
@@ -92,7 +92,7 @@ if __name__ == "__main__":
             if date_time_bounds[index] <= msg.sent_on < date_time_bounds[next_index]:
                 number_of_messages += 1
 
-        computed_number_of_messages.append({
+        messages_per_period.append({
             "Operator": target_operator,
             "MessageDirection": target_message_direction,
             "PreviousMessageTimestamp": str(date_time_bounds[index]),
@@ -101,7 +101,7 @@ if __name__ == "__main__":
         })
 
         log.info(
-            f"Logging {len(computed_number_of_messages)} generated messages...")
+            f"Logging {len(messages_per_period)} generated messages...")
         with open(window_of_downtimes_output_file_path, mode="w") as f:
-            json.dump(computed_number_of_messages, f)
+            json.dump(messages_per_period, f)
         log.info(f"Logged generated messages")
