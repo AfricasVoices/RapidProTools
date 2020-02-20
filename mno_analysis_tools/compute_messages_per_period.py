@@ -95,8 +95,8 @@ if __name__ == "__main__":
         messages_per_period.append({
             "Operator": target_operator,
             "MessageDirection": target_message_direction,
-            "PreviousMessageTimestamp": str(date_time_bounds[index]),
-            "NextMessageTimestamp": str(date_time_bounds[next_index]),
+            "periodStart": str(date_time_bounds[index]),
+            "periodEnd": str(date_time_bounds[next_index]),
             "NumberOfMessages": number_of_messages
         })
 
