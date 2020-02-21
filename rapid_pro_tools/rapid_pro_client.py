@@ -223,18 +223,19 @@ class RapidProClient(object):
                 created_before_exclusive=created_before_exclusive
             )
 
-        live_messages = self.rapid_pro.get_messages(after=created_after_inclusive, before=created_before_inclusive)\
+        production_messages = self.rapid_pro.get_messages(after=created_after_inclusive, before=created_before_inclusive)\
             .all(retry_on_rate_exceed=True)
 
-        raw_messages = archived_messages + live_messages
-        log.info(f"Fetched {len(raw_messages)} messages ({len(archived_messages)} from archives, {len(live_messages)} from production)")
+        raw_messages = archived_messages + production_messages
+        log.info(f"Fetched {len(raw_messages)} messages ({len(archived_messages)} from archives, "
+                 f"{len(production_messages)} from production)")
 
         # Check that we only see each message once. 
         seen_message_ids = set()
         for message in raw_messages:
-            assert message.id not in seen_message_ids,  f"Duplicate message {message.id} found in the downloaded data. This could be " \
-                                                        f"because a message with this id exists in both the archives and the live " \
-                                                        f"database."
+            assert message.id not in seen_message_ids,  f"Duplicate message {message.id} found in the downloaded data. " \
+                                                        f"This could be because a message with this id exists in both " \
+                                                        f"the archives and the production database."
             seen_message_ids.add(message.id)
 
         if raw_export_log_file is not None:
@@ -336,7 +337,7 @@ class RapidProClient(object):
     def get_raw_runs_for_flow_id(self, flow_id, last_modified_after_inclusive=None, last_modified_before_exclusive=None,
                                  raw_export_log_file=None, ignore_archives=False):
         """
-        Gets the raw runs for the given flow_id from Rapid Pro's live database and, if needed, from its archives.
+        Gets the raw runs for the given flow_id from Rapid Pro's production database and, if needed, from its archives.
 
         :param flow_id: Id of the flow to download the runs of.
         :type flow_id: str
@@ -373,12 +374,13 @@ class RapidProClient(object):
                 last_modified_before_exclusive=last_modified_before_exclusive
             )
 
-        live_runs = self.rapid_pro.get_runs(
+        production_runs = self.rapid_pro.get_runs(
             flow=flow_id, after=last_modified_after_inclusive, before=last_modified_before_inclusive
         ).all(retry_on_rate_exceed=True)
 
-        raw_runs = archived_runs + live_runs
-        log.info(f"Fetched {len(raw_runs)} runs ({len(archived_runs)} from archives, {len(live_runs)} from production)")
+        raw_runs = archived_runs + production_runs
+        log.info(f"Fetched {len(raw_runs)} runs ({len(archived_runs)} from archives, "
+                 f"{len(production_runs)} from production)")
 
         # Check that we only see each run once. This shouldn't be possible, due to
         # https://github.com/nyaruka/rp-archiver/blob/7d3430b5260fa92abb62d828fc526af8e9d9d50a/archiver.go#L624,
@@ -386,8 +388,8 @@ class RapidProClient(object):
         seen_run_ids = set()
         for run in raw_runs:
             assert run.id not in seen_run_ids, f"Duplicate run {run.id} found in the downloaded data. This could be " \
-                                               f"because a run with this id exists in both the archives and the live " \
-                                               f"database."
+                                               f"because a run with this id exists in both the archives and the " \
+                                               f"production database."
             seen_run_ids.add(run.id)
 
         if raw_export_log_file is not None:
