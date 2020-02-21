@@ -233,9 +233,9 @@ class RapidProClient(object):
         # Check that we only see each message once. 
         seen_message_ids = set()
         for message in raw_messages:
-            assert message.id not in seen_message_ids,  f"Duplicate message {message.id} found in the downloaded data. " \
-                                                        f"This could be because a message with this id exists in both " \
-                                                        f"the archives and the production database."
+            assert message.id not in seen_message_ids, f"Duplicate message {message.id} found in the downloaded data. " \
+                                                       f"This could be because a message with this id exists in both " \
+                                                       f"the archives and the production database."
             seen_message_ids.add(message.id)
 
         if raw_export_log_file is not None:
