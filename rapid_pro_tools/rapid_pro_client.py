@@ -143,9 +143,52 @@ class RapidProClient(object):
         :rtype: temba_client.v2.types.Export
         """
         return self.rapid_pro.get_definitions(flows=flow_ids, dependencies="all")
+    
+    def _get_archived_messages(self, created_after_inclusive=None, created_before_exclusive=None):
+        """
+        Gets the raw messages from Rapid Pro's archives.
+        
+        Uses the created dates to determine which archives to download.
+        Filtering is done on creation date because this is the only timestamp metadata field Rapid Pro supports filtering
+
+        :param created_after_inclusive: Start of the date-range to download messages from.
+                                        If set, only downloads messages created since that date,
+                                        otherwise downloads from the beginning of time.
+        :type created_after_inclusive: datetime.datetime | None
+        :param created_before_exclusive: End of the date-range to download messages from.
+                                        If set, only downloads messages created before that date,
+                                        otherwise downloads until the end of time.
+        :return: Raw messages downloaded from Rapid Pro's archives.
+        :rtype: list of temba_client.v2.types.Message
+        """
+        messages = []
+        for archive_metadata in self.list_archives("message"):
+            # Determine the start and end dates for this archive
+            archive_start_date = archive_metadata.start_date
+            if archive_metadata.period == "daily":
+                archive_end_date = archive_start_date + relativedelta(days=1, microseconds=-1)
+            else:
+                assert archive_metadata.period == "monthly"
+                archive_end_date = archive_start_date + relativedelta(months=1, microseconds=-1)
+
+            if (created_after_inclusive is not None and archive_end_date < created_after_inclusive) or \
+                    (created_before_exclusive is not None and archive_start_date >= created_before_exclusive):
+                log.debug(f"Skipping {archive_metadata.period} archive with date range {archive_start_date} - "
+                          f"{archive_end_date}")
+                continue
+
+            for message in self.get_archive(archive_metadata):
+                # Skip messages from a datetime that is outside the date range of interest
+                if (created_after_inclusive is not None and message.modified_on < created_after_inclusive) or \
+                        (created_before_exclusive is not None and message.modified_on >= created_before_exclusive):
+                    continue
+
+                messages.append(message)
+
+        return messages
 
     def get_raw_messages(self, created_after_inclusive=None, created_before_exclusive=None,
-                         raw_export_log_file=None):
+                         raw_export_log_file=None, ignore_archives=False):
         """
         Gets the raw messages from RapidPro.
 
@@ -171,10 +214,28 @@ class RapidProClient(object):
         if created_before_exclusive is not None:
             created_before_inclusive = created_before_exclusive - datetime.timedelta(microseconds=1)
 
-        raw_messages = self.rapid_pro.get_messages(after=created_after_inclusive, before=created_before_inclusive)\
+        if ignore_archives:
+            log.debug(f"Ignoring messages in archives (because `ignore_archives` argument was set to True)")
+            archived_messages = []
+        else:
+            archived_messages = self._get_archived_messages(
+                created_after_inclusive=created_after_inclusive,
+                created_before_exclusive=created_before_exclusive
+            )
+
+        live_messages = self.rapid_pro.get_messages(after=created_after_inclusive, before=created_before_inclusive)\
             .all(retry_on_rate_exceed=True)
 
-        log.info(f"Fetched {len(raw_messages)} messages")
+        raw_messages = archived_messages + live_messages
+        log.info(f"Fetched {len(raw_messages)} messages ({len(archived_messages)} from archives, {len(live_messages)} from production)")
+
+        # Check that we only see each message once. 
+        seen_message_ids = set()
+        for message in raw_messages:
+            assert message.id not in seen_message_ids,  f"Duplicate message {message.id} found in the downloaded data. This could be " \
+                                                        f"because a message with this id exists in both the archives and the live " \
+                                                        f"database."
+            seen_message_ids.add(message.id)
 
         if raw_export_log_file is not None:
             log.info(f"Logging {len(raw_messages)} fetched messages...")
