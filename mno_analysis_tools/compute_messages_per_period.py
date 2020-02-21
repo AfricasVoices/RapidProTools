@@ -85,14 +85,9 @@ if __name__ == "__main__":
     # `NextMessageTimestamp` to get number of mesages per period and relate each quantity
     #  with the operator and the message direction.
     messages_per_period = []
-    for index, date_time_bound in enumerate(date_time_bounds):
+    for index in range(len(date_time_bounds) - 2):
         number_of_messages = 0
-
-        max_allowable_index = len(date_time_bounds) - 1
-        if index < max_allowable_index:
-            next_index = index + 1
-        else:
-            continue
+        next_index = index + 1
 
         for msg in filtered_messages:
             if date_time_bounds[index] <= msg.sent_on < date_time_bounds[next_index]:
