@@ -34,10 +34,10 @@ if __name__ == "__main__":
     parser.add_argument("target_message_direction", metavar="direction-of-message", choices=('in', 'out'),
                         help="Direction of messages to limit the search for downtime to",
                         )
-    parser.add_argument("start_date", metavar="start date", type=lambda s: isoparse(s),
+    parser.add_argument("start_date", metavar="start-date", type=lambda s: isoparse(s),
                         help="The start date as ISO 8601 string from which the number of messages will be computed",
                         )
-    parser.add_argument("end_date", metavar="end date", type=lambda s: isoparse(s),
+    parser.add_argument("end_date", metavar="end-date", type=lambda s: isoparse(s),
                         help="The end date as ISO 8601 string to which the number of messages computation will end",
                         )
     parser.add_argument("time_frame", metavar="time-frame", type=lambda s: datetime.strptime(s, '%H:%M:%S'),
