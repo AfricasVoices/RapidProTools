@@ -223,6 +223,7 @@ class RapidProClient(object):
                 created_before_exclusive=created_before_exclusive
             )
 
+        log.info(f"Fetching messages from production Rapid Pro instance...")
         production_messages = self.rapid_pro.get_messages(after=created_after_inclusive, before=created_before_inclusive)\
             .all(retry_on_rate_exceed=True)
 
@@ -374,6 +375,7 @@ class RapidProClient(object):
                 last_modified_before_exclusive=last_modified_before_exclusive
             )
 
+        log.info(f"Fetching runs from production Rapid Pro instance...")
         production_runs = self.rapid_pro.get_runs(
             flow=flow_id, after=last_modified_after_inclusive, before=last_modified_before_inclusive
         ).all(retry_on_rate_exceed=True)
