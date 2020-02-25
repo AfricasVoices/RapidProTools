@@ -1,5 +1,5 @@
 // Set the dimensions and margins of the graph
-const margin = { top: 20, right: 20, bottom: 30, left: 50 },
+const margin = { top: 20, right: 30, bottom: 30, left: 50 },
     graphWidth = 960 - margin.left - margin.right,
     graphHeight = 500 - margin.top - margin.bottom,
     // svg
@@ -17,12 +17,17 @@ const margin = { top: 20, right: 20, bottom: 30, left: 50 },
     // Scales
     x = d3.scaleTime().range([0, graphWidth]),
     y = d3.scaleLinear().range([graphHeight, 0]),
+    yRight = d3.scaleLinear().range([graphHeight, 0]),
     // Axes groups
     xAxisGroup = graph
         .append("g")
         .attr("class", "x-axis")
         .attr("transform", "translate(0," + graphHeight + ")"),
     yAxisGroup = graph.append("g").attr("class", "y-axis"),
+    yAxisGroup2 = graph
+        .append("g")
+        .attr("transform", "translate( " + graphWidth + ", 0 )")
+        .attr("class", "y-axis2"),
     line = d3
         .line()
         .x(function(d) {
@@ -37,11 +42,11 @@ const margin = { top: 20, right: 20, bottom: 30, left: 50 },
             return x(new Date(d.periodEnd));
         })
         .y(function(d) {
-            return y(d.NumberOfMessages);
+            return yRight(d.NumberOfMessages);
         }),
     // d3 line path generator
-    path = graph.append("path");
-path1 = graph.append("path");
+    path = graph.append("path"),
+    path1 = graph.append("path");
 
 Promise.all([d3.json("down.json"), d3.json("msgs.json")])
     .then(function(data) {
@@ -53,10 +58,6 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
         );
         data[1].sort((a, b) => new Date(a.periodEnd) - new Date(b.periodEnd));
         // Set scale domains
-        // x.domain(d3.extent(data[0], d => new Date(d.NextMessageTimeTimestamp)));
-        // y.domain([0, d3.max(data[0], d => d.DownTimeDurationSeconds)]);
-        // x.domain(d3.extent(data[1], d => new Date(d.periodEnd)));
-        // y.domain([0, d3.max(data[1], d => d.NumberOfMessages)]);
         x.domain(
             d3.extent(
                 [].concat(
@@ -65,24 +66,9 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
                 )
             )
         );
-        y.domain([
-            0,
-            d3.max(
-                [].concat(
-                    data[0].map(d => d.DownTimeDurationSeconds),
-                    data[1].map(d => d.NumberOfMessages)
-                )
-            )
-        ]);
+        y.domain([0, d3.max(data[0].map(d => d.DownTimeDurationSeconds))]);
+        yRight.domain([0, d3.max(data[1].map(d => d.NumberOfMessages))]);
 
-        // console.log(
-        //     d3.max(
-        //         [].concat(
-        //             data[0].map(d => d.DownTimeDurationSeconds),
-        //             data[1].map(d => d.NumberOfMessages)
-        //         )
-        //     )
-        // );
         // console.log(data[0].map(item => new Date(item.NextMessageTimeTimestamp)));
         // console.log(data[1].map(item => new Date(item.periodEnd)));
         // Update path data line 1
@@ -125,7 +111,7 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
             .append("circle")
             .attr("r", 4)
             .attr("cx", d => x(new Date(d.periodEnd)))
-            .attr("cy", d => y(d.NumberOfMessages))
+            .attr("cy", d => yRight(d.NumberOfMessages))
             .attr("fill", "#CCC");
 
         graph
@@ -150,11 +136,13 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
             .ticks(4)
             .tickFormat(d3.timeFormat("%b %d"));
         const yAxis = d3.axisLeft(y).ticks(4);
+        const yAxis2 = d3.axisRight(yRight).ticks(4);
         // .tickFormat(d => (d = "m"));
 
         // Call axes
         xAxisGroup.call(xAxis);
         yAxisGroup.call(yAxis);
+        yAxisGroup2.call(yAxis2);
 
         // Rotae axis text
         xAxisGroup
