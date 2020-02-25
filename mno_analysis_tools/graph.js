@@ -30,20 +30,12 @@ const margin = { top: 20, right: 30, bottom: 30, left: 50 },
         .attr("class", "y-axis2"),
     line = d3
         .line()
-        .x(function(d) {
-            return x(new Date(d.NextMessageTimeTimestamp));
-        })
-        .y(function(d) {
-            return y(d.DownTimeDurationSeconds);
-        }),
+        .x(d => x(new Date(d.NextMessageTimeTimestamp)))
+        .y(d => y(d.DownTimeDurationSeconds)),
     line2 = d3
         .line()
-        .x(function(d) {
-            return x(new Date(d.periodEnd));
-        })
-        .y(function(d) {
-            return yRight(d.NumberOfMessages);
-        }),
+        .x(d => x(new Date(d.periodEnd)))
+        .y(d => yRight(d.NumberOfMessages)),
     // d3 line path generator
     path = graph.append("path"),
     path1 = graph.append("path");
@@ -61,8 +53,10 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
         x.domain(
             d3.extent(
                 [].concat(
+                    data[0].map(d => new Date(d.PreviousMessageTimestamp)),
                     data[0].map(d => new Date(d.NextMessageTimeTimestamp)),
-                    data[1].map(d => new Date(d.periodEnd))
+                    data[1].map(d => new Date(d.periodEnd)),
+                    data[1].map(d => new Date(d.periodStart))
                 )
             )
         );
@@ -87,6 +81,7 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
             .attr("d", line2);
 
         const circles = graph.selectAll("circle").data(data[0]);
+        const circles1 = graph.selectAll("circle1").data(data[0]);
         const circles2 = graph.selectAll("circle2").data(data[1]);
 
         // Remove unwanted points
@@ -103,7 +98,15 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
             .attr("r", 4)
             .attr("cx", d => x(new Date(d.NextMessageTimeTimestamp)))
             .attr("cy", d => y(d.DownTimeDurationSeconds))
-            .attr("fill", "#CCC");
+            .attr("fill", "red");
+
+        circles1
+            .enter()
+            .append("circle")
+            .attr("r", 4)
+            .attr("cx", d => x(new Date(d.PreviousMessageTimestamp)))
+            .attr("cy", d => y(d.DownTimeDurationSeconds))
+            .attr("fill", "white");
 
         // Add new points
         circles2
@@ -133,7 +136,7 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
         // Create axes
         const xAxis = d3
             .axisBottom(x)
-            .ticks(4)
+            .ticks(24)
             .tickFormat(d3.timeFormat("%b %d"));
         const yAxis = d3.axisLeft(y).ticks(4);
         const yAxis2 = d3.axisRight(yRight).ticks(4);
