@@ -82,7 +82,7 @@ if __name__ == "__main__":
     time_interval = timedelta(hours=time_frame.hour,
                               minutes=time_frame.minute, seconds=time_frame.second)
 
-    date_time_bounds = date_time_range(start_date,  end_date, time_interval)
+    date_time_bounds = date_time_range(start_date, end_date, time_interval)
 
     # Compute number of messages between two datetime bounds i.e `PreviousMessageTimestamp` and
     # `NextMessageTimestamp` to get number of mesages per period and relate each quantity
