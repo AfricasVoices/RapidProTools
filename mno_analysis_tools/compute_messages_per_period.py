@@ -94,7 +94,7 @@ if __name__ == "__main__":
 
         for msg in filtered_messages:
             if date_time_bounds[index] <= msg.sent_on < date_time_bounds[next_index]:
-                number_of_messages += 1
+                messages_this_period += 1
 
         messages_per_period.append({
             "Operator": target_operator,
