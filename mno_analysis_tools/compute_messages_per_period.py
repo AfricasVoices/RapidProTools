@@ -100,9 +100,9 @@ if __name__ == "__main__":
     for index in range(len(messages_per_period) - 2):
         next_index = index + 1
         message_difference_per_period.append({
-            "PeriodStart": str(messages_per_period[index]["PeriodStart"]),
-            "PeriodBetween": str(messages_per_period[index]["PeriodEnd"]),
-            "PeriodEnd": str(messages_per_period[next_index]["PeriodEnd"]),
+            "PeriodStart": messages_per_period[index]["PeriodStart"],
+            "PeriodBetween": messages_per_period[index]["PeriodEnd"],
+            "PeriodEnd": messages_per_period[next_index]["PeriodEnd"],
             "MessageDifference": abs(messages_per_period[next_index]["NumberOfMessages"] - messages_per_period[index]["NumberOfMessages"])
         })
 
