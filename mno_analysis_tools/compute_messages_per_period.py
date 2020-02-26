@@ -91,8 +91,8 @@ if __name__ == "__main__":
         messages_per_period.append({
             "Operator": target_operator,
             "MessageDirection": target_message_direction,
-            "periodStart": str(date_time_bounds[index]),
-            "periodEnd": str(date_time_bounds[next_index]),
+            "PeriodStart": str(date_time_bounds[index]),
+            "PeriodEnd": str(date_time_bounds[next_index]),
             "NumberOfMessages": messages_this_period
         })
 
@@ -100,9 +100,9 @@ if __name__ == "__main__":
     for index in range(len(messages_per_period) - 2):
         next_index = index + 1
         message_difference_per_period.append({
-            "periodStart": str(messages_per_period[index]["periodStart"]),
-            "periodBetween": str(messages_per_period[index]["periodEnd"]),
-            "periodEnd": str(messages_per_period[next_index]["periodEnd"]),
+            "PeriodStart": str(messages_per_period[index]["PeriodStart"]),
+            "PeriodBetween": str(messages_per_period[index]["PeriodEnd"]),
+            "PeriodEnd": str(messages_per_period[next_index]["PeriodEnd"]),
             "MessageDifference": abs(messages_per_period[next_index]["NumberOfMessages"] - messages_per_period[index]["NumberOfMessages"])
         })
 
