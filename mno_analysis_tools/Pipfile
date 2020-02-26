@@ -11,7 +11,6 @@ pipelineinfrastructure = {editable = true,git = "https://www.github.com/AfricasV
 rapidprotools = {editable = true,git = "https://github.com/AfricasVoices/RapidProTools",ref = "update_rapid_pro_client.get_messages"}
 rapidpro-python = "*"
 python-dateutil = "*"
-isodate = "*"
 
 [requires]
 python_version = "3.6"
