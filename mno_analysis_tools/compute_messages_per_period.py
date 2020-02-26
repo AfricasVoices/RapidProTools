@@ -20,32 +20,23 @@ log = Logger(__name__)
 log.set_project_name("ComputeMessagesPerPeriod")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Number of messages between two firebase time periods ")
+    parser = argparse.ArgumentParser(description="Number of messages between two firebase time periods ")
     parser.add_argument("raw_messages_file_path", metavar="raw-messages-file-path",
-                        help="File to read the seralized Rapid Pro message data from",
-                        )
+                        help="File to read the seralized Rapid Pro message data from")
     parser.add_argument("window_of_downtimes_output_file_path", metavar="window-of-downtimes-output-file-path",
-                        help="File to write the computed messages per period data downloaded as json",
-                        )
+                        help="File to write the computed messages per period data downloaded as json")
     parser.add_argument("message_difference_file_path", metavar="message-difference-file-path",
-                        help="File to write the messages difference between two periods data downloaded as json",
-                        )
+                        help="File to write the messages difference between two periods data downloaded as json")
     parser.add_argument("target_operator", metavar="target-operator",
-                        help="Operator to analyze for downtime",
-                        )
+                        help="Operator to analyze for downtime")
     parser.add_argument("target_message_direction", metavar="direction-of-message", choices=('in', 'out'),
-                        help="Direction of messages to limit the search for downtime to",
-                        )
+                        help="Direction of messages to limit the search for downtime to")
     parser.add_argument("start_date", metavar="start-date", type=lambda s: isoparse(s),
-                        help="The start date as ISO 8601 string from which the number of messages will be computed",
-                        )
+                        help="The start date as ISO 8601 string from which the number of messages will be computed")
     parser.add_argument("end_date", metavar="end-date", type=lambda s: isoparse(s),
-                        help="The end date as ISO 8601 string to which the number of messages computation will end",
-                        )
+                        help="The end date as ISO 8601 string to which the number of messages computation will end")
     parser.add_argument("time_frame", metavar="time-frame", type=lambda s: datetime.strptime(s, '%H:%M:%S'),
-                        help="The time frame (HH:MM:SS) to generate dates in intervals between the start and end date",
-                        )
+                        help="The time frame (HH:MM:SS) to generate dates in intervals between the start and end date")
 
     args = parser.parse_args()
 
