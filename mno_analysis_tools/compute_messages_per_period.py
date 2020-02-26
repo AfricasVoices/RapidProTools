@@ -28,6 +28,9 @@ if __name__ == "__main__":
     parser.add_argument("window_of_downtimes_output_file_path", metavar="output-file",
                         help="File to write the computed messages per period data downloaded as json",
                         )
+    parser.add_argument("message_difference_file_path", metavar="output-file",
+                        help="File to write the messages difference between two periods data downloaded as json",
+                        )
     parser.add_argument("target_operator", metavar="operator",
                         help="Operator to analyze for downtime",
                         )
@@ -47,6 +50,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     raw_messages_file_path = args.raw_messages_file_path
+    message_difference_file_path = args.message_difference_file_path
     window_of_downtimes_output_file_path = args.window_of_downtimes_output_file_path
     target_operator = args.target_operator
     target_message_direction = args.target_message_direction
@@ -100,7 +104,19 @@ if __name__ == "__main__":
             "NumberOfMessages": number_of_messages
         })
 
+    message_difference_per_period = []
+    for index in range(len(messages_per_period) - 2):
+        next_index = index + 1
+        message_difference_per_period.append({
+            "periodStart": str(messages_per_period[index]["periodStart"]),
+            "periodBetween": str(messages_per_period[index]["periodEnd"]),
+            "periodEnd": str(messages_per_period[next_index]["periodEnd"]),
+            "MessageDifference": abs(messages_per_period[next_index]["NumberOfMessages"] - messages_per_period[index]["NumberOfMessages"])
+        })
+
     log.info(f"Logging {len(messages_per_period)} generated messages...")
     with open(window_of_downtimes_output_file_path, mode="w") as f:
         json.dump(messages_per_period, f)
+    with open(message_difference_file_path, mode="w") as f:
+        json.dump(message_difference_per_period, f)
     log.info(f"Logged generated messages")
