@@ -22,16 +22,16 @@ log.set_project_name("ComputeMessagesPerPeriod")
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Number of messages between two firebase time periods ")
-    parser.add_argument("raw_messages_file_path", metavar="input-file",
+    parser.add_argument("raw_messages_file_path", metavar="raw-messages-file-path",
                         help="File to read the seralized Rapid Pro message data from",
                         )
-    parser.add_argument("window_of_downtimes_output_file_path", metavar="output-file",
+    parser.add_argument("window_of_downtimes_output_file_path", metavar="window-of-downtimes-output-file-path",
                         help="File to write the computed messages per period data downloaded as json",
                         )
-    parser.add_argument("message_difference_file_path", metavar="output-file",
+    parser.add_argument("message_difference_file_path", metavar="message-difference-file-path",
                         help="File to write the messages difference between two periods data downloaded as json",
                         )
-    parser.add_argument("target_operator", metavar="operator",
+    parser.add_argument("target_operator", metavar="target-operator",
                         help="Operator to analyze for downtime",
                         )
     parser.add_argument("target_message_direction", metavar="direction-of-message", choices=('in', 'out'),
