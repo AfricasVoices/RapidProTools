@@ -81,8 +81,8 @@ if __name__ == "__main__":
     #  with the operator and the message direction.
     messages_per_period = []
     for index in range(len(date_time_bounds) - 2):
-        messages_this_period = 0
         next_index = index + 1
+        messages_this_period = 0
 
         for msg in filtered_messages:
             if date_time_bounds[index] <= msg.sent_on < date_time_bounds[next_index]:
