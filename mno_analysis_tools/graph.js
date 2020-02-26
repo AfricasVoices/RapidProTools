@@ -1,5 +1,5 @@
 // Set the dimensions and margins of the graph
-const margin = { top: 20, right: 30, bottom: 30, left: 50 },
+const margin = { top: 20, right: 30, bottom: 70, left: 50 },
     graphWidth = 960 - margin.left - margin.right,
     graphHeight = 500 - margin.top - margin.bottom,
     // svg
@@ -36,6 +36,22 @@ const margin = { top: 20, right: 30, bottom: 30, left: 50 },
         .line()
         .x(d => x(new Date(d.periodEnd)))
         .y(d => yRight(d.NumberOfMessages)),
+    dotLines = graph.append("g").attr("class", "lines"),
+    xdotlines = dotLines
+        .append("line")
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", 4),
+    xdotlines2 = dotLines
+        .append("line")
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", 4),
+    ydotlines = dotLines
+        .append("line")
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", 4),
     // d3 line path generator
     path = graph.append("path"),
     path1 = graph.append("path");
@@ -66,11 +82,11 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
         // console.log(data[0].map(item => new Date(item.NextMessageTimeTimestamp)));
         // console.log(data[1].map(item => new Date(item.periodEnd)));
         // Update path data line 1
-        path.data([data[0]])
-            .attr("fill", "none")
-            .attr("stroke", "#00BFA5")
-            .attr("stroke-width", 2)
-            .attr("d", line);
+        // path.data([data[0]])
+        //     .attr("fill", "none")
+        //     .attr("stroke", "#00BFA5")
+        //     .attr("stroke-width", 2)
+        //     .attr("d", line);
 
         // Update path data line 2
         path1
@@ -84,18 +100,40 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
         const circles1 = graph.selectAll("circle1").data(data[0]);
         const circles2 = graph.selectAll("circle2").data(data[1]);
 
-        // Remove unwanted points
-        // circles.exit().remove()
-        // Update current points
-        // circles
-        //     .attr("cx", d => x(new Date(d.date)))
-        //     .attr("cy", d => y(d.distance))
+        graph
+            .selectAll("path")
+            .data(data[0])
+            .enter()
+            .append("path")
+            .attr("d", makeRect)
+            .attr("stroke", "#00BFA5")
+            .attr("stroke-width", 30)
+            // .attr("fill", "orange")
+            .style("opacity", 0)
+            .transition()
+            .style("opacity", 1)
+            .duration(3500);
+
+        function makeRect(d, i) {
+            var x0 = x(new Date(d.PreviousMessageTimestamp));
+            var y0 = y(d.DownTimeDurationSeconds);
+            var x1 = x(new Date(d.NextMessageTimeTimestamp));
+            var y1 = graphHeight;
+
+            var p1 = x0 + " " + y0;
+            var p2 = x0 + " " + y1;
+            var p3 = x1 + " " + y1;
+            var p4 = x1 + " " + y0;
+            var l = "L";
+
+            return "M" + p1 + l + p2 + l + p3 + l + p4 + "Z";
+        }
 
         // Add new points
         circles
             .enter()
             .append("circle")
-            .attr("r", 4)
+            .attr("r", 2)
             .attr("cx", d => x(new Date(d.NextMessageTimeTimestamp)))
             .attr("cy", d => y(d.DownTimeDurationSeconds))
             .attr("fill", "red");
@@ -103,7 +141,7 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
         circles1
             .enter()
             .append("circle")
-            .attr("r", 4)
+            .attr("r", 2)
             .attr("cx", d => x(new Date(d.PreviousMessageTimestamp)))
             .attr("cy", d => y(d.DownTimeDurationSeconds))
             .attr("fill", "white");
@@ -136,8 +174,10 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
         // Create axes
         const xAxis = d3
             .axisBottom(x)
-            .ticks(24)
-            .tickFormat(d3.timeFormat("%b %d"));
+            .ticks(d3.timeDay.every(4))
+            .tickFormat(d3.timeFormat("%Y-%m-%d"));
+        // .ticks(24)
+        // .tickFormat(d3.timeFormat("%b %d"));
         const yAxis = d3.axisLeft(y).ticks(4);
         const yAxis2 = d3.axisRight(yRight).ticks(4);
         // .tickFormat(d => (d = "m"));
@@ -150,9 +190,12 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
         // Rotae axis text
         xAxisGroup
             .selectAll("text")
-            .attr("transform", "rotate(-40)")
-            .attr("text-anchor", end);
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-65)");
     })
     .catch(function(err) {
         // handle error here
+        console.log(error);
     });
