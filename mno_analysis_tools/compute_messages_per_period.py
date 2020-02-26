@@ -1,5 +1,4 @@
 import json
-import isodate
 import argparse
 from dateutil.parser import isoparse
 from datetime import datetime, timedelta
@@ -41,8 +40,8 @@ if __name__ == "__main__":
     parser.add_argument("end_date", metavar="end-date", type=lambda s: isoparse(s),
                         help="The end date as ISO 8601 string to which the number of messages computation will end",
                         )
-    parser.add_argument("time_frame", metavar="time-frame", type=lambda s: isodate.parse_duration(s),
-                        help="The duration as ISO 8601 string to be used in generating datetime range",
+    parser.add_argument("time_frame", metavar="time-frame", type=lambda s: datetime.strptime(s, '%H:%M:%S'),
+                        help="The time frame (HH:MM:SS) to generate dates in intervals between the start and end date",
                         )
 
     args = parser.parse_args()
@@ -76,7 +75,10 @@ if __name__ == "__main__":
             filtered_messages.append(msg)
     log.info(f"{len(filtered_messages)} messages after filtering")
 
-    date_time_bounds = date_time_range(start_date,  end_date, time_frame)
+    time_interval = timedelta(hours=time_frame.hour,
+                              minutes=time_frame.minute, seconds=time_frame.second)
+
+    date_time_bounds = date_time_range(start_date,  end_date, time_interval)
 
     # Compute number of messages between two datetime bounds i.e `PreviousMessageTimestamp` and
     # `NextMessageTimestamp` to get number of mesages per period and relate each quantity
