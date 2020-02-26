@@ -100,7 +100,7 @@ if __name__ == "__main__":
             "NumberOfMessages": number_of_messages
         })
 
-        log.info(f"Logging {len(messages_per_period)} generated messages...")
-        with open(window_of_downtimes_output_file_path, mode="w") as f:
-            json.dump(messages_per_period, f)
-        log.info(f"Logged generated messages")
+    log.info(f"Logging {len(messages_per_period)} generated messages...")
+    with open(window_of_downtimes_output_file_path, mode="w") as f:
+        json.dump(messages_per_period, f)
+    log.info(f"Logged generated messages")
