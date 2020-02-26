@@ -76,7 +76,7 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
                 )
             )
         );
-        y.domain([0, d3.max(data[0].map(d => d.DownTimeDurationSeconds))]);
+        y.domain([0, d3.max(data[0].map(d => Math.floor(d.DownTimeDurationSeconds % 60)))]);
         yRight.domain([0, d3.max(data[1].map(d => d.NumberOfMessages))]);
 
         // console.log(data[0].map(item => new Date(item.NextMessageTimeTimestamp)));
@@ -116,7 +116,7 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
 
         function makeRect(d, i) {
             var x0 = x(new Date(d.PreviousMessageTimestamp));
-            var y0 = y(d.DownTimeDurationSeconds);
+            var y0 = y(Math.floor(d.DownTimeDurationSeconds % 60));
             var x1 = x(new Date(d.NextMessageTimeTimestamp));
             var y1 = graphHeight;
 
@@ -197,5 +197,5 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
     })
     .catch(function(err) {
         // handle error here
-        console.log(error);
+        console.log(err);
     });
