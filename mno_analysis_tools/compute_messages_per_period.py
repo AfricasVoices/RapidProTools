@@ -81,7 +81,7 @@ if __name__ == "__main__":
     #  with the operator and the message direction.
     messages_per_period = []
     for index in range(len(date_time_bounds) - 2):
-        number_of_messages = 0
+        messages_this_period = 0
         next_index = index + 1
 
         for msg in filtered_messages:
@@ -93,7 +93,7 @@ if __name__ == "__main__":
             "MessageDirection": target_message_direction,
             "periodStart": str(date_time_bounds[index]),
             "periodEnd": str(date_time_bounds[next_index]),
-            "NumberOfMessages": number_of_messages
+            "NumberOfMessages": messages_this_period
         })
 
     message_difference_per_period = []
