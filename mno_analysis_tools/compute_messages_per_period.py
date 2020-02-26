@@ -20,7 +20,8 @@ log = Logger(__name__)
 log.set_project_name("ComputeMessagesPerPeriod")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Number of messages between two firebase time periods ")
+    parser = argparse.ArgumentParser(
+        description="Compute the number of messages in each interval between the given start and end dates")
     parser.add_argument("raw_messages_file_path", metavar="raw-messages-file-path",
                         help="File to read the seralized Rapid Pro message data from")
     parser.add_argument("window_of_downtimes_output_file_path", metavar="window-of-downtimes-output-file-path",
