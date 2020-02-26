@@ -42,8 +42,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     raw_messages_file_path = args.raw_messages_file_path
-    message_difference_file_path = args.message_difference_file_path
     window_of_downtimes_output_file_path = args.window_of_downtimes_output_file_path
+    message_difference_file_path = args.message_difference_file_path
     target_operator = args.target_operator
     target_message_direction = args.target_message_direction
     start_date = args.start_date
