@@ -79,8 +79,6 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
         y.domain([0, d3.max(data[0].map(d => Math.floor(d.DownTimeDurationSeconds % 60)))]);
         yRight.domain([0, d3.max(data[1].map(d => d.NumberOfMessages))]);
 
-        // console.log(data[0].map(item => new Date(item.NextMessageTimeTimestamp)));
-        // console.log(data[1].map(item => new Date(item.periodEnd)));
         // Update path data line 1
         // path.data([data[0]])
         //     .attr("fill", "none")
@@ -106,25 +104,24 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
             .enter()
             .append("path")
             .attr("d", makeRect)
-            .attr("stroke", "#00BFA5")
-            .attr("stroke-width", 0)
-            .attr("fill", "orange")
+            // .attr("stroke", "#00BFA5")
+            // .attr("stroke-width", 1)
+            .attr("fill", "grey")
             .style("opacity", 0)
             .transition()
             .style("opacity", 1)
             .duration(3500);
 
         function makeRect(d, i) {
-            var x0 = x(new Date(d.PreviousMessageTimestamp));
-            var y0 = y(Math.floor(d.DownTimeDurationSeconds % 60));
-            var x1 = x(new Date(d.NextMessageTimeTimestamp));
-            var y1 = graphHeight;
-
-            var p1 = x0 + " " + y0;
-            var p2 = x0 + " " + y1;
-            var p3 = x1 + " " + y1;
-            var p4 = x1 + " " + y0;
-            var l = "L";
+            let x0 = x(new Date(d.PreviousMessageTimestamp)),
+                y0 = y(Math.floor(d.DownTimeDurationSeconds % 60)),
+                x1 = x(new Date(d.NextMessageTimeTimestamp)),
+                y1 = graphHeight,
+                p1 = x0 + " " + y0,
+                p2 = x0 + " " + y1,
+                p3 = x1 + " " + y1,
+                p4 = x1 + " " + y0,
+                l = "L";
 
             return "M" + p1 + l + p2 + l + p3 + l + p4 + "Z";
         }
@@ -150,7 +147,7 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
         circles2
             .enter()
             .append("circle")
-            .attr("r", 4)
+            .attr("r", 1)
             .attr("cx", d => x(new Date(d.periodEnd)))
             .attr("cy", d => yRight(d.NumberOfMessages))
             .attr("fill", "#CCC");
