@@ -80,7 +80,7 @@ if __name__ == "__main__":
     # `NextMessageTimestamp` to get number of mesages per period and relate each quantity
     #  with the operator and the message direction.
     messages_per_period = []
-    for index in range(len(date_time_bounds) - 2):
+    for index in range(len(date_time_bounds) - 1):
         next_index = index + 1
 
         messages_this_period = 0
