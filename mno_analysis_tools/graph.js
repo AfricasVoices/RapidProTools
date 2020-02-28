@@ -56,28 +56,53 @@ const margin = { top: 20, right: 30, bottom: 70, left: 50 },
     path = graph.append("path"),
     path1 = graph.append("path");
 
-Promise.all([d3.json("down.json"), d3.json("msgs.json")])
+Promise.all([
+    d3.json("incoming_downtime.json"),
+    d3.json("outgoing_downtime.json"),
+    d3.json("incoming_messages.json"),
+    d3.json("outgoing_messages.json"),
+    d3.json("incoming_messages_differences.json"),
+    d3.json("outgoing_messages_differences.json")
+])
     .then(function(data) {
-        // files[0] will contain file1.json
-        // files[1] will contain file2.json
+        let incoming_downtime = data[0];
+        let outgoing_downtime = data[1];
+        let incoming_messages = data[2];
+        let outgoing_messages = data[3];
+        let incoming_messages_differences = data[4];
+        let outgoing_messages_differences = data[5];
+
+        let downtime = incoming_downtime;
+        let messages = incoming_messages;
+        let message_differences = incoming_messages_differences;
+        if (m == "in") {
+            let downtime = incoming_downtime;
+            let messages = incoming_messages;
+            let message_differences = incoming_messages_differences;
+        } else if (m == "out") {
+            let downtime = outgoing_downtime;
+            let messages = outgoing_messages;
+            let message_differences = outgoing_messages_differences;
+        }
+
         // sort data based on date objects
-        data[0].sort(
+        downtime.sort(
             (a, b) => new Date(a.NextMessageTimeTimestamp) - new Date(b.NextMessageTimeTimestamp)
         );
-        data[1].sort((a, b) => new Date(a.periodEnd) - new Date(b.periodEnd));
+        messages.sort((a, b) => new Date(a.periodEnd) - new Date(b.periodEnd));
         // Set scale domains
         x.domain(
             d3.extent(
                 [].concat(
-                    data[0].map(d => new Date(d.PreviousMessageTimestamp)),
-                    data[0].map(d => new Date(d.NextMessageTimeTimestamp)),
-                    data[1].map(d => new Date(d.periodEnd)),
-                    data[1].map(d => new Date(d.periodStart))
+                    downtime.map(d => new Date(d.PreviousMessageTimestamp)),
+                    downtime.map(d => new Date(d.NextMessageTimeTimestamp)),
+                    messages.map(d => new Date(d.periodEnd)),
+                    messages.map(d => new Date(d.periodStart))
                 )
             )
         );
-        y.domain([0, d3.max(data[0].map(d => Math.floor(d.DownTimeDurationSeconds % 60)))]);
-        yRight.domain([0, d3.max(data[1].map(d => d.NumberOfMessages))]);
+        y.domain([0, d3.max(downtime.map(d => Math.floor(d.DownTimeDurationSeconds % 60)))]);
+        yRight.domain([0, d3.max(messages.map(d => d.NumberOfMessages))]);
 
         // Update path data line 1
         // path.data([data[0]])
@@ -88,19 +113,19 @@ Promise.all([d3.json("down.json"), d3.json("msgs.json")])
 
         // Update path data line 2
         path1
-            .data([data[1]])
+            .data([messages])
             .attr("fill", "none")
             .attr("stroke", "#00BFA5")
             .attr("stroke-width", 2)
             .attr("d", line2);
 
-        const circles = graph.selectAll("circle").data(data[0]);
-        const circles1 = graph.selectAll("circle1").data(data[0]);
-        const circles2 = graph.selectAll("circle2").data(data[1]);
+        const circles = graph.selectAll("circle").data(downtime);
+        const circles1 = graph.selectAll("circle1").data(downtime);
+        const circles2 = graph.selectAll("circle2").data(messages);
 
         graph
             .selectAll("path")
-            .data(data[0])
+            .data(downtime)
             .enter()
             .append("path")
             .attr("d", makeRect)
