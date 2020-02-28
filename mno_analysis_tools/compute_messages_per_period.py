@@ -30,7 +30,7 @@ if __name__ == "__main__":
                         help="File to write the messages difference between two periods data downloaded as json")
     parser.add_argument("target_operator", metavar="target-operator",
                         help="Operator to analyze for downtime")
-    parser.add_argument("target_message_direction", metavar="direction-of-message", choices=('in', 'out'),
+    parser.add_argument("target_message_direction", metavar="target-message-direction", choices=('in', 'out'),
                         help="Direction of messages to limit the search for downtime to")
     parser.add_argument("start_date", metavar="start-date", type=lambda s: isoparse(s),
                         help="The start date as ISO 8601 string from which the number of messages will be computed")
