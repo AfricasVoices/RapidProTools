@@ -28,13 +28,13 @@ const margin = { top: 20, right: 30, bottom: 70, left: 50 },
         .append("g")
         .attr("transform", "translate( " + graphWidth + ", 0 )")
         .attr("class", "y-axis2"),
-    line = d3
+    MessageDifferenceLine = d3
         .line()
-        .x(d => x(new Date(d.NextMessageTimeTimestamp)))
-        .y(d => y(d.DownTimeDurationSeconds)),
-    line2 = d3
+        .x(d => x(new Date(d.PeriodBetween)))
+        .y(d => y(d.MessageDifference)),
+    NumberOfMessagesLine = d3
         .line()
-        .x(d => x(new Date(d.periodEnd)))
+        .x(d => x(new Date(d.PeriodEnd)))
         .y(d => yRight(d.NumberOfMessages)),
     dotLines = graph.append("g").attr("class", "lines"),
     xdotlines = dotLines
@@ -53,8 +53,8 @@ const margin = { top: 20, right: 30, bottom: 70, left: 50 },
         .attr("stroke-width", 1)
         .attr("stroke-dasharray", 4),
     // d3 line path generator
-    path = graph.append("path"),
-    path1 = graph.append("path");
+    path1 = graph.append("path"),
+    path = graph.append("path");
 
 Promise.all([
     d3.json("incoming_downtime.json"),
@@ -75,49 +75,71 @@ Promise.all([
         let downtime = incoming_downtime;
         let messages = incoming_messages;
         let message_differences = incoming_messages_differences;
-        if (m == "in") {
-            let downtime = incoming_downtime;
-            let messages = incoming_messages;
-            let message_differences = incoming_messages_differences;
-        } else if (m == "out") {
-            let downtime = outgoing_downtime;
-            let messages = outgoing_messages;
-            let message_differences = outgoing_messages_differences;
-        }
+        // if (m == "in") {
+        //     let downtime = incoming_downtime;
+        //     let messages = incoming_messages;
+        //     let message_differences = incoming_messages_differences;
+        // } else if (m == "out") {
+        //     let downtime = outgoing_downtime;
+        //     let messages = outgoing_messages;
+        //     let message_differences = outgoing_messages_differences;
+        // }
 
         // sort data based on date objects
         downtime.sort(
             (a, b) => new Date(a.NextMessageTimeTimestamp) - new Date(b.NextMessageTimeTimestamp)
         );
-        messages.sort((a, b) => new Date(a.periodEnd) - new Date(b.periodEnd));
+        messages.sort((a, b) => new Date(a.PeriodEnd) - new Date(b.PeriodEnd));
         // Set scale domains
         x.domain(
             d3.extent(
                 [].concat(
                     downtime.map(d => new Date(d.PreviousMessageTimestamp)),
                     downtime.map(d => new Date(d.NextMessageTimeTimestamp)),
-                    messages.map(d => new Date(d.periodEnd)),
-                    messages.map(d => new Date(d.periodStart))
+                    messages.map(d => new Date(d.PeriodEnd)),
+                    messages.map(d => new Date(d.PeriodStart))
                 )
             )
         );
         y.domain([0, d3.max(downtime.map(d => Math.floor(d.DownTimeDurationSeconds % 60)))]);
-        yRight.domain([0, d3.max(messages.map(d => d.NumberOfMessages))]);
+        yRight.domain([
+            d3.min(
+                [].concat(
+                    messages.map(d => d.NumberOfMessages),
+                    message_differences.map(d => d.MessageDifference)
+                )
+            ),
+            d3.max(
+                [].concat(
+                    messages.map(d => d.NumberOfMessages),
+                    message_differences.map(d => d.MessageDifference)
+                )
+            )
+        ]);
+        // yRight.domain([
+        //     0,
+        //     d3.max(
+        //         [].concat(
+        //             messages.map(d => d.NumberOfMessages),
+        //             message_differences.map(d => d.MessageDifference)
+        //         )
+        //     )
+        // ]);
 
         // Update path data line 1
-        // path.data([data[0]])
-        //     .attr("fill", "none")
-        //     .attr("stroke", "#00BFA5")
-        //     .attr("stroke-width", 2)
-        //     .attr("d", line);
+        path.data([message_differences])
+            // .attr("fill", "yellow")
+            .attr("stroke", "yellow")
+            .attr("stroke-width", 5)
+            .attr("d", MessageDifferenceLine);
 
         // Update path data line 2
         path1
             .data([messages])
             .attr("fill", "none")
             .attr("stroke", "#00BFA5")
-            .attr("stroke-width", 2)
-            .attr("d", line2);
+            .attr("stroke-width", 5)
+            .attr("d", NumberOfMessagesLine);
 
         const circles = graph.selectAll("circle").data(downtime);
         const circles1 = graph.selectAll("circle1").data(downtime);
@@ -131,10 +153,10 @@ Promise.all([
             .attr("d", makeRect)
             // .attr("stroke", "#00BFA5")
             // .attr("stroke-width", 1)
-            .attr("fill", "grey")
+            .attr("fill", "orange")
             .style("opacity", 0)
             .transition()
-            .style("opacity", 1)
+            .style("opacity", 0.2)
             .duration(3500);
 
         function makeRect(d, i) {
@@ -173,7 +195,7 @@ Promise.all([
             .enter()
             .append("circle")
             .attr("r", 1)
-            .attr("cx", d => x(new Date(d.periodEnd)))
+            .attr("cx", d => x(new Date(d.PeriodEnd)))
             .attr("cy", d => yRight(d.NumberOfMessages))
             .attr("fill", "#CCC");
 
