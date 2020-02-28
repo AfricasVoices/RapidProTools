@@ -103,7 +103,7 @@ if __name__ == "__main__":
             "PeriodStart": messages_per_period[index]["PeriodStart"],
             "PeriodBetween": messages_per_period[index]["PeriodEnd"],
             "PeriodEnd": messages_per_period[next_index]["PeriodEnd"],
-            "MessageDifference": abs(messages_per_period[next_index]["NumberOfMessages"] - messages_per_period[index]["NumberOfMessages"])
+            "MessageDifference": messages_per_period[next_index]["NumberOfMessages"] - messages_per_period[index]["NumberOfMessages"]
         })
 
     log.info(f"Logging {len(messages_per_period)} generated messages...")
