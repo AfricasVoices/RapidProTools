@@ -22,11 +22,11 @@ log.set_project_name("ComputeMessagesPerPeriod")
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Compute the number of messages in each interval between the given start and end dates")
-    parser.add_argument("raw_messages_file_path", metavar="raw-messages-file-path",
+    parser.add_argument("raw_messages_input_file_path", metavar="raw-messages-input-file-path",
                         help="File to read the seralized Rapid Pro message data from")
-    parser.add_argument("computed_messages_per_period_file_path", metavar="computed-messages-per-period-file-path",
+    parser.add_argument("computed_messages_per_period_output_file_path", metavar="computed-messages-per-period-output-file-path",
                         help="File to write the computed messages per period data downloaded as json")
-    parser.add_argument("message_difference_file_path", metavar="message-difference-file-path",
+    parser.add_argument("message_difference_output_file_path", metavar="message-difference-output-file-path",
                         help="File to write the messages difference between two periods data downloaded as json")
     parser.add_argument("target_operator", metavar="target-operator",
                         help="Operator to analyze for downtime")
@@ -41,17 +41,17 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    raw_messages_file_path = args.raw_messages_file_path
-    computed_messages_per_period_file_path = args.computed_messages_per_period_file_path
-    message_difference_file_path = args.message_difference_file_path
+    raw_messages_input_file_path = args.raw_messages_input_file_path
+    computed_messages_per_period_output_file_path = args.computed_messages_per_period_output_file_path
+    message_difference_output_file_path = args.message_difference_output_file_path
     target_operator = args.target_operator
     target_message_direction = args.target_message_direction
     start_date = args.start_date
     end_date = args.end_date
     time_frame = args.time_frame
 
-    with open(raw_messages_file_path, mode="r") as f:
-        log.info("Loading messages from {raw_messages_file_path}...")
+    with open(raw_messages_input_file_path, mode="r") as f:
+        log.info("Loading messages from {raw_messages_input_file_path}...")
         input = json.load(f)
         messages = [Message.deserialize(val) for val in input]
         log.info(f"Loaded {len(messages)} messages")
@@ -107,8 +107,8 @@ if __name__ == "__main__":
         })
 
     log.info(f"Logging {len(messages_per_period)} generated messages...")
-    with open(computed_messages_per_period_file_path, mode="w") as f:
+    with open(computed_messages_per_period_output_file_path, mode="w") as f:
         json.dump(messages_per_period, f)
-    with open(message_difference_file_path, mode="w") as f:
+    with open(message_difference_output_file_path, mode="w") as f:
         json.dump(message_difference_per_period, f)
     log.info(f"Logged generated messages")
