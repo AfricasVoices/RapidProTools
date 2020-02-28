@@ -66,6 +66,7 @@ if __name__ == "__main__":
             operator = PhoneCleaner.clean_operator(msg.urn.split(":")[1])
         else:
             operator = msg.urn.split(":")[0]
+        msg_direction = msg.direction
         if operator == target_operator and msg.direction == target_message_direction:
             log.info(f"Filtering messages...")
             filtered_messages.append(msg)
@@ -89,8 +90,8 @@ if __name__ == "__main__":
                 messages_this_period += 1
 
         messages_per_period.append({
-            "Operator": target_operator,
-            "MessageDirection": target_message_direction,
+            "Operator": operator,
+            "MessageDirection": msg_direction,
             "PeriodStart": date_time_bounds[index].isoformat(),
             "PeriodEnd": date_time_bounds[next_index].isoformat(),
             "NumberOfMessages": messages_this_period
