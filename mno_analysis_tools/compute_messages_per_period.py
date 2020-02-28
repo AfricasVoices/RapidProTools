@@ -101,6 +101,8 @@ if __name__ == "__main__":
     for index in range(len(messages_per_period) - 1):
         next_index = index + 1
         message_difference_per_period.append({
+            "Operator": operator,
+            "MessageDirection": msg_direction,
             "PeriodStart": messages_per_period[index]["PeriodStart"],
             "PeriodBetween": messages_per_period[index]["PeriodEnd"],
             "PeriodEnd": messages_per_period[next_index]["PeriodEnd"],
