@@ -112,6 +112,7 @@ if __name__ == "__main__":
     log.info(f"Logging {len(messages_per_period)} generated messages...")
     with open(computed_messages_per_period_output_file_path, mode="w") as f:
         json.dump(messages_per_period, f)
+        
     with open(message_difference_output_file_path, mode="w") as f:
         json.dump(message_difference_per_period, f)
     log.info(f"Logged generated messages")
