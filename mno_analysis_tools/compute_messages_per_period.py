@@ -66,8 +66,8 @@ if __name__ == "__main__":
             operator = PhoneCleaner.clean_operator(msg.urn.split(":")[1])
         else:
             operator = msg.urn.split(":")[0]
-        msg_direction = msg.direction
         if operator == target_operator and msg.direction == target_message_direction:
+            msg_direction = msg.direction
             log.info(f"Filtering messages...")
             filtered_messages.append(msg)
     log.info(f"{len(filtered_messages)} messages after filtering")
