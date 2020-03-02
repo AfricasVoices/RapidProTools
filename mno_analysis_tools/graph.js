@@ -1,4 +1,4 @@
-// Set the dimensions and margins of the graph
+// Set the dimensions and margins of the graphs
 const margin = { top: 20, right: 30, bottom: 70, left: 50 },
     graphWidth = 960 - margin.left - margin.right,
     graphHeight = 500 - margin.top - margin.bottom;
@@ -19,15 +19,15 @@ const incomingMsgGraphSvg = d3
         .attr("transform", `translate(${margin.left}, ${margin.top})`),
     // Scales
     incomingMsgGraphxScale = d3.scaleTime().range([0, graphWidth]),
-    incomingMsgGraphyScale = d3.scaleLinear().range([graphHeight, 0]),
+    incomingMsgGraphLeftyScale = d3.scaleLinear().range([graphHeight, 0]),
     incomingMsgGraphyRightScale = d3.scaleLinear().range([graphHeight, 0]),
     // Axes group
     incomingMsgGraphxAxisGroup = incomingMsgGraph
         .append("g")
         .attr("class", "x-axis")
         .attr("transform", "translate(0," + graphHeight + ")"),
-    incomingMsgGraphyAxisGroup = incomingMsgGraph.append("g").attr("class", "y-axis"),
-    yAxisGroup2 = incomingMsgGraph
+    incomingMsgGraphLeftyAxisGroup = incomingMsgGraph.append("g").attr("class", "y-axis"),
+    incomingMsgGraphRightYAxisGroup = incomingMsgGraph
         .append("g")
         .attr("transform", "translate( " + graphWidth + ", 0 )")
         .attr("class", "y-axis2"),
@@ -60,8 +60,8 @@ const outgoingMsgGraphSvg = d3
         .attr("transform", `translate(${margin.left}, ${margin.top})`),
     // Scales
     outgoingMsgGraphxScale = d3.scaleTime().range([0, graphWidth]),
-    outgoingMsgGraphyScale = d3.scaleLinear().range([graphHeight, 0]),
-    outgoingMsgGraphyRightScale = d3.scaleLinear().range([graphHeight, 0]),
+    outgoingMsgGraphLeftyScale = d3.scaleLinear().range([graphHeight, 0]),
+    outgoingMsgGraphRightyScale = d3.scaleLinear().range([graphHeight, 0]),
     // Axes groups
     outgoingMsgGraphxAxisGroup = outgoingMsgGraph
         .append("g")
@@ -76,11 +76,11 @@ const outgoingMsgGraphSvg = d3
     outgoingMsgGraphMessageDifferenceLine = d3
         .line()
         .x(d => outgoingMsgGraphxScale(new Date(d.PeriodBetween)))
-        .y(d => outgoingMsgGraphyRightScale(d.MessageDifference)),
+        .y(d => outgoingMsgGraphRightyScale(d.MessageDifference)),
     outgoingMsgGraphNumberOfMessagesLine = d3
         .line()
         .x(d => outgoingMsgGraphxScale(new Date(d.PeriodEnd)))
-        .y(d => outgoingMsgGraphyRightScale(d.NumberOfMessages)),
+        .y(d => outgoingMsgGraphRightyScale(d.NumberOfMessages)),
     // d3 line path generator
     outgoingMsgGraphNumberOfMessagesLinePath = outgoingMsgGraph.append("path"),
     outgoingMsgGraphMessageDifferenceLinePath = outgoingMsgGraph.append("path");
@@ -104,7 +104,7 @@ Promise.all([
 
         const makeRect = (d, i) => {
             let x0 = incomingMsgGraphxScale(new Date(d.PreviousMessageTimestamp)),
-                y0 = incomingMsgGraphyScale(Math.floor(d.DownTimeDurationSeconds / 3600)),
+                y0 = incomingMsgGraphLeftyScale(Math.floor(d.DownTimeDurationSeconds / 3600)),
                 x1 = incomingMsgGraphxScale(new Date(d.NextMessageTimeTimestamp)),
                 y1 = graphHeight,
                 p1 = x0 + " " + y0,
@@ -134,7 +134,7 @@ Promise.all([
                 )
             )
         );
-        incomingMsgGraphyScale.domain([
+        incomingMsgGraphLeftyScale.domain([
             0,
             d3.max(incoming_downtime.map(d => Math.floor(d.DownTimeDurationSeconds / 3600)))
         ]);
@@ -178,18 +178,21 @@ Promise.all([
             .style("opacity", 0.2)
             .duration(3500);
         // Create axes
-        const xAxis = d3
+        const incomingMsgGraphxAxis = d3
             .axisBottom(incomingMsgGraphxScale)
             .ticks(d3.timeDay.every(4))
             .tickFormat(d3.timeFormat("%Y-%m-%d"))
             .ticks(24);
 
-        const yAxis = d3.axisLeft(incomingMsgGraphyScale).ticks(4);
-        const yAxis2 = d3.axisRight(incomingMsgGraphyRightScale).ticks(4);
+        const incomingMsgGraphLeftyAxis = d3.axisLeft(incomingMsgGraphLeftyScale).ticks(4);
+        const incomingMsgGraphRightyAxis = d3.axisRight(incomingMsgGraphyRightScale).ticks(4);
         // Call axes
-        incomingMsgGraphxAxisGroup.call(xAxis);
-        incomingMsgGraphyAxisGroup.call(yAxis);
-        yAxisGroup2.call(yAxis2);
+        incomingMsgGraphxAxisGroup.call(incomingMsgGraphxAxis);
+        incomingMsgGraphLeftyAxisGroup.call(incomingMsgGraphLeftyAxis);
+        incomingMsgGraphRightYAxisGroup.call(incomingMsgGraphRightyAxis);
+        // outgoingMsgGraphxAxisGroup.call(outgoingMsgGraphxAxis);
+        // outgoingMsgGraphLeftYAxisGroup.call(outgoingMsgGraphLeftyAxis);
+        // outgoingMsgGraphRightYAxisGroup.call(outgoingMsgGraphRightyAxis);
         // Rotate axis text
         incomingMsgGraphxAxisGroup
             .selectAll("text")
@@ -215,11 +218,11 @@ Promise.all([
                 )
             )
         );
-        outgoingMsgGraphyScale.domain([
+        outgoingMsgGraphLeftyScale.domain([
             0,
             d3.max(outgoing_downtime.map(d => Math.floor(d.DownTimeDurationSeconds / 3600)))
         ]);
-        outgoingMsgGraphyRightScale.domain([
+        outgoingMsgGraphRightyScale.domain([
             d3.min(
                 [].concat(
                     outgoing_messages.map(d => d.NumberOfMessages),
@@ -267,13 +270,13 @@ Promise.all([
             .ticks(d3.timeDay.every(4))
             .tickFormat(d3.timeFormat("%Y-%m-%d"))
             .ticks(24);
-        const outgoingMsgGraphyAxis = d3.axisLeft(outgoingMsgGraphyScale).ticks(4);
-        const outgoingMsgGraphyAxis2 = d3.axisRight(outgoingMsgGraphyRightScale).ticks(4);
+        const outgoingMsgGraphLeftyAxis = d3.axisLeft(outgoingMsgGraphLeftyScale).ticks(4);
+        const outgoingMsgGraphRightyAxis = d3.axisRight(outgoingMsgGraphRightyScale).ticks(4);
 
         // Call axes
         outgoingMsgGraphxAxisGroup.call(outgoingMsgGraphxAxis);
-        outgoingMsgGraphLeftYAxisGroup.call(outgoingMsgGraphyAxis2);
-        outgoingMsgGraphRightYAxisGroup.call(outgoingMsgGraphyAxis);
+        outgoingMsgGraphLeftYAxisGroup.call(outgoingMsgGraphLeftyAxis);
+        outgoingMsgGraphRightYAxisGroup.call(outgoingMsgGraphRightyAxis);
 
         // Rotate axis text
         outgoingMsgGraphxAxisGroup
