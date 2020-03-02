@@ -18,9 +18,9 @@ const incomingMsgGraphSvg = d3
         .attr("Height", graphHeight)
         .attr("transform", `translate(${margin.left}, ${margin.top})`),
     // Scales
-    x = d3.scaleTime().range([0, graphWidth]),
-    y = d3.scaleLinear().range([graphHeight, 0]),
-    yRight = d3.scaleLinear().range([graphHeight, 0]),
+    incomingMsgGraphxScale = d3.scaleTime().range([0, graphWidth]),
+    incomingMsgGraphyScale = d3.scaleLinear().range([graphHeight, 0]),
+    incomingMsgGraphyRightScale = d3.scaleLinear().range([graphHeight, 0]),
     // Axes group
     incomingMsgGraphxAxisGroup = incomingMsgGraph
         .append("g")
@@ -34,15 +34,15 @@ const incomingMsgGraphSvg = d3
     // Line
     MessageDifferenceLine = d3
         .line()
-        .x(d => x(new Date(d.PeriodBetween)))
-        .y(d => yRight(d.MessageDifference)),
+        .x(d => incomingMsgGraphxScale(new Date(d.PeriodBetween)))
+        .y(d => incomingMsgGraphyRightScale(d.MessageDifference)),
     NumberOfMessagesLine = d3
         .line()
-        .x(d => x(new Date(d.PeriodEnd)))
-        .y(d => yRight(d.NumberOfMessages)),
+        .x(d => incomingMsgGraphxScale(new Date(d.PeriodEnd)))
+        .y(d => incomingMsgGraphyRightScale(d.NumberOfMessages)),
     // d3 line path generator
-    path1 = incomingMsgGraph.append("path"),
-    path = incomingMsgGraph.append("path");
+    incomingMsgGraphNumberOfMessagesLinePath = incomingMsgGraph.append("path"),
+    incomingMsgGraphMessageDifferenceLinePath = incomingMsgGraph.append("path");
 // --------------------------------------------------------------------------------------------------
 
 // Outgoing Messages
@@ -75,15 +75,15 @@ const outgoingMsgGraphSvg = d3
     // Line
     outgoingMsgGraphMessageDifferenceLine = d3
         .line()
-        .x(d => x(new Date(d.PeriodBetween)))
-        .y(d => yRight(d.MessageDifference)),
+        .x(d => outgoingMsgGraphxScale(new Date(d.PeriodBetween)))
+        .y(d => outgoingMsgGraphyRightScale(d.MessageDifference)),
     outgoingMsgGraphNumberOfMessagesLine = d3
         .line()
-        .x(d => x(new Date(d.PeriodEnd)))
-        .y(d => yRight(d.NumberOfMessages)),
+        .x(d => outgoingMsgGraphxScale(new Date(d.PeriodEnd)))
+        .y(d => outgoingMsgGraphyRightScale(d.NumberOfMessages)),
     // d3 line path generator
-    outgoingMsgGraphPath1 = outgoingMsgGraph.append("path"),
-    outgoingMsgGraphPath = outgoingMsgGraph.append("path");
+    outgoingMsgGraphNumberOfMessagesLinePath = outgoingMsgGraph.append("path"),
+    outgoingMsgGraphMessageDifferenceLinePath = outgoingMsgGraph.append("path");
 // --------------------------------------------------------------------------------------------------
 
 Promise.all([
@@ -103,9 +103,9 @@ Promise.all([
             outgoing_messages_differences = data[5];
 
         const makeRect = (d, i) => {
-            let x0 = x(new Date(d.PreviousMessageTimestamp)),
-                y0 = y(Math.floor(d.DownTimeDurationSeconds / 3600)),
-                x1 = x(new Date(d.NextMessageTimeTimestamp)),
+            let x0 = incomingMsgGraphxScale(new Date(d.PreviousMessageTimestamp)),
+                y0 = incomingMsgGraphyScale(Math.floor(d.DownTimeDurationSeconds / 3600)),
+                x1 = incomingMsgGraphxScale(new Date(d.NextMessageTimeTimestamp)),
                 y1 = graphHeight,
                 p1 = x0 + " " + y0,
                 p2 = x0 + " " + y1,
@@ -124,7 +124,7 @@ Promise.all([
         );
         incoming_messages.sort((a, b) => new Date(a.PeriodEnd) - new Date(b.PeriodEnd));
         // Set scale domains
-        x.domain(
+        incomingMsgGraphxScale.domain(
             d3.extent(
                 [].concat(
                     incoming_downtime.map(d => new Date(d.PreviousMessageTimestamp)),
@@ -134,11 +134,11 @@ Promise.all([
                 )
             )
         );
-        y.domain([
+        incomingMsgGraphyScale.domain([
             0,
             d3.max(incoming_downtime.map(d => Math.floor(d.DownTimeDurationSeconds / 3600)))
         ]);
-        yRight.domain([
+        incomingMsgGraphyRightScale.domain([
             d3.min(
                 [].concat(
                     incoming_messages.map(d => d.NumberOfMessages),
@@ -153,13 +153,13 @@ Promise.all([
             )
         ]);
         // Update path data line 1
-        path.data([incoming_messages_differences])
-            // .attr("fill", "yellow")
+        incomingMsgGraphMessageDifferenceLinePath
+            .data([incoming_messages_differences])
             .attr("stroke", "yellow")
             .attr("stroke-width", 1)
             .attr("d", MessageDifferenceLine);
         // Update path data line 2
-        path1
+        incomingMsgGraphNumberOfMessagesLinePath
             .data([incoming_messages])
             .attr("fill", "blue")
             .attr("stroke", "#00BFA5")
@@ -172,8 +172,6 @@ Promise.all([
             .enter()
             .append("path")
             .attr("d", makeRect)
-            // .attr("stroke", "#00BFA5")
-            // .attr("stroke-width", 1)
             .attr("fill", "orange")
             .style("opacity", 0)
             .transition()
@@ -181,14 +179,13 @@ Promise.all([
             .duration(3500);
         // Create axes
         const xAxis = d3
-            .axisBottom(x)
+            .axisBottom(incomingMsgGraphxScale)
             .ticks(d3.timeDay.every(4))
-            .tickFormat(d3.timeFormat("%Y-%m-%d"));
-        // .ticks(24)
-        // .tickFormat(d3.timeFormat("%b %d"));
+            .tickFormat(d3.timeFormat("%Y-%m-%d"))
+            .ticks(24);
 
-        const yAxis = d3.axisLeft(y).ticks(4);
-        const yAxis2 = d3.axisRight(yRight).ticks(4);
+        const yAxis = d3.axisLeft(incomingMsgGraphyScale).ticks(4);
+        const yAxis2 = d3.axisRight(incomingMsgGraphyRightScale).ticks(4);
         // Call axes
         incomingMsgGraphxAxisGroup.call(xAxis);
         incomingMsgGraphyAxisGroup.call(yAxis);
@@ -238,15 +235,14 @@ Promise.all([
         ]);
 
         // Update path data line 1
-        outgoingMsgGraphPath
+        outgoingMsgGraphMessageDifferenceLinePath
             .data([outgoing_messages_differences])
-            // .attr("fill", "yellow")
             .attr("stroke", "yellow")
             .attr("stroke-width", 1)
             .attr("d", outgoingMsgGraphMessageDifferenceLine);
 
         // Update path data line 2
-        outgoingMsgGraphPath1
+        outgoingMsgGraphNumberOfMessagesLinePath
             .data([outgoing_messages])
             .attr("fill", "blue")
             .attr("stroke", "#00BFA5")
@@ -259,8 +255,6 @@ Promise.all([
             .enter()
             .append("path")
             .attr("d", makeRect)
-            .attr("stroke", "#00BFA5")
-            .attr("stroke-width", 1)
             .attr("fill", "orange")
             .style("opacity", 0)
             .transition()
@@ -271,12 +265,10 @@ Promise.all([
         const outgoingMsgGraphxAxis = d3
             .axisBottom(outgoingMsgGraphxScale)
             .ticks(d3.timeDay.every(4))
-            .tickFormat(d3.timeFormat("%Y-%m-%d"));
-        // .ticks(24)
-        // .tickFormat(d3.timeFormat("%b %d"));
+            .tickFormat(d3.timeFormat("%Y-%m-%d"))
+            .ticks(24);
         const outgoingMsgGraphyAxis = d3.axisLeft(outgoingMsgGraphyScale).ticks(4);
         const outgoingMsgGraphyAxis2 = d3.axisRight(outgoingMsgGraphyRightScale).ticks(4);
-        // .tickFormat(d => (d = "m"));
 
         // Call axes
         outgoingMsgGraphxAxisGroup.call(outgoingMsgGraphxAxis);
