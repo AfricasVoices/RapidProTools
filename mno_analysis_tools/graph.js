@@ -92,7 +92,12 @@ Promise.all([
     d3.json("outgoing_msg_diff_per_period.json")
 ])
     .then(function(data) {
-        // plot graphs
+        let incoming_messages = data[0],
+            outgoing_messages = data[1],
+            incoming_downtime = data[2],
+            outgoing_downtime = data[3],
+            incoming_messages_differences = data[4],
+            outgoing_messages_differences = data[5];
     })
     .catch(function(err) {
         alert(err);
