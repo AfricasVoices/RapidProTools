@@ -24,8 +24,6 @@ if __name__ == "__main__":
         description="Compute the number of messages in each interval between the given start and end dates")
     parser.add_argument("raw_messages_input_file_path", metavar="raw-messages-input-file-path",
                         help="File to read the serialized Rapid Pro message data from")
-    parser.add_argument("computed_messages_per_period_output_file_path", metavar="computed-messages-per-period-output-file-path",
-                        help="File to write the computed messages per period data downloaded as json")
     parser.add_argument("message_difference_output_file_path", metavar="message-difference-output-file-path",
                         help="File to write the messages difference between two periods data downloaded as json")
     parser.add_argument("target_operator", metavar="target-operator",
@@ -42,7 +40,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     raw_messages_input_file_path = args.raw_messages_input_file_path
-    computed_messages_per_period_output_file_path = args.computed_messages_per_period_output_file_path
     message_difference_output_file_path = args.message_difference_output_file_path
     target_operator = args.target_operator
     target_message_direction = args.target_message_direction
@@ -112,7 +109,4 @@ if __name__ == "__main__":
         f"writing messages_per_period and  message_difference_per_period json files...")
     with open(computed_messages_per_period_output_file_path, mode="w") as f:
         json.dump(messages_per_period, f)
-
-    with open(message_difference_output_file_path, mode="w") as f:
-        json.dump(message_difference_per_period, f)
     log.info(f"Logged generated messages")
