@@ -4,10 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MNO Analysis</title>
+    <link rel="stylesheet" href="https://avf-dashboards.firebaseapp.com/vendor/bootstrap-4.3.1/bootstrap.min.css">
+    <link rel="stylesheet" href="https://avf-dashboards.firebaseapp.com/styles.css">
+    <link rel="stylesheet" href="https://avf-dashboards.firebaseapp.com/vendor/font-5.11.2/fontawesome/css/all.css">
 </head>
 <body>
-    
-    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <!-- NAVBAR WITH DROPDOWN & RESPONSIVE TOGGLE-->
+    <nav class="navbar navbar-expand-sm navbar-brown bg-white mb-1 py-0">
+        <div class="container">
+            <a class="navbar-brand" href="#"><img class="logo" src="https://avf-dashboards.firebaseapp.com/avfdashboardlogo.png" alt="avf-logo"></a>
+            <!-- TOGGLE TRIGGER FOR SMALL DEVICES -->
+            <button class="navbar-light navbar-toggler" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <!-- RESPONSIVE TOGGLE -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li><a class="coding-progress-link nav-link border-left border-top border-right active-link">MESSAGE CODING</a></li>
+                    <li class="nav-item dropdown">
+                        <!-- DROPDOWN TRIGGER -->
+                        <a href="#" class="nav-link border-top border-right dropdown-toggle" data-toggle="dropdown">TRAFFIC</a> 
+                        <!-- DROPDOWN MENU
+                        Display dropdown menu here -->
+                        <div class="dropdown-menu project-menu"></div>
+                    </li> 
+                    <li class="px-2 pt-1 border-top border-right"><button class="logout-btn btn btn-brown btn-sm shadow">Logout<i class="fas fa-sign-out-alt mx-2"></i></button></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="card m-4 incoming-graph"></div>
+        <div class="card m-4 outgoing-graph"></div>
+    </div>
+    <script src="https://avf-dashboards.firebaseapp.com/vendor/d3-5.12.0/d3.js"></script>
     <script src="index.js"></script>
     <script src="graph.js"></script>
 </body>
