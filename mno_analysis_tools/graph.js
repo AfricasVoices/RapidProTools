@@ -112,6 +112,87 @@ Promise.all([
 
             return "M" + p1 + l + p2 + l + p3 + l + p4 + "Z";
         };
+
+        // Plot Incoming Graph
+        // sort data based on date objects
+        incoming_downtime.sort(
+            (a, b) => new Date(a.NextMessageTimeTimestamp) - new Date(b.NextMessageTimeTimestamp)
+        );
+        incoming_messages.sort((a, b) => new Date(a.PeriodEnd) - new Date(b.PeriodEnd));
+        // Set scale domains
+        incomingMsgGraphxScale.domain(
+            d3.extent(
+                [].concat(
+                    incoming_downtime.map(d => new Date(d.PreviousMessageTimestamp)),
+                    incoming_downtime.map(d => new Date(d.NextMessageTimeTimestamp)),
+                    incoming_messages.map(d => new Date(d.PeriodEnd)),
+                    incoming_messages.map(d => new Date(d.PeriodStart))
+                )
+            )
+        );
+        incomingMsgGraphLeftyScale.domain([
+            0,
+            d3.max(incoming_downtime.map(d => Math.floor(d.DownTimeDurationSeconds / 3600)))
+        ]);
+        incomingMsgGraphyRightScale.domain([
+            d3.min(
+                [].concat(
+                    incoming_messages.map(d => d.NumberOfMessages),
+                    incoming_messages_differences.map(d => d.MessageDifference)
+                )
+            ),
+            d3.max(
+                [].concat(
+                    incoming_messages.map(d => d.NumberOfMessages),
+                    incoming_messages_differences.map(d => d.MessageDifference)
+                )
+            )
+        ]);
+        // Update path data line 1
+        incomingMsgGraphMessageDifferenceLinePath
+            .data([incoming_messages_differences])
+            .attr("stroke", "yellow")
+            .attr("stroke-width", 1)
+            .attr("d", MessageDifferenceLine);
+        // Update path data line 2
+        incomingMsgGraphNumberOfMessagesLinePath
+            .data([incoming_messages])
+            .attr("fill", "blue")
+            .attr("stroke", "#00BFA5")
+            .attr("stroke-width", 1)
+            .attr("d", NumberOfMessagesLine);
+
+        incomingMsgGraph
+            .selectAll("path")
+            .data(incoming_downtime)
+            .enter()
+            .append("path")
+            .attr("d", makeRect)
+            .attr("fill", "orange")
+            .style("opacity", 0)
+            .transition()
+            .style("opacity", 0.2)
+            .duration(3500);
+        // Create axes
+        const incomingMsgGraphxAxis = d3
+            .axisBottom(incomingMsgGraphxScale)
+            .ticks(d3.timeDay.every(4))
+            .tickFormat(d3.timeFormat("%Y-%m-%d"))
+            .ticks(24);
+
+        const incomingMsgGraphLeftyAxis = d3.axisLeft(incomingMsgGraphLeftyScale).ticks(10);
+        const incomingMsgGraphRightyAxis = d3.axisRight(incomingMsgGraphyRightScale).ticks(10);
+        // Call axes
+        incomingMsgGraphxAxisGroup.call(incomingMsgGraphxAxis);
+        incomingMsgGraphLeftyAxisGroup.call(incomingMsgGraphLeftyAxis);
+        incomingMsgGraphRightYAxisGroup.call(incomingMsgGraphRightyAxis);
+        // Rotate axis text
+        incomingMsgGraphxAxisGroup
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-65)");
     })
     .catch(function(err) {
         alert(err);
