@@ -120,7 +120,7 @@ Promise.all([
                 )
             )
         );
-        y.domain([0, d3.max(downtime.map(d => Math.floor(d.DownTimeDurationSeconds / 60)))]);
+        y.domain([0, d3.max(downtime.map(d => Math.floor(d.DownTimeDurationSeconds / 3600)))]);
         yRight.domain([
             d3.min(
                 [].concat(
@@ -181,7 +181,7 @@ Promise.all([
         );
         outgoingMsgGraphyScale.domain([
             0,
-            d3.max(outgoing_downtime.map(d => Math.floor(d.DownTimeDurationSeconds / 60)))
+            d3.max(outgoing_downtime.map(d => Math.floor(d.DownTimeDurationSeconds / 3600)))
         ]);
         outgoingMsgGraphyRightScale.domain([
             d3.min(
@@ -230,7 +230,7 @@ Promise.all([
 
         function makeRect(d, i) {
             let x0 = x(new Date(d.PreviousMessageTimestamp)),
-                y0 = y(Math.floor(d.DownTimeDurationSeconds / 60)),
+                y0 = y(Math.floor(d.DownTimeDurationSeconds / 3600)),
                 x1 = x(new Date(d.NextMessageTimeTimestamp)),
                 y1 = graphHeight,
                 p1 = x0 + " " + y0,
