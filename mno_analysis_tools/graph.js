@@ -87,18 +87,18 @@ const outgoingMsgGraphSvg = d3
 // --------------------------------------------------------------------------------------------------
 
 Promise.all([
-    d3.json("incoming_msg_downtime.json"),
-    d3.json("outgoing_msg_downtime.json"),
     d3.json("incoming_msg.json"),
     d3.json("outgoing_msg.json"),
+    d3.json("incoming_msg_downtime.json"),
+    d3.json("outgoing_msg_downtime.json"),
     d3.json("incoming_msg_diff_per_period.json"),
     d3.json("outgoing_msg_diff_per_period.json")
 ])
     .then(function(data) {
-        let incoming_downtime = data[0],
-            outgoing_downtime = data[1],
-            incoming_messages = data[2],
-            outgoing_messages = data[3],
+        let incoming_messages = data[0],
+            outgoing_messages = data[1],
+            incoming_downtime = data[2],
+            outgoing_downtime = data[3],
             incoming_messages_differences = data[4],
             outgoing_messages_differences = data[5];
 
