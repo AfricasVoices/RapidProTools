@@ -23,7 +23,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Compute the number of messages in each interval between the given start and end dates")
     parser.add_argument("raw_messages_input_file_path", metavar="raw-messages-input-file-path",
-                        help="File to read the seralized Rapid Pro message data from")
+                        help="File to read the serialized Rapid Pro message data from")
     parser.add_argument("computed_messages_per_period_output_file_path", metavar="computed-messages-per-period-output-file-path",
                         help="File to write the computed messages per period data downloaded as json")
     parser.add_argument("message_difference_output_file_path", metavar="message-difference-output-file-path",
