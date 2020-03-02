@@ -67,11 +67,11 @@ const outgoingMsgGraphSvg = d3
         .append("g")
         .attr("class", "x-axis")
         .attr("transform", "translate(0," + graphHeight + ")"),
-    outgoingMsgGraphRightYAxisGroup = outgoingMsgGraph.append("g").attr("class", "right-y-axis"),
-    outgoingMsgGraphLeftYAxisGroup = outgoingMsgGraph
+    outgoingMsgGraphLeftYAxisGroup = outgoingMsgGraph.append("g").attr("class", "left-y-axis"),
+    outgoingMsgGraphRightYAxisGroup = outgoingMsgGraph
         .append("g")
         .attr("transform", "translate( " + graphWidth + ", 0 )")
-        .attr("class", "left-y-axis"),
+        .attr("class", "right-y-axis"),
     // Line
     outgoingMsgGraphMessageDifferenceLine = d3
         .line()
@@ -184,15 +184,12 @@ Promise.all([
             .tickFormat(d3.timeFormat("%Y-%m-%d"))
             .ticks(24);
 
-        const incomingMsgGraphLeftyAxis = d3.axisLeft(incomingMsgGraphLeftyScale).ticks(4);
-        const incomingMsgGraphRightyAxis = d3.axisRight(incomingMsgGraphyRightScale).ticks(4);
+        const incomingMsgGraphLeftyAxis = d3.axisLeft(incomingMsgGraphLeftyScale).ticks(10);
+        const incomingMsgGraphRightyAxis = d3.axisRight(incomingMsgGraphyRightScale).ticks(10);
         // Call axes
         incomingMsgGraphxAxisGroup.call(incomingMsgGraphxAxis);
         incomingMsgGraphLeftyAxisGroup.call(incomingMsgGraphLeftyAxis);
         incomingMsgGraphRightYAxisGroup.call(incomingMsgGraphRightyAxis);
-        // outgoingMsgGraphxAxisGroup.call(outgoingMsgGraphxAxis);
-        // outgoingMsgGraphLeftYAxisGroup.call(outgoingMsgGraphLeftyAxis);
-        // outgoingMsgGraphRightYAxisGroup.call(outgoingMsgGraphRightyAxis);
         // Rotate axis text
         incomingMsgGraphxAxisGroup
             .selectAll("text")
@@ -270,8 +267,8 @@ Promise.all([
             .ticks(d3.timeDay.every(4))
             .tickFormat(d3.timeFormat("%Y-%m-%d"))
             .ticks(24);
-        const outgoingMsgGraphLeftyAxis = d3.axisLeft(outgoingMsgGraphLeftyScale).ticks(4);
-        const outgoingMsgGraphRightyAxis = d3.axisRight(outgoingMsgGraphRightyScale).ticks(4);
+        const outgoingMsgGraphLeftyAxis = d3.axisLeft(outgoingMsgGraphLeftyScale).ticks(10);
+        const outgoingMsgGraphRightyAxis = d3.axisRight(outgoingMsgGraphRightyScale).ticks(10);
 
         // Call axes
         outgoingMsgGraphxAxisGroup.call(outgoingMsgGraphxAxis);
