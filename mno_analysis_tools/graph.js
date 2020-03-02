@@ -2,6 +2,7 @@
 const margin = { top: 20, right: 30, bottom: 70, left: 50 },
     graphWidth = 960 - margin.left - margin.right,
     graphHeight = 500 - margin.top - margin.bottom;
+// --------------------------------------------------------------------------------------------------
 
 // Incoming Messages
 // Svg
@@ -42,6 +43,7 @@ const incomingMsgGraphSvg = d3
     // d3 line path generator
     path1 = incomingMsgGraph.append("path"),
     path = incomingMsgGraph.append("path");
+// --------------------------------------------------------------------------------------------------
 
 // Outgoing Messages
 // Svg
@@ -82,68 +84,83 @@ const outgoingMsgGraphSvg = d3
     // d3 line path generator
     outgoingMsgGraphPath1 = outgoingMsgGraph.append("path"),
     outgoingMsgGraphPath = outgoingMsgGraph.append("path");
+// --------------------------------------------------------------------------------------------------
 
 Promise.all([
-    d3.json("incoming_downtime.json"),
-    d3.json("outgoing_downtime.json"),
-    d3.json("incoming_messages.json"),
-    d3.json("outgoing_messages.json"),
-    d3.json("incoming_messages_differences.json"),
-    d3.json("outgoing_messages_differences.json")
+    d3.json("incoming_msg_downtime.json"),
+    d3.json("outgoing_msg_downtime.json"),
+    d3.json("incoming_msg_messages.json"),
+    d3.json("outgoing_msg_messages.json"),
+    d3.json("incoming_msg_diff_per_period.json"),
+    d3.json("outgoing_msg_diff_per_period.json")
 ])
     .then(function(data) {
-        let incoming_downtime = data[0];
-        let outgoing_downtime = data[1];
-        let incoming_messages = data[2];
-        let outgoing_messages = data[3];
-        let incoming_messages_differences = data[4];
-        let outgoing_messages_differences = data[5];
+        let incoming_downtime = data[0],
+            outgoing_downtime = data[1],
+            incoming_messages = data[2],
+            outgoing_messages = data[3],
+            incoming_messages_differences = data[4],
+            outgoing_messages_differences = data[5];
 
-        let downtime = incoming_downtime;
-        let messages = incoming_messages;
-        let message_differences = incoming_messages_differences;
+        const makeRect = (d, i) => {
+            let x0 = x(new Date(d.PreviousMessageTimestamp)),
+                y0 = y(Math.floor(d.DownTimeDurationSeconds / 3600)),
+                x1 = x(new Date(d.NextMessageTimeTimestamp)),
+                y1 = graphHeight,
+                p1 = x0 + " " + y0,
+                p2 = x0 + " " + y1,
+                p3 = x1 + " " + y1,
+                p4 = x1 + " " + y0,
+                l = "L";
+
+            return "M" + p1 + l + p2 + l + p3 + l + p4 + "Z";
+        };
+        // --------------------------------------------------------------------------------------------------
 
         // Plot Incoming Graph
         // sort data based on date objects
-        downtime.sort(
+        incoming_downtime.sort(
             (a, b) => new Date(a.NextMessageTimeTimestamp) - new Date(b.NextMessageTimeTimestamp)
         );
-        messages.sort((a, b) => new Date(a.PeriodEnd) - new Date(b.PeriodEnd));
+        incoming_messages.sort((a, b) => new Date(a.PeriodEnd) - new Date(b.PeriodEnd));
         // Set scale domains
         x.domain(
             d3.extent(
                 [].concat(
-                    downtime.map(d => new Date(d.PreviousMessageTimestamp)),
-                    downtime.map(d => new Date(d.NextMessageTimeTimestamp)),
-                    messages.map(d => new Date(d.PeriodEnd)),
-                    messages.map(d => new Date(d.PeriodStart))
+                    incoming_downtime.map(d => new Date(d.PreviousMessageTimestamp)),
+                    incoming_downtime.map(d => new Date(d.NextMessageTimeTimestamp)),
+                    incoming_messages.map(d => new Date(d.PeriodEnd)),
+                    incoming_messages.map(d => new Date(d.PeriodStart))
                 )
             )
         );
-        y.domain([0, d3.max(downtime.map(d => Math.floor(d.DownTimeDurationSeconds / 3600)))]);
+        y.domain([
+            0,
+            d3.max(incoming_downtime.map(d => Math.floor(d.DownTimeDurationSeconds / 3600)))
+        ]);
         yRight.domain([
             d3.min(
                 [].concat(
-                    messages.map(d => d.NumberOfMessages),
-                    message_differences.map(d => d.MessageDifference)
+                    incoming_messages.map(d => d.NumberOfMessages),
+                    incoming_messages_differences.map(d => d.MessageDifference)
                 )
             ),
             d3.max(
                 [].concat(
-                    messages.map(d => d.NumberOfMessages),
-                    message_differences.map(d => d.MessageDifference)
+                    incoming_messages.map(d => d.NumberOfMessages),
+                    incoming_messages_differences.map(d => d.MessageDifference)
                 )
             )
         ]);
         // Update path data line 1
-        path.data([message_differences])
+        path.data([incoming_messages_differences])
             // .attr("fill", "yellow")
             .attr("stroke", "yellow")
             .attr("stroke-width", 1)
             .attr("d", MessageDifferenceLine);
         // Update path data line 2
         path1
-            .data([messages])
+            .data([incoming_messages])
             .attr("fill", "blue")
             .attr("stroke", "#00BFA5")
             .attr("stroke-width", 1)
@@ -151,7 +168,7 @@ Promise.all([
 
         incomingMsgGraph
             .selectAll("path")
-            .data(downtime)
+            .data(incoming_downtime)
             .enter()
             .append("path")
             .attr("d", makeRect)
@@ -162,6 +179,28 @@ Promise.all([
             .transition()
             .style("opacity", 0.2)
             .duration(3500);
+        // Create axes
+        const xAxis = d3
+            .axisBottom(x)
+            .ticks(d3.timeDay.every(4))
+            .tickFormat(d3.timeFormat("%Y-%m-%d"));
+        // .ticks(24)
+        // .tickFormat(d3.timeFormat("%b %d"));
+
+        const yAxis = d3.axisLeft(y).ticks(4);
+        const yAxis2 = d3.axisRight(yRight).ticks(4);
+        // Call axes
+        incomingMsgGraphxAxisGroup.call(xAxis);
+        incomingMsgGraphyAxisGroup.call(yAxis);
+        yAxisGroup2.call(yAxis2);
+        // Rotate axis text
+        incomingMsgGraphxAxisGroup
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-65)");
+        // --------------------------------------------------------------------------------------------------
 
         // Plot Outgoing Graph
         outgoing_downtime.sort(
@@ -228,53 +267,23 @@ Promise.all([
             .style("opacity", 0.2)
             .duration(3500);
 
-        function makeRect(d, i) {
-            let x0 = x(new Date(d.PreviousMessageTimestamp)),
-                y0 = y(Math.floor(d.DownTimeDurationSeconds / 3600)),
-                x1 = x(new Date(d.NextMessageTimeTimestamp)),
-                y1 = graphHeight,
-                p1 = x0 + " " + y0,
-                p2 = x0 + " " + y1,
-                p3 = x1 + " " + y1,
-                p4 = x1 + " " + y0,
-                l = "L";
-
-            return "M" + p1 + l + p2 + l + p3 + l + p4 + "Z";
-        }
         // Create axes
-        const xAxis = d3
-            .axisBottom(x)
-            .ticks(d3.timeDay.every(4))
-            .tickFormat(d3.timeFormat("%Y-%m-%d"));
-        // .ticks(24)
-        // .tickFormat(d3.timeFormat("%b %d"));
         const outgoingMsgGraphxAxis = d3
             .axisBottom(outgoingMsgGraphxScale)
             .ticks(d3.timeDay.every(4))
             .tickFormat(d3.timeFormat("%Y-%m-%d"));
         // .ticks(24)
         // .tickFormat(d3.timeFormat("%b %d"));
-        const yAxis = d3.axisLeft(y).ticks(4);
         const outgoingMsgGraphyAxis = d3.axisLeft(outgoingMsgGraphyScale).ticks(4);
-        const yAxis2 = d3.axisRight(yRight).ticks(4);
         const outgoingMsgGraphyAxis2 = d3.axisRight(outgoingMsgGraphyRightScale).ticks(4);
         // .tickFormat(d => (d = "m"));
 
         // Call axes
-        incomingMsgGraphxAxisGroup.call(xAxis);
         outgoingMsgGraphxAxisGroup.call(outgoingMsgGraphxAxis);
-        incomingMsgGraphyAxisGroup.call(yAxis);
         outgoingMsgGraphLeftYAxisGroup.call(outgoingMsgGraphyAxis2);
-        yAxisGroup2.call(yAxis2);
         outgoingMsgGraphRightYAxisGroup.call(outgoingMsgGraphyAxis);
 
-        // Rotae axis text
-        incomingMsgGraphxAxisGroup
-            .selectAll("text")
-            .style("text-anchor", "end")
-            .attr("dx", "-.8em")
-            .attr("dy", ".15em")
-            .attr("transform", "rotate(-65)");
+        // Rotate axis text
         outgoingMsgGraphxAxisGroup
             .selectAll("text")
             .style("text-anchor", "end")
@@ -283,6 +292,5 @@ Promise.all([
             .attr("transform", "rotate(-65)");
     })
     .catch(function(err) {
-        // handle error here
-        console.log(err);
+        alert(err);
     });
