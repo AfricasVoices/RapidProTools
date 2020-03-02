@@ -26,8 +26,6 @@ if __name__ == "__main__":
                         help="File to read the serialized Rapid Pro message data from")
     parser.add_argument("computed_messages_per_period_output_file_path", metavar="computed-messages-per-period-output-file-path",
                         help="File to write the computed messages per period data downloaded as json")
-    parser.add_argument("message_difference_output_file_path", metavar="message-difference-output-file-path",
-                        help="File to write the messages difference between two periods data downloaded as json")
     parser.add_argument("target_operator", metavar="target-operator",
                         help="Operator to analyze for downtime")
     parser.add_argument("target_message_direction", metavar="target-message-direction", choices=('in', 'out'),
@@ -43,7 +41,6 @@ if __name__ == "__main__":
 
     raw_messages_input_file_path = args.raw_messages_input_file_path
     computed_messages_per_period_output_file_path = args.computed_messages_per_period_output_file_path
-    message_difference_output_file_path = args.message_difference_output_file_path
     target_operator = args.target_operator
     target_message_direction = args.target_message_direction
     start_date = args.start_date
@@ -95,22 +92,7 @@ if __name__ == "__main__":
             "NumberOfMessages": messages_this_period
         })
 
-    message_difference_per_period = []
-    for index in range(len(messages_per_period) - 1):
-        next_index = index + 1
-        message_difference_per_period.append({
-            "Operator": operator,
-            "MessageDirection": msg_direction,
-            "PeriodStart": messages_per_period[index]["PeriodStart"],
-            "PeriodBetween": messages_per_period[index]["PeriodEnd"],
-            "PeriodEnd": messages_per_period[next_index]["PeriodEnd"],
-            "MessageDifference": messages_per_period[next_index]["NumberOfMessages"] - messages_per_period[index]["NumberOfMessages"]
-        })
-
-    log.info(f"writing messages_per_period and  message_difference_per_period json files...")
+    log.info(f"writing messages_per_period json file...")
     with open(computed_messages_per_period_output_file_path, mode="w") as f:
         json.dump(messages_per_period, f)
-        
-    with open(message_difference_output_file_path, mode="w") as f:
-        json.dump(message_difference_per_period, f)
     log.info(f"Logged generated messages")
