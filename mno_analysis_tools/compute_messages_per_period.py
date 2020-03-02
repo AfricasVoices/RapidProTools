@@ -67,7 +67,6 @@ if __name__ == "__main__":
             operator = msg.urn.split(":")[0]
         if operator == target_operator and msg.direction == target_message_direction:
             msg_direction = msg.direction
-            log.info(f"Filtering messages...")
             filtered_messages.append(msg)
     log.info(f" returning {len(filtered_messages)} {target_operator} {target_message_direction} messages")
 
