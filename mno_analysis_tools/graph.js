@@ -82,3 +82,18 @@ const outgoingMsgGraphSvg = d3
     // d3 line path generator
     outgoingMsgGraphNumberOfMessagesLinePath = outgoingMsgGraph.append("path"),
     outgoingMsgGraphMessageDifferenceLinePath = outgoingMsgGraph.append("path");
+
+Promise.all([
+    d3.json("incoming_msg.json"),
+    d3.json("outgoing_msg.json"),
+    d3.json("incoming_msg_downtime.json"),
+    d3.json("outgoing_msg_downtime.json"),
+    d3.json("incoming_msg_diff_per_period.json"),
+    d3.json("outgoing_msg_diff_per_period.json")
+])
+    .then(function(data) {
+        // plot graphs
+    })
+    .catch(function(err) {
+        alert(err);
+    });
