@@ -98,6 +98,20 @@ Promise.all([
             outgoing_downtime = data[3],
             incoming_messages_differences = data[4],
             outgoing_messages_differences = data[5];
+
+        const makeRect = d => {
+            let x0 = incomingMsgGraphxScale(new Date(d.PreviousMessageTimestamp)),
+                y0 = incomingMsgGraphLeftyScale(Math.floor(d.DownTimeDurationSeconds / 3600)),
+                x1 = incomingMsgGraphxScale(new Date(d.NextMessageTimeTimestamp)),
+                y1 = graphHeight,
+                p1 = x0 + " " + y0,
+                p2 = x0 + " " + y1,
+                p3 = x1 + " " + y1,
+                p4 = x1 + " " + y0,
+                l = "L";
+
+            return "M" + p1 + l + p2 + l + p3 + l + p4 + "Z";
+        };
     })
     .catch(function(err) {
         alert(err);
