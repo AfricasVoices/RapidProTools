@@ -17,11 +17,11 @@ def date_time_range(start, end, delta):
 
 
 log = Logger(__name__)
-log.set_project_name("ComputeMessagesPerPeriod")
-
+log.set_project_name("ComputeMessagesBetweenTwoFirebaseTimePeriods")
+/
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Compute the number of messages in each interval between the given start and end dates")
+        description="Compute message difference between two firebase time periods `the time period for firebase is a constant number`")
     parser.add_argument("raw_messages_input_file_path", metavar="raw-messages-input-file-path",
                         help="File to read the serialized Rapid Pro message data from")
     parser.add_argument("message_difference_output_file_path", metavar="message-difference-output-file-path",
