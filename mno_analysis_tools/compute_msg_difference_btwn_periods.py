@@ -93,6 +93,7 @@ if __name__ == "__main__":
             "NumberOfMessages": messages_this_period
         })
 
+    # Compute message difference between two firebase time periods
     message_difference_per_period = []
     for index in range(len(messages_per_period) - 1):
         next_index = index + 1
