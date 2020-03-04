@@ -18,7 +18,7 @@ def date_time_range(start, end, delta):
 
 log = Logger(__name__)
 log.set_project_name("ComputeMessagesBetweenTwoFirebaseTimePeriods")
-/
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Compute message difference between two firebase time periods `the time period for firebase is a constant number`")
