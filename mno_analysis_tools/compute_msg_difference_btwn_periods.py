@@ -34,8 +34,8 @@ if __name__ == "__main__":
                         help="The start date as ISO 8601 string from which the number of messages will be computed")
     parser.add_argument("end_date", metavar="end-date", type=lambda s: isoparse(s),
                         help="The end date as ISO 8601 string to which the number of messages computation will end")
-    parser.add_argument("time_frame", metavar="time-frame", type=lambda s: datetime.strptime(s, '%H:%M:%S'),
-                        help="The time frame (HH:MM:SS) to generate dates in intervals between the start and end date")
+    parser.add_argument("-t", "--time_frame", action="store_true", metavar="time-frame", type=lambda s: datetime.strptime(s, '%H:%M:%S'),
+                        default="00:10:00", help="The time frame (HH:MM:SS) to generate dates in intervals between the start and end date")
 
     args = parser.parse_args()
 
@@ -45,7 +45,8 @@ if __name__ == "__main__":
     target_message_direction = args.target_message_direction
     start_date = args.start_date
     end_date = args.end_date
-    time_frame = args.time_frame
+    if args.time_frame:
+        time_frame = args.time_frame
 
     with open(raw_messages_input_file_path, mode="r") as f:
         log.info("Loading messages from {raw_messages_input_file_path}...")
