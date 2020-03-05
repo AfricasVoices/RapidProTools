@@ -49,8 +49,8 @@ if __name__ == "__main__":
 
     with open(raw_messages_input_file_path, mode="r") as f:
         log.info("Loading messages from {raw_messages_input_file_path}...")
-        input = json.load(f)
-        messages = [Message.deserialize(val) for val in input]
+        raw_messages_data = json.load(f)
+        messages = [Message.deserialize(val) for val in raw_messages_data]
         log.info(f"Loaded {len(messages)} messages")
 
     # Filter messages based on the target operator and target direction of the message
