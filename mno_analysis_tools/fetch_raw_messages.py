@@ -12,14 +12,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Fetches archives from Rapid Pro instance")
     parser.add_argument("domain", metavar="domain",
-                        help="Domain that the instance of Rapid Pro is running on",
-                        )
+                        help="Domain that the instance of Rapid Pro is running on")
     parser.add_argument("token", metavar="token",
-                        help="Token for authenticating to the instance",
-                        )
+                        help="Token for authenticating to the instance")
     parser.add_argument("raw_messages_file_path", metavar="output-file-path",
-                        help="File to write the raw data downloaded as json",
-                        )
+                        help="File to write the raw data downloaded as json")
 
     args = parser.parse_args()
     source_domain = args.domain
