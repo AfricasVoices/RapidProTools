@@ -110,5 +110,5 @@ if __name__ == "__main__":
     log.info(
         f"writing messages_per_period and  message_difference_per_period json files...")
     with open(message_difference_output_file_path, mode="w") as f:
-        json.dump(messages_per_period, f)
+        json.dump(message_difference_per_period, f)
     log.info(f"Logged generated messages")
