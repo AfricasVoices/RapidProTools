@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
     date_time_bounds = date_time_range(start_date, end_date, time_interval)
 
-    # Compute number of messages between two datetime bounds i.e `PreviousMessageTimestamp` and
+    # Compute the number of messages between two firebase time bounds i.e `PreviousMessageTimestamp` and
     # `NextMessageTimestamp` to get number of mesages per period and relate each quantity
     #  with the operator and the message direction.
     messages_per_period = []
