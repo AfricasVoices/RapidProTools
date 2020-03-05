@@ -66,7 +66,7 @@ if __name__ == "__main__":
         if operator == target_operator and msg.direction == target_message_direction:
             msg_direction = msg.direction
             filtered_messages.append(msg)
-    log.info(f" returning {len(filtered_messages)} {target_operator} {target_message_direction} messages")
+    log.info(f"returning {len(filtered_messages)} {target_operator} {target_message_direction} messages")
 
     time_interval = timedelta(hours=time_frame.hour,
                               minutes=time_frame.minute, seconds=time_frame.second)
