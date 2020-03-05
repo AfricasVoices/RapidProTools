@@ -55,7 +55,7 @@ if __name__ == "__main__":
         log.info(f"Loaded {len(messages)} messages")
 
     # Filter messages based on the target operator and target direction of the message
-    log.info(f"Filtering messages based on operator {target_operator} and "
+    log.info(f"Filtering messages based on {target_operator} and "
              "message direction {target_message_direction} from {len(messages)} total messages ")
     filtered_messages = []
     for msg in messages:
