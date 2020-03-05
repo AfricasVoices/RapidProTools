@@ -49,7 +49,7 @@ if __name__ == "__main__":
         time_frame = args.time_frame
 
     with open(raw_messages_input_file_path, mode="r") as f:
-        log.info("Loading messages from {raw_messages_input_file_path}...")
+        log.info(f"Loading messages from {raw_messages_input_file_path}...")
         input = json.load(f)
         messages = [Message.deserialize(val) for val in input]
         log.info(f"Loaded {len(messages)} messages")
