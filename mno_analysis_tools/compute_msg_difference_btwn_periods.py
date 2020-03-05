@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     # Filter messages based on the target operator and target direction of the message
     log.info(f"Filtering messages based on {target_operator} and "
-             "{target_message_direction} message direction from {len(messages)} total messages ")
+             f"{target_message_direction} message direction from {len(messages)} total messages ")
     filtered_messages = []
     for msg in messages:
         if msg.urn.startswith("tel:"):
