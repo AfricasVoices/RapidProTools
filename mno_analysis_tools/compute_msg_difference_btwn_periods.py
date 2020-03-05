@@ -107,8 +107,7 @@ if __name__ == "__main__":
             "MessageDifference": messages_per_period[next_index]["NumberOfMessages"] - messages_per_period[index]["NumberOfMessages"]
         })
 
-    log.info(
-        f"writing messages_per_period and  message_difference_per_period json files...")
+    log.info(f"writing message_difference_per_period json file...")
     with open(message_difference_output_file_path, mode="w") as f:
         json.dump(message_difference_per_period, f)
     log.info(f"Logged generated messages")
