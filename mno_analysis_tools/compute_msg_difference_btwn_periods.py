@@ -27,7 +27,7 @@ if __name__ == "__main__":
     parser.add_argument("message_difference_output_file_path", metavar="message-difference-output-file-path",
                         help="File to write the messages difference between two periods data downloaded as json")
     parser.add_argument("target_operator", metavar="target-operator",
-                        help="Operator to analyze for downtime")
+                        help="Operator to compute message difference between two firebase time periods")
     parser.add_argument("target_message_direction", metavar="target-message-direction", choices=('in', 'out'),
                         help="Direction of messages to limit the search for downtime to")
     parser.add_argument("start_date", metavar="start-date", type=lambda s: isoparse(s),
