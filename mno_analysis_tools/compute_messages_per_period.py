@@ -27,7 +27,7 @@ if __name__ == "__main__":
     parser.add_argument("computed_messages_per_period_output_file_path", metavar="computed-messages-per-period-output-file-path",
                         help="File to write the computed messages per period data downloaded as json")
     parser.add_argument("target_operator", metavar="target-operator",
-                        help="Operator to analyze for downtime")
+                        help="Operator to compute messages per period for")
     parser.add_argument("target_message_direction", metavar="target-message-direction", choices=('in', 'out'),
                         help="Direction of messages to limit the search for downtime to")
     parser.add_argument("start_date", metavar="start-date", type=lambda s: isoparse(s),
@@ -49,8 +49,8 @@ if __name__ == "__main__":
 
     with open(raw_messages_input_file_path, mode="r") as f:
         log.info("Loading messages from {raw_messages_input_file_path}...")
-        input = json.load(f)
-        messages = [Message.deserialize(val) for val in input]
+        raw_messages_data = json.load(f)
+        messages = [Message.deserialize(val) for val in raw_messages_data]
         log.info(f"Loaded {len(messages)} messages")
 
     # Filter messages based on the target operator and target direction of the message
