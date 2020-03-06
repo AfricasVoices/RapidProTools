@@ -14,23 +14,17 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Compute maximum window of time with 0 messages")
     parser.add_argument("raw_messages_file_path", metavar="input-file",
-                        help="File to read the raw data downloaded as json",
-                        )
+                        help="File to read the raw messages data downloaded as JSON")
     parser.add_argument("window_of_downtimes_output_file_path", metavar="output-file",
-                        help="File to write the raw data downloaded as json.",
-                        )
+                        help="File to write the raw messages data downloaded as jSON.")
     parser.add_argument("target_operator", metavar="operator",
-                        help="Operator to analyze for downtime",
-                        )
+                        help="Operator to analyze for downtime")
     parser.add_argument("target_message_direction", metavar="direction-of-message", choices=('in', 'out'),
-                        help="Direction of messages to limit the search for downtime to"
-                        )
+                        help="Direction of messages to limit the search for downtime to")
     parser.add_argument("start_date", metavar="start-date", type=lambda s: isoparse(s),
-                        help="The start date as ISO 8601 string from which the window of downtime will be computed",
-                        )
+                        help="The start date as ISO 8601 string from which the window of downtime will be computed")
     parser.add_argument("end_date", metavar="end-date", type=lambda s: isoparse(s),
-                        help="The end date as ISO 8601 string to which the window of downtime computation will end",
-                        )
+                        help="The end date as ISO 8601 string to which the window of downtime computation will end")
 
     args = parser.parse_args()
 
@@ -43,8 +37,8 @@ if __name__ == "__main__":
 
     with open(raw_messages_file_path, mode="r") as f:
         log.info("Loading messages from {raw_messages_file_path}...")
-        output = json.loads(f.read())
-        messages = [Message.deserialize(val) for val in output]
+        raw_messages_data = json.load(f)
+        messages = [Message.deserialize(val) for val in raw_messages_data]
         log.info(f"Loaded {len(messages)} messages")
 
     msg_sent_on_timestamps = []
