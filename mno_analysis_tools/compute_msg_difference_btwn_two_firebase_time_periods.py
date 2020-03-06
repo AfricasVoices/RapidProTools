@@ -25,7 +25,7 @@ if __name__ == "__main__":
     parser.add_argument("raw_messages_input_file_path", metavar="raw-messages-input-file-path",
                         help="File to read the serialized Rapid Pro message data from")
     parser.add_argument("messages_difference_per_two_firebase_period_output_file_path", metavar="message-difference-output-file-path",
-                        help="File to write the messages difference between two periods data downloaded as json")
+                        help=" File to write the messages difference between two firebase time periods data downloaded as JSON")
     parser.add_argument("target_operator", metavar="target-operator",
                         help="Operator to compute message difference between two firebase time periods")
     parser.add_argument("target_message_direction", metavar="target-message-direction", choices=('in', 'out'),
