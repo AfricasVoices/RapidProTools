@@ -107,6 +107,6 @@ if __name__ == "__main__":
         })
 
     log.info(f"writing message_difference_per_period json file...")
-    with open(messages_difference_per_two_firebase_period_output_file_path, mode="w") as f:
+    with open(messages_difference_per_two_firebase_time_period_output_file_path, mode="w") as f:
         json.dump(message_difference_per_period, f)
     log.info(f"Logged generated messages")
