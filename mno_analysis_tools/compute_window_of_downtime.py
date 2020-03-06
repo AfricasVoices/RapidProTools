@@ -75,7 +75,7 @@ if __name__ == "__main__":
             "Operator": target_operator,
             "MessageDirection": target_message_direction,
             "PreviousMessageTimestamp": str(msg_sent_on_timestamps[index]),
-            "NextMessageTimeTimestamp": str(msg_sent_on_timestamps[next_index]),
+            "NextMessageTimestamp": str(msg_sent_on_timestamps[next_index]),
             "DownTimeDurationSeconds": str(abs(time_diff.total_seconds()))
         })
 
