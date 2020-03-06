@@ -28,7 +28,11 @@ $ python fetch_raw_messages.py <domain> <token> <raw_messages_file_path>
 where:
 - `domain` is the domain that the instance of Rapid Pro is running on
 - `token` is the organisation access token for authenticating to the instance
-- `raw_messages_file_path`  is a relative path to the directory in which the raw messages data should be downloaded to. Downloaded Raw Messages file is saved to `./raw_messages.json`.
+- `raw_messages_file_path`  is a relative path to the directory in which the raw messages data should be downloaded to. Downloaded Raw Messages file is saved to `./raw_messages.json`. The file will contain a list of dictionarys with the following keys: `id`, `broadcast`, `contact`, `urn`, `channel`, `direction`, `type`, `status`, `visibility`, `text`, `labels`, `created_on`, `sent_on`, `modified_on`.
+
+The following information will be useful in the next step:
+- Possible Operators include: `NC`, `telegram`, `kenyan telephone`, `golis`, `hormud`, `nationlink`, `somnet`,`somtel`,`telegram`, `telesom`
+- Message direction can be either `in` or `out`
 
 ### 2. Generate Outputs
 This stage processes the raw data to produce outputs from the computations below as Json for MNO downtime analysis.
