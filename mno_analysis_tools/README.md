@@ -76,9 +76,8 @@ where:
 - `end_date` The end date as ISO 8601 string to which the number of messages computation will end
 - `time_frame` is an optional argument for the time frame (HH:MM:SS) to generate dates in intervals between the start and end date. The default time frame is 10 seconds.
 
-### 3. Upload web page
-This stage uploads the graphs page. You can either upload it locally or open the page with browser
-
-
+### 3. Generate Graphs
+This stage generates the MNO analysis graphs. 
+To use, ensure the you have the data from the previous step then upload the index web page
 
 
