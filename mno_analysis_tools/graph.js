@@ -102,7 +102,7 @@ Promise.all([
         const makeRect = d => {
             let x0 = incomingMsgGraphxScale(new Date(d.PreviousMessageTimestamp)),
                 y0 = incomingMsgGraphLeftyScale(Math.floor(d.DownTimeDurationSeconds / 3600)),
-                x1 = incomingMsgGraphxScale(new Date(d.NextMessageTimeTimestamp)),
+                x1 = incomingMsgGraphxScale(new Date(d.NextMessageTimestamp)),
                 y1 = graphHeight,
                 p1 = x0 + " " + y0,
                 p2 = x0 + " " + y1,
@@ -116,7 +116,7 @@ Promise.all([
         // Plot Incoming Graph
         // sort data based on date objects
         incoming_downtime.sort(
-            (a, b) => new Date(a.NextMessageTimeTimestamp) - new Date(b.NextMessageTimeTimestamp)
+            (a, b) => new Date(a.NextMessageTimestamp) - new Date(b.NextMessageTimestamp)
         );
         incoming_messages.sort((a, b) => new Date(a.PeriodEnd) - new Date(b.PeriodEnd));
         // Set scale domains
@@ -124,7 +124,7 @@ Promise.all([
             d3.extent(
                 [].concat(
                     incoming_downtime.map(d => new Date(d.PreviousMessageTimestamp)),
-                    incoming_downtime.map(d => new Date(d.NextMessageTimeTimestamp)),
+                    incoming_downtime.map(d => new Date(d.NextMessageTimestamp)),
                     incoming_messages.map(d => new Date(d.PeriodEnd)),
                     incoming_messages.map(d => new Date(d.PeriodStart))
                 )
@@ -196,7 +196,7 @@ Promise.all([
 
         // Plot Outgoing Graph
         outgoing_downtime.sort(
-            (a, b) => new Date(a.NextMessageTimeTimestamp) - new Date(b.NextMessageTimeTimestamp)
+            (a, b) => new Date(a.NextMessageTimestamp) - new Date(b.NextMessageTimestamp)
         );
         outgoing_messages.sort((a, b) => new Date(a.PeriodEnd) - new Date(b.PeriodEnd));
         // Set scale domains
@@ -204,7 +204,7 @@ Promise.all([
             d3.extent(
                 [].concat(
                     outgoing_downtime.map(d => new Date(d.PreviousMessageTimestamp)),
-                    outgoing_downtime.map(d => new Date(d.NextMessageTimeTimestamp)),
+                    outgoing_downtime.map(d => new Date(d.NextMessageTimestamp)),
                     outgoing_messages.map(d => new Date(d.PeriodEnd)),
                     outgoing_messages.map(d => new Date(d.PeriodStart))
                 )
