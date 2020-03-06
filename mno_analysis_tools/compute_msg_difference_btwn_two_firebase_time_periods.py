@@ -94,10 +94,10 @@ if __name__ == "__main__":
         })
 
     # Compute message difference between two firebase time periods
-    message_difference_per_period = []
+    message_difference_per_two_firebase_time_period = []
     for index in range(len(messages_per_two_firebase_time_period) - 1):
         next_index = index + 1
-        message_difference_per_period.append({
+        message_difference_per_two_firebase_time_period.append({
             "Operator": operator,
             "MessageDirection": msg_direction,
             "PeriodStart": messages_per_two_firebase_time_period[index]["PeriodStart"],
@@ -108,5 +108,5 @@ if __name__ == "__main__":
 
     log.info(f"writing message_difference_per_period json file...")
     with open(messages_difference_per_two_firebase_time_period_output_file_path, mode="w") as f:
-        json.dump(message_difference_per_period, f)
+        json.dump(message_difference_per_two_firebase_time_period, f)
     log.info(f"Logged generated messages")
