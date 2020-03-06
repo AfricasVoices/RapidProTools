@@ -44,7 +44,7 @@ $ python compute_messages_per_period.py <raw_messages_input_file_path> <computed
 ```
 
 where:
-- `raw_messages_input_file_path` is a relative path to the directory containing the file to read serialized Rapid Pro message data from
+- `raw_messages_input_file_path` is a relative path to the file to read serialized Rapid Pro message data from
 - `computed_messages_per_period_output_file_path` is a relative path to the file to write the computed messages per period data. Downloaded data file is saved to either `./incoming_msg.json` or `outgoing_msg.json` depending on the target message direction.
 - `target_operator` Operator to analyze
 - `target_message_direction` Direction of messages to limit the search for downtime to
@@ -68,7 +68,6 @@ where:
 
 ### 3. Upload web page
 This stage uploads the graphs page. You can either upload it locally or open the page with browser
-
 
 
 
