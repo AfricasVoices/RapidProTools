@@ -1,5 +1,15 @@
 # MNO Analysis Tools
-Contains scripts for fetching raw messages, processing the raw messages and a web page that visualizes the processed raw messages through graphs for MNO analysis.
+Contains scripts for fetching raw messages, processing the raw messages and a web page that visualizes the processed raw messages through graphs for MNO analysis. The aim of the analysis is to aid in the design of the MNo downtime alert system. 
+
+The scripts contain the implementation of the following declarations made in the `MNo downtime alert` design document:
+
+(a) Compute max window of time with 0 messages.<br> 
+(b) Compute `rN = d(n)/d(t)` i.e message difference between two firebase time periods (the time period for firebase is a constant number).<br>
+(c) Plot log scale line graphs showing:
+ - Messages received per time over the period of the project.
+ - rN
+ - a Bar plot indicating the periods with the maximum window of time with 0 messages.
+
 
 ## Usage
 To generate the MNO analysis graphs follow the following steps, executed in sequence:\
