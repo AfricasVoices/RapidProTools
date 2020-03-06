@@ -85,7 +85,7 @@ if __name__ == "__main__":
             if date_time_bounds[index] <= msg.sent_on < date_time_bounds[next_index]:
                 messages_this_period += 1
 
-        messages_per_period.append({
+        messages_per_two_firebase_time_period.append({
             "Operator": operator,
             "MessageDirection": msg_direction,
             "PeriodStart": date_time_bounds[index].isoformat(),
@@ -95,15 +95,15 @@ if __name__ == "__main__":
 
     # Compute message difference between two firebase time periods
     message_difference_per_period = []
-    for index in range(len(messages_per_period) - 1):
+    for index in range(len(messages_per_two_firebase_time_period) - 1):
         next_index = index + 1
         message_difference_per_period.append({
             "Operator": operator,
             "MessageDirection": msg_direction,
-            "PeriodStart": messages_per_period[index]["PeriodStart"],
-            "PeriodBetween": messages_per_period[index]["PeriodEnd"],
-            "PeriodEnd": messages_per_period[next_index]["PeriodEnd"],
-            "MessageDifference": messages_per_period[next_index]["NumberOfMessages"] - messages_per_period[index]["NumberOfMessages"]
+            "PeriodStart": messages_per_two_firebase_time_period[index]["PeriodStart"],
+            "PeriodBetween": messages_per_two_firebase_time_period[index]["PeriodEnd"],
+            "PeriodEnd": messages_per_two_firebase_time_period[next_index]["PeriodEnd"],
+            "MessageDifference": messages_per_two_firebase_time_period[next_index]["NumberOfMessages"] - messages_per_two_firebase_time_period[index]["NumberOfMessages"]
         })
 
     log.info(f"writing message_difference_per_period json file...")
