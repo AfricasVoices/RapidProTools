@@ -24,7 +24,7 @@ if __name__ == "__main__":
         description="Compute message difference between two firebase time periods `the time period for firebase is a constant number`")
     parser.add_argument("raw_messages_input_file_path", metavar="raw-messages-input-file-path",
                         help="File to read the serialized Rapid Pro message data from")
-    parser.add_argument("messages_difference_per_two_firebase_period_output_file_path", metavar="message-difference-output-file-path",
+    parser.add_argument("messages_difference_per_two_firebase_time_period_output_file_path", metavar="message-difference-output-file-path",
                         help=" File to write the messages difference between two firebase time periods data downloaded as JSON")
     parser.add_argument("target_operator", metavar="target-operator",
                         help="Operator to compute message difference between two firebase time periods")
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     raw_messages_input_file_path = args.raw_messages_input_file_path
-    messages_difference_per_two_firebase_period_output_file_path = args.messages_difference_per_two_firebase_period_output_file_path
+    messages_difference_per_two_firebase_time_period_output_file_path = args.messages_difference_per_two_firebase_time_period_output_file_path
     target_operator = args.target_operator
     target_message_direction = args.target_message_direction
     start_date = args.start_date
