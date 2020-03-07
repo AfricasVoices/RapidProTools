@@ -1,5 +1,5 @@
 // Set the dimensions and margins of the graphs
-const margin = { top: 20, right: 30, bottom: 70, left: 50 },
+const margin = { top: 50, right: 30, bottom: 70, left: 50 },
     graphWidth = 960 - margin.left - margin.right,
     graphHeight = 500 - margin.top - margin.bottom;
 
@@ -42,6 +42,47 @@ const incomingMsgGraphSvg = d3
     // d3 line path generator
     incomingMsgGraphNumberOfMessagesLinePath = incomingMsgGraph.append("path"),
     incomingMsgGraphMessageDifferenceLinePath = incomingMsgGraph.append("path");
+
+// Handmade legend
+incomingMsgGraphSvg
+    .append("circle")
+    .attr("cx", 100)
+    .attr("cy", 10)
+    .attr("r", 6)
+    .style("fill", "yellow");
+incomingMsgGraphSvg
+    .append("text")
+    .attr("x", 120)
+    .attr("y", 15)
+    .text("message difference between two firebase time periods")
+    .style("font-size", "12px")
+    .attr("alignment-baseline", "middle");
+incomingMsgGraphSvg
+    .append("circle")
+    .attr("cx", 450)
+    .attr("cy", 10)
+    .attr("r", 6)
+    .style("fill", "#00BFA5");
+incomingMsgGraphSvg
+    .append("text")
+    .attr("x", 470)
+    .attr("y", 15)
+    .text("Messages received per time")
+    .style("font-size", "12px")
+    .attr("alignment-baseline", "middle");
+incomingMsgGraphSvg
+    .append("circle")
+    .attr("cx", 720)
+    .attr("cy", 10)
+    .attr("r", 6)
+    .style("fill", "orange");
+incomingMsgGraphSvg
+    .append("text")
+    .attr("x", 740)
+    .attr("y", 15)
+    .text("window of time with 0 messages")
+    .style("font-size", "12px")
+    .attr("alignment-baseline", "middle");
 
 // Outgoing Messages
 // Svg
