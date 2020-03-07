@@ -1,5 +1,5 @@
 // Set the dimensions and margins of the graphs
-const margin = { top: 50, right: 30, bottom: 70, left: 50 },
+const margin = { top: 50, right: 30, bottom: 70, left: 70 },
     graphWidth = 960 - margin.left - margin.right,
     graphHeight = 500 - margin.top - margin.bottom;
 
@@ -52,6 +52,16 @@ incomingMsgGraph
     .style("font-size", "20px")
     .style("text-decoration", "bold")
     .text("Total Incoming Messages");
+
+// Y axis Label for the total incoming sms graph
+incomingMsgGraph
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - margin.left)
+    .attr("x", 0 - graphHeight / 2)
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Downtime Duration in Seconds");
 
 // Handmade legend
 incomingMsgGraphSvg
@@ -144,6 +154,15 @@ outgoingMsgGraph
     .style("text-decoration", "bold")
     .text("Total Outgoing Messages");
 
+// Y axis Label for the total outgoing sms graph
+outgoingMsgGraph
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - margin.left)
+    .attr("x", 0 - graphHeight / 2)
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Downtime Duration in Seconds");
 // Handmade legend
 outgoingMsgGraphSvg
     .append("circle")
