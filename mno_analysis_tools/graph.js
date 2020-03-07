@@ -43,7 +43,7 @@ const incomingMsgGraphSvg = d3
     incomingMsgGraphNumberOfMessagesLinePath = incomingMsgGraph.append("path"),
     incomingMsgGraphMessageDifferenceLinePath = incomingMsgGraph.append("path");
 
-// Total Failed Sms(s) graph title
+// Total Incoming Sms(s) graph title
 incomingMsgGraph
     .append("text")
     .attr("x", graphWidth / 2)
