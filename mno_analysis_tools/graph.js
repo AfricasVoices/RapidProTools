@@ -124,6 +124,47 @@ const outgoingMsgGraphSvg = d3
     outgoingMsgGraphNumberOfMessagesLinePath = outgoingMsgGraph.append("path"),
     outgoingMsgGraphMessageDifferenceLinePath = outgoingMsgGraph.append("path");
 
+// Handmade legend
+outgoingMsgGraphSvg
+    .append("circle")
+    .attr("cx", 100)
+    .attr("cy", 10)
+    .attr("r", 6)
+    .style("fill", "yellow");
+outgoingMsgGraphSvg
+    .append("text")
+    .attr("x", 120)
+    .attr("y", 15)
+    .text("message difference between two firebase time periods")
+    .style("font-size", "12px")
+    .attr("alignment-baseline", "middle");
+outgoingMsgGraphSvg
+    .append("circle")
+    .attr("cx", 450)
+    .attr("cy", 10)
+    .attr("r", 6)
+    .style("fill", "#00BFA5");
+outgoingMsgGraphSvg
+    .append("text")
+    .attr("x", 470)
+    .attr("y", 15)
+    .text("Messages received per time")
+    .style("font-size", "12px")
+    .attr("alignment-baseline", "middle");
+outgoingMsgGraphSvg
+    .append("circle")
+    .attr("cx", 720)
+    .attr("cy", 10)
+    .attr("r", 6)
+    .style("fill", "orange");
+outgoingMsgGraphSvg
+    .append("text")
+    .attr("x", 740)
+    .attr("y", 15)
+    .text("window of time with 0 messages")
+    .style("font-size", "12px")
+    .attr("alignment-baseline", "middle");
+
 Promise.all([
     d3.json("incoming_msg.json"),
     d3.json("outgoing_msg.json"),
