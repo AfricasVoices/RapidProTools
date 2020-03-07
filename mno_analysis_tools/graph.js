@@ -1,5 +1,5 @@
 // Set the dimensions and margins of the graphs
-const margin = { top: 50, right: 50, bottom: 70, left: 70 },
+const margin = { top: 50, right: 50, bottom: 90, left: 70 },
     graphWidth = 960 - margin.left - margin.right,
     graphHeight = 500 - margin.top - margin.bottom;
 
@@ -52,6 +52,13 @@ incomingMsgGraph
     .style("font-size", "20px")
     .style("text-decoration", "bold")
     .text("Total Incoming Messages");
+
+// Add X axis label for the total incoming sms graph
+incomingMsgGraph
+    .append("text")
+    .attr("transform", "translate(" + graphWidth / 2 + " ," + (graphHeight + margin.top + 40) + ")")
+    .style("text-anchor", "middle")
+    .text("Date (D-M-Y)");
 
 // Y axis Label for the total incoming sms graph
 incomingMsgGraph
@@ -163,6 +170,13 @@ outgoingMsgGraph
     .style("font-size", "20px")
     .style("text-decoration", "bold")
     .text("Total Outgoing Messages");
+
+// Add X axis label for the total outgoing sms graph
+outgoingMsgGraph
+    .append("text")
+    .attr("transform", "translate(" + graphWidth / 2 + " ," + (graphHeight + margin.top + 40) + ")")
+    .style("text-anchor", "middle")
+    .text("Date (D-M-Y)");
 
 // Y axis Label for the total outgoing sms graph
 outgoingMsgGraph
