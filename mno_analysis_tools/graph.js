@@ -222,7 +222,7 @@ outgoingMsgGraphSvg
     .append("text")
     .attr("x", 470)
     .attr("y", 30)
-    .text("Messages received per time")
+    .text("Messages sent per time")
     .style("font-size", "12px")
     .attr("alignment-baseline", "middle");
 outgoingMsgGraphSvg
@@ -258,7 +258,7 @@ Promise.all([
         const makeRect = d => {
             let x0 = incomingMsgGraphxScale(new Date(d.PreviousMessageTimestamp)),
                 y0 = incomingMsgGraphLeftyScale(Math.floor(d.DownTimeDurationSeconds / 3600)),
-                x1 = incomingMsgGraphxScale(new Date(d.NextMessageTimestamp)),
+                x1 = incomingMsgGraphxScale(new Date(d.NextMessageTimeTimestamp)),
                 y1 = graphHeight,
                 p1 = x0 + " " + y0,
                 p2 = x0 + " " + y1,
@@ -272,7 +272,7 @@ Promise.all([
         // Plot Incoming Graph
         // sort data based on date objects
         incoming_downtime.sort(
-            (a, b) => new Date(a.NextMessageTimestamp) - new Date(b.NextMessageTimestamp)
+            (a, b) => new Date(a.NextMessageTimeTimestamp) - new Date(b.NextMessageTimeTimestamp)
         );
         incoming_messages.sort((a, b) => new Date(a.PeriodEnd) - new Date(b.PeriodEnd));
         // Set scale domains
@@ -280,7 +280,7 @@ Promise.all([
             d3.extent(
                 [].concat(
                     incoming_downtime.map(d => new Date(d.PreviousMessageTimestamp)),
-                    incoming_downtime.map(d => new Date(d.NextMessageTimestamp)),
+                    incoming_downtime.map(d => new Date(d.NextMessageTimeTimestamp)),
                     incoming_messages.map(d => new Date(d.PeriodEnd)),
                     incoming_messages.map(d => new Date(d.PeriodStart))
                 )
@@ -352,7 +352,7 @@ Promise.all([
 
         // Plot Outgoing Graph
         outgoing_downtime.sort(
-            (a, b) => new Date(a.NextMessageTimestamp) - new Date(b.NextMessageTimestamp)
+            (a, b) => new Date(a.NextMessageTimeTimestamp) - new Date(b.NextMessageTimeTimestamp)
         );
         outgoing_messages.sort((a, b) => new Date(a.PeriodEnd) - new Date(b.PeriodEnd));
         // Set scale domains
@@ -360,7 +360,7 @@ Promise.all([
             d3.extent(
                 [].concat(
                     outgoing_downtime.map(d => new Date(d.PreviousMessageTimestamp)),
-                    outgoing_downtime.map(d => new Date(d.NextMessageTimestamp)),
+                    outgoing_downtime.map(d => new Date(d.NextMessageTimeTimestamp)),
                     outgoing_messages.map(d => new Date(d.PeriodEnd)),
                     outgoing_messages.map(d => new Date(d.PeriodStart))
                 )
