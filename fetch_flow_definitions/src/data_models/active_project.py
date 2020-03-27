@@ -10,6 +10,6 @@ class ActiveProject(object):
         project_name = source["project_name"]
         rapid_pro_domain = source["rapid_pro_domain"]
         rapid_pro_token_url = source["rapid_pro_token_url"]
-        flow_definitions_upload_url_prefix = source["flow_definitions_upload_url_prefix"]
+        flow_definitions_upload_url_prefix = source.get("flow_definitions_upload_url_prefix")
 
         return cls(project_name, rapid_pro_domain, rapid_pro_token_url, flow_definitions_upload_url_prefix)
