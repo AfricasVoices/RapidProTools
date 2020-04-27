@@ -295,7 +295,7 @@ class RapidProClient(object):
         """
         Interrupts the given URNs from the flows they are currently in, if any.
 
-        Makes 1 request for every 100 URNs.
+        If the list of URNs contains more than 100 items, requests will be made in batches of 100 URNs at a time.
 
         :param urns: URNs to interrupt
         :type urns: list of str
