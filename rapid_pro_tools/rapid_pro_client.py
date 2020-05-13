@@ -277,6 +277,55 @@ class RapidProClient(object):
         log.info(f"Message send request created with broadcast id {response.id}")
         return response.id
 
+    def send_message_to_urns(self, message, target_urns, interrupt=False):
+        """
+        Sends a message to URNs.
+
+        :param message: Text of the message to send.
+        :type message: str
+        :param target_urn: URNs to send the message to.
+        :type target_urn: str
+        :param interrupt: Whether to interrupt the target_urn from flows before sending the message.
+        :type interrupt: bool
+        :return: Ids of the Rapid Pro broadcasts created for this send request.
+                 These ids may be used to check on the status of the broadcast by making further requests to Rapid Pro.
+        :rtype: list of int
+        """
+        log.info(f"Sending a message to {len(urns)} URNs...")
+        log.debug(f"Sending to {urns}...")
+        batch = []
+        ids = []
+        interrupted = 0
+        sent = 0
+
+        for urn in urns:
+            batch.append(urn)
+            if len(batch) >= 100:  # limit of 100 imposed by Rapid Pro's API
+                if interrupt:
+                    self.rapid_pro.bulk_interrupt_contacts(batch)
+                    interrupted += len(batch)
+                    log.info(f"Interrupted {interrupted} / {len(urns)} URNs")
+
+                response: Broadcast = self.rapid_pro.create_broadcast(message, urns=batch)
+                ids.append(response.id)
+                sent += len(batch)
+                batch = []
+        if len(batch) > 0:
+            if interrupt:
+                self.rapid_pro.bulk_interrupt_contacts(batch)
+                interrupted += len(batch)
+            response: Broadcast = self.rapid_pro.create_broadcast(message, urns=batch)
+            sent += len(batch)
+
+            ids.append(response.id)
+
+
+        log.info(f"Interrupted {interrupted} / {len(urns)} URNs")
+        log.info(f"Sent {sent} / {len(urns)} URNs")
+
+        log.info(f"Message send request created with broadcasts ids {ids}")
+        return ids
+
     def get_broadcast_for_broadcast_id(self, broadcast_id):
         """
         Gets the broadcast with the requested id from Rapid Pro.
