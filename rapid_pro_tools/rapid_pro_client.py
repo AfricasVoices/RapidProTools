@@ -292,6 +292,7 @@ class RapidProClient(object):
                  e.g. using get_broadcast_for_broadcast_id.
         :rtype: list of int
         """
+        urns = target_urns
         log.info(f"Sending a message to {len(urns)} URNs...")
         log.debug(f"Sending to {urns}...")
         batch = []
