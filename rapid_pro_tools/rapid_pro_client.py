@@ -292,6 +292,7 @@ class RapidProClient(object):
                  e.g. using get_broadcast_for_broadcast_id.
         :rtype: list of int
         """
+        urns = target_urns
         log.info(f"Sending a message to {len(urns)} URNs...")
         log.debug(f"Sending to {urns}...")
         batch = []
@@ -322,8 +323,8 @@ class RapidProClient(object):
             log.info(f"Interrupted {interrupted} / {len(urns)} URNs")
             log.info(f"Sent {sent} / {len(urns)} URNs")
 
-        log.info(f"Message send request created with broadcast ids {ids}")
-        return ids
+        log.info(f"Message send request created with broadcast ids {broadcast_ids}")
+        return broadcast_ids
 
     def get_broadcast_for_broadcast_id(self, broadcast_id):
         """
