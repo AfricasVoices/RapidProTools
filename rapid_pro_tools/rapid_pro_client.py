@@ -273,7 +273,7 @@ class RapidProClient(object):
         
         log.info("Sending a message to an individual...")
         log.debug(f"Sending to '{target_urn}' the message '{message}'...")
-        response: Broadcast = self.rapid_pro.create_broadcast(message, urns=[target_urn])
+        response = self.rapid_pro.create_broadcast(message, urns=[target_urn])
         log.info(f"Message send request created with broadcast id {response.id}")
         return response.id
 
@@ -295,7 +295,7 @@ class RapidProClient(object):
         log.info(f"Sending a message to {len(urns)} URNs...")
         log.debug(f"Sending to {urns}...")
         batch = []
-        ids = []
+        broadcast_ids = []
         interrupted = 0
         sent = 0
 
@@ -307,22 +307,20 @@ class RapidProClient(object):
                     interrupted += len(batch)
                     log.info(f"Interrupted {interrupted} / {len(urns)} URNs")
 
-                response: Broadcast = self.rapid_pro.create_broadcast(message, urns=batch)
-                ids.append(response.id)
+                response = self.rapid_pro.create_broadcast(message, urns=batch)
+                broadcast_ids.append(response.id)
                 sent += len(batch)
                 batch = []
+                log.info(f"Sent {sent} / {len(urns)} URNs")
         if len(batch) > 0:
             if interrupt:
                 self.rapid_pro.bulk_interrupt_contacts(batch)
                 interrupted += len(batch)
             response: Broadcast = self.rapid_pro.create_broadcast(message, urns=batch)
             sent += len(batch)
-
-            ids.append(response.id)
-
-
-        log.info(f"Interrupted {interrupted} / {len(urns)} URNs")
-        log.info(f"Sent {sent} / {len(urns)} URNs")
+            broadcast_ids.append(response.id)
+            log.info(f"Interrupted {interrupted} / {len(urns)} URNs")
+            log.info(f"Sent {sent} / {len(urns)} URNs")
 
         log.info(f"Message send request created with broadcast ids {ids}")
         return ids
