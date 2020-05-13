@@ -289,6 +289,7 @@ class RapidProClient(object):
         :type interrupt: bool
         :return: Ids of the Rapid Pro broadcasts created for this send request.
                  These ids may be used to check on the status of the broadcast by making further requests to Rapid Pro.
+                 e.g. using get_broadcast_for_broadcast_id.
         :rtype: list of int
         """
         log.info(f"Sending a message to {len(urns)} URNs...")
