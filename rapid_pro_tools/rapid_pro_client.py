@@ -324,7 +324,7 @@ class RapidProClient(object):
         log.info(f"Interrupted {interrupted} / {len(urns)} URNs")
         log.info(f"Sent {sent} / {len(urns)} URNs")
 
-        log.info(f"Message send request created with broadcasts ids {ids}")
+        log.info(f"Message send request created with broadcast ids {ids}")
         return ids
 
     def get_broadcast_for_broadcast_id(self, broadcast_id):
