@@ -285,7 +285,7 @@ class RapidProClient(object):
         :type message: str
         :param target_urn: URNs to send the message to.
         :type target_urn: str
-        :param interrupt: Whether to interrupt the target_urn from flows before sending the message.
+        :param interrupt: Whether to interrupt the target_urns from flows before sending the message.
         :type interrupt: bool
         :return: Ids of the Rapid Pro broadcasts created for this send request.
                  These ids may be used to check on the status of the broadcast by making further requests to Rapid Pro.
