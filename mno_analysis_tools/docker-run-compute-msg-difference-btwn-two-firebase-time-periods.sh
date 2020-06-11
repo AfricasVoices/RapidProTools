@@ -5,7 +5,7 @@ set -e
 IMAGE_NAME=compute-msg-difference-btwn-two-firebase-time-periods
 
 # Check that the correct number of arguments were provided.
-if [[ $# -ne 6 ]]; then
+if [[ $# -lt 6 ]]; then
     echo "Usage: ./docker-run-compute-msg-difference-btwn-periods.sh 
     <raw_messages_file_path> <target_operator> <target_message_direction> 
     <start_date> <end_date> <time_frame> <output_dir>" 
@@ -18,7 +18,6 @@ TARGET_OPERATOR=$2
 TARGET_MESSAGE_DIRECTION=$3
 START_DATE=$4
 END_DATE=$5
-OUTPUT_DIR=$6
 
 # Build an image for this pipeline stage.
 docker build -t "$IMAGE_NAME" .
@@ -30,10 +29,20 @@ else
    MSG_DIRECTION="outgoing"
 fi
 
+if [[ -z $7 ]]; then
+OUTPUT_DIR=$6
 CMD="pipenv run python -u compute_msg_difference_btwn_two_firebase_time_periods.py \
     /data/raw_messages.json /data/${MSG_DIRECTION}_msg_diff_per_period.json \
     \"$TARGET_OPERATOR\" \"$TARGET_MESSAGE_DIRECTION\"  \"$START_DATE\" \"$END_DATE\" 
 "
+else
+TIME_FRAME=$6
+OUTPUT_DIR=$7
+CMD="pipenv run python -u compute_msg_difference_btwn_two_firebase_time_periods.py \
+    /data/raw_messages.json /data/${MSG_DIRECTION}_msg_diff_per_period.json \
+    \"$TARGET_OPERATOR\" \"$TARGET_MESSAGE_DIRECTION\"  \"$START_DATE\" \"$END_DATE\" -t \"$TIME_FRAME\"
+"
+fi
 
 container="$(docker container create -w /app "$IMAGE_NAME" /bin/bash -c "$CMD")"
 echo "Created container $container"
