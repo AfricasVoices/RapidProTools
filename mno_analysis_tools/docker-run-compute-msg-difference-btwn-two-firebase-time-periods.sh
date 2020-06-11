@@ -8,7 +8,7 @@ IMAGE_NAME=compute-msg-difference-btwn-two-firebase-time-periods
 if [[ $# -lt 6 ]]; then
     echo "Usage: ./docker-run-compute-msg-difference-btwn-periods.sh 
     <raw_messages_file_path> <target_operator> <target_message_direction> 
-    <start_date> <end_date> <time_frame> <output_dir>" 
+    <start_date> <end_date> <output_dir> <time_frame>" 
     exit   
 fi
  
