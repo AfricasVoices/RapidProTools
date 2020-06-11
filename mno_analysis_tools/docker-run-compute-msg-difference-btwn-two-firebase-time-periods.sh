@@ -31,20 +31,10 @@ else
    MSG_DIRECTION="outgoing"
 fi
 
-if [[ -z $7 ]]; then
-OUTPUT_DIR=$6
-CMD="pipenv run python -u compute_msg_difference_btwn_two_firebase_time_periods.py \
-    /data/raw_messages.json /data/${MSG_DIRECTION}_msg_diff_per_period.json \
-    \"$TARGET_OPERATOR\" \"$TARGET_MESSAGE_DIRECTION\"  \"$START_DATE\" \"$END_DATE\" 
-"
-else
-TIME_FRAME=$6
-OUTPUT_DIR=$7
 CMD="pipenv run python -u compute_msg_difference_btwn_two_firebase_time_periods.py \
     /data/raw_messages.json /data/${MSG_DIRECTION}_msg_diff_per_period.json \
     \"$TARGET_OPERATOR\" \"$TARGET_MESSAGE_DIRECTION\"  \"$START_DATE\" \"$END_DATE\" -t \"$TIME_FRAME\"
 "
-fi
 
 container="$(docker container create -w /app "$IMAGE_NAME" /bin/bash -c "$CMD")"
 echo "Created container $container"
