@@ -23,7 +23,8 @@ OUTPUT_DIR=$6
 # Build an image for this pipeline stage.
 docker build -t "$IMAGE_NAME" .
 
-if [[ $TARGET_MESSAGE_DIRECTION == "in" ]] then
+if [[ $TARGET_MESSAGE_DIRECTION == "in" ]] 
+then
    MSG_DIRECTION="incoming"
 else
    MSG_DIRECTION="outgoing"
