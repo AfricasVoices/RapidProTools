@@ -34,8 +34,8 @@ if __name__ == "__main__":
                         help="The start date as ISO 8601 string from which the number of messages will be computed")
     parser.add_argument("end_date", metavar="end-date", type=lambda s: isoparse(s),
                         help="The end date as ISO 8601 string to which the number of messages computation will end")
-    parser.add_argument("time_frame", metavar="time-frame", type=lambda s: datetime.strptime(s, '%d:%H:%M:%S'),
-                        help="The time frame (DD:HH:MM:SS) to generate dates in intervals between the start and end date")
+    parser.add_argument("time_frame", metavar="time-frame", type=lambda s: datetime.strptime(s, '%H:%M:%S'),
+                        help="The time frame (HH:MM:SS) to generate dates in intervals between the start and end date")
 
     args = parser.parse_args()
 
