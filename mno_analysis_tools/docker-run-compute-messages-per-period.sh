@@ -54,5 +54,5 @@ docker start -a -i "$container"
 
 # Copy the output data back out of the container
 echo "Copying $container_short_id:/data/. -> $OUTPUT_DIR"
-# mkdir -p "$OUTPUT_DIR"
+mkdir -p "$OUTPUT_DIR"
 docker cp "$container:/data/." "$OUTPUT_DIR"
