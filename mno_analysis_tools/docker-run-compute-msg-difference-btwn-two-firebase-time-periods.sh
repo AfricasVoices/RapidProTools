@@ -18,6 +18,8 @@ TARGET_OPERATOR=$2
 TARGET_MESSAGE_DIRECTION=$3
 START_DATE=$4
 END_DATE=$5
+OUTPUT_DIR=$6
+TIME_FRAME=${7:-00:20:10}
 
 # Build an image for this pipeline stage.
 docker build -t "$IMAGE_NAME" .
