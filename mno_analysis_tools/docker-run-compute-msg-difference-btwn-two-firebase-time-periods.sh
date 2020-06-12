@@ -4,6 +4,20 @@ set -e
 
 IMAGE_NAME=compute-msg-difference-btwn-two-firebase-time-periods
 
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+         --profile-memory)
+            PROFILE_MEMORY=true
+            MEMORY_PROFILE_OUTPUT_PATH="$2"
+            shift 2;;
+        --)
+            shift
+            break;;
+        *)
+            break;;
+    esac
+done
+
 # Check that the correct number of arguments were provided.
 if [[ $# -lt 6 ]]; then
     echo "Usage: ./docker-run-compute-msg-difference-btwn-periods.sh 
@@ -22,7 +36,12 @@ OUTPUT_DIR=$6
 TIME_FRAME=${7:-00:00:10}
 
 # Build an image for this pipeline stage.
-docker build -t "$IMAGE_NAME" .
+docker build --build-arg INSTALL_MEMORY_PROFILER="$PROFILE_MEMORY" -t "$IMAGE_NAME" .
+
+# Create a container from the image that was just built.
+if [[ "$PROFILE_MEMORY" = true ]]; then
+    PROFILE_MEMORY_CMD="mprof run -o /data/memory.prof"
+fi
 
 if [[ $TARGET_MESSAGE_DIRECTION == "in" ]] 
 then
@@ -31,7 +50,7 @@ else
    MSG_DIRECTION="outgoing"
 fi
 
-CMD="pipenv run python -u compute_msg_difference_btwn_two_firebase_time_periods.py \
+CMD="pipenv run $PROFILE_MEMORY_CMD python -u compute_msg_difference_btwn_two_firebase_time_periods.py \
     /data/raw_messages.json /data/${MSG_DIRECTION}_msg_diff_per_period.json \
     \"$TARGET_OPERATOR\" \"$TARGET_MESSAGE_DIRECTION\"  \"$START_DATE\" \"$END_DATE\" -t \"$TIME_FRAME\"
 "
@@ -56,3 +75,9 @@ docker start -a -i "$container"
 echo "Copying $container_short_id:/data/. -> $OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 docker cp "$container:/data/." "$OUTPUT_DIR"
+
+if [[ "$PROFILE_MEMORY" = true ]]; then
+    echo "Copying $container_short_id:/data/memory.prof -> $MEMORY_PROFILE_OUTPUT_PATH"
+    mkdir -p "$(dirname "$MEMORY_PROFILE_OUTPUT_PATH")"
+    docker cp "$container:/data/memory.prof" "$MEMORY_PROFILE_OUTPUT_PATH"
+fi
