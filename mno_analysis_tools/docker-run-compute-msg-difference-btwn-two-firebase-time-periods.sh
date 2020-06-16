@@ -69,6 +69,7 @@ trap finish EXIT
 docker cp "$RAW_MESSAGES_FILE_PATH" "$container:/data/raw_messages.json"
 
 # Run the container
+echo "Starting container $container_short_id"
 docker start -a -i "$container"
 
 # Copy the output data back out of the container

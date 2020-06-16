@@ -54,6 +54,7 @@ function finish {
 trap finish EXIT
 
 # Run the container
+echo "Starting container $container_short_id"
 docker start -a -i "$container"
 
 # Copy the output data back out of the container
