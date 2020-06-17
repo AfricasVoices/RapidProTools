@@ -20,7 +20,8 @@ done
 
 # Check that the correct number of arguments were provided.
 if [[ $# -ne 6 ]]; then
-    echo "Usage: ./docker-run-compute-window-of-downtime.sh 
+    echo "Usage: ./docker-run-compute-window-of-downtime.sh
+    [--profile-memory <profile-output-path>]
     <raw_messages_file_path> <target_operator> <target_message_direction> 
     <start_date> <end_date> <output_dir>" 
     exit   
