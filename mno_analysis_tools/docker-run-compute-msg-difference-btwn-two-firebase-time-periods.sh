@@ -20,7 +20,7 @@ done
 
 # Check that the correct number of arguments were provided.
 if [[ $# -lt 6 ]]; then
-    echo "Usage: ./docker-run-compute-msg-difference-btwn-periods.sh 
+    echo "Usage: ./docker-run-compute-msg-difference-btwn-two-firebase-time-periods.sh 
     <raw_messages_file_path> <target_operator> <target_message_direction> 
     <start_date> <end_date> <output_dir> <time_frame>" 
     exit   
