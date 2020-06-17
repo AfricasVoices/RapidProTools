@@ -9,7 +9,7 @@ if [[ $# -ne 9 ]]; then
     echo " <target_operator> <target_message_direction>"
     echo " <start_date> <end_date> <time_frame> <optional_time_frame>"
     echo " <output_dir>"
-    echo "Runs the pipeline end-to-end (Fetch Raw Messages, compute window of downtime,
+    echo "Runs the Mno Analysis end-to-end (Fetch Raw Messages, compute window of downtime,
         compute messages per period, compute msg difference btwn periods)"
     exit
 fi
