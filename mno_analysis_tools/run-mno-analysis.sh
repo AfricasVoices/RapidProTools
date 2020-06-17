@@ -3,7 +3,7 @@
 set -e
 
 if [[ $# -ne 9 ]]; then
-    echo "Usage: ./run_pipeline.sh"
+    echo "Usage: ./run-mno-analysis.sh"
     echo " [--profile-memory <profile-output-path>]"
     echo " <domain> <token> <raw_messages_file_path>"
     echo " <target_operator> <target_message_direction>"
