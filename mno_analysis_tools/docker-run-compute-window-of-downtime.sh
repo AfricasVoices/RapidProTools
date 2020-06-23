@@ -40,7 +40,7 @@ docker build --build-arg INSTALL_MEMORY_PROFILER="$PROFILE_MEMORY" -t "$IMAGE_NA
 
 # Create a container from the image that was just built.
 if [[ "$PROFILE_MEMORY" = true ]]; then
-    PROFILE_MEMORY_CMD="mprof run -o /data/memory.prof"
+    PROFILE_MEMORY_CMD="mprof run -o /data/memory_1.prof"
 fi
 
 if [[ $TARGET_MESSAGE_DIRECTION == "in" ]] 
@@ -78,7 +78,7 @@ mkdir -p "$OUTPUT_DIR"
 docker cp "$container:/data/." "$OUTPUT_DIR"
 
 if [[ "$PROFILE_MEMORY" = true ]]; then
-    echo "Copying $container_short_id:/data/memory.prof -> $MEMORY_PROFILE_OUTPUT_PATH"
+    echo "Copying $container_short_id:/data/memory_1.prof -> $MEMORY_PROFILE_OUTPUT_PATH"
     mkdir -p "$(dirname "$MEMORY_PROFILE_OUTPUT_PATH")"
-    docker cp "$container:/data/memory.prof" "$MEMORY_PROFILE_OUTPUT_PATH"
+    docker cp "$container:/data/memory_1.prof" "$MEMORY_PROFILE_OUTPUT_PATH"
 fi
