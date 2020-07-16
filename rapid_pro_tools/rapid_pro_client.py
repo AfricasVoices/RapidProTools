@@ -253,7 +253,7 @@ class RapidProClient(object):
 
         return raw_messages
 
-    def send_message_to_urn(self, message, target_urn):
+    def send_message_to_urn(self, message, target_urn, interrupt=False):
         """
         Sends a message to the given URN.
 
@@ -261,16 +261,70 @@ class RapidProClient(object):
         :type message: str
         :param target_urn: URN to send the message to.
         :type target_urn: str
+        :param interrupt: Whether to interrupt the target_urn from flows before sending the message.
+        :type interrupt: bool
         :return: Id of the Rapid Pro broadcast created for this send request.
                  This id may be used to check on the status of the broadcast by making further requests to Rapid Pro.
                  Note that this is a broadcast (to one person) because Rapid Pro does not support unicasting.
         :rtype: int
         """
+        if interrupt:
+            self.interrupt_urns([target_urn])
+        
         log.info("Sending a message to an individual...")
         log.debug(f"Sending to '{target_urn}' the message '{message}'...")
-        response: Broadcast = self.rapid_pro.create_broadcast(message, urns=[target_urn])
+        response = self.rapid_pro.create_broadcast(message, urns=[target_urn])
         log.info(f"Message send request created with broadcast id {response.id}")
         return response.id
+
+    def send_message_to_urns(self, message, target_urns, interrupt=False):
+        """
+        Sends a message to URNs.
+
+        :param message: Text of the message to send.
+        :type message: str
+        :param target_urn: URNs to send the message to.
+        :type target_urn: str
+        :param interrupt: Whether to interrupt the target_urns from flows before sending the message.
+        :type interrupt: bool
+        :return: Ids of the Rapid Pro broadcasts created for this send request.
+                 These ids may be used to check on the status of the broadcast by making further requests to Rapid Pro.
+                 e.g. using get_broadcast_for_broadcast_id.
+        :rtype: list of int
+        """
+        urns = target_urns
+        log.info(f"Sending a message to {len(urns)} URNs...")
+        log.debug(f"Sending to {urns}...")
+        batch = []
+        broadcast_ids = []
+        interrupted = 0
+        sent = 0
+
+        for urn in urns:
+            batch.append(urn)
+            if len(batch) >= 100:  # limit of 100 imposed by Rapid Pro's API
+                if interrupt:
+                    self.rapid_pro.bulk_interrupt_contacts(batch)
+                    interrupted += len(batch)
+                    log.info(f"Interrupted {interrupted} / {len(urns)} URNs")
+
+                response = self.rapid_pro.create_broadcast(message, urns=batch)
+                broadcast_ids.append(response.id)
+                sent += len(batch)
+                batch = []
+                log.info(f"Sent {sent} / {len(urns)} URNs")
+        if len(batch) > 0:
+            if interrupt:
+                self.rapid_pro.bulk_interrupt_contacts(batch)
+                interrupted += len(batch)
+            response: Broadcast = self.rapid_pro.create_broadcast(message, urns=batch)
+            sent += len(batch)
+            broadcast_ids.append(response.id)
+            log.info(f"Interrupted {interrupted} / {len(urns)} URNs")
+            log.info(f"Sent {sent} / {len(urns)} URNs")
+
+        log.info(f"Message send request created with broadcast ids {broadcast_ids}")
+        return broadcast_ids
 
     def get_broadcast_for_broadcast_id(self, broadcast_id):
         """
@@ -285,6 +339,31 @@ class RapidProClient(object):
         assert len(matching_broadcasts) == 1, f"{len(matching_broadcasts)} broadcasts have id {broadcast_id} " \
             f"(expected exactly 1)"
         return matching_broadcasts[0]
+
+    def interrupt_urns(self, urns):
+        """
+        Interrupts the given URNs from the flows they are currently in, if any.
+
+        If the list of URNs contains more than 100 items, requests will be made in batches of 100 URNs at a time.
+
+        :param urns: URNs to interrupt
+        :type urns: list of str
+        """
+        log.info(f"Interrupting {len(urns)} URNs...")
+        log.debug(f"Interrupting {urns}...")
+        batch = []
+        interrupted = 0
+        for urn in urns:
+            batch.append(urn)
+            if len(batch) >= 100:  # limit of 100 imposed by Rapid Pro's API
+                self.rapid_pro.bulk_interrupt_contacts(batch)
+                interrupted += len(batch)
+                log.info(f"Interrupted {interrupted} / {len(urns)} URNs")
+                batch = []
+        if len(batch) > 0:
+            self.rapid_pro.bulk_interrupt_contacts(batch)
+            interrupted += len(batch)
+            log.info(f"Interrupted {interrupted} / {len(urns)} URNs")
 
     def _get_archived_runs_for_flow_id(self, flow_id, last_modified_after_inclusive=None,
                                        last_modified_before_exclusive=None):

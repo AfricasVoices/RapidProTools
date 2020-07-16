@@ -37,6 +37,11 @@ if __name__ == "__main__":
     log.info(f"Loaded the details for {len(active_projects)} active projects")
 
     for project in active_projects:
+        if project.flow_definitions_upload_url_prefix is None:
+            log.info(f"Not archiving flow definitions for project {project.project_name} because its "
+                     f"'flow_definitions_upload_url_prefix' is unspecified.")
+            continue
+
         log.info(f"Archiving the latest flow definitions for project {project.project_name}...")
 
         log.info("Downloading the Rapid Pro token file and initialising the Rapid Pro client...")
