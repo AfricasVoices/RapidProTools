@@ -2,11 +2,26 @@
 
 set -e
 
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+         --optional-time-frame)
+            OPTIONAL_TIME_FRAME=true
+            OPTIONAL_TIME_FRAME_VALUE="$2"
+            shift 2;;
+        --)
+            shift
+            break;;
+        *)
+            break;;
+    esac
+done
+
 if [[ $# -ne 9 ]]; then
     echo "Usage: ./run-mno-analysis.sh"
+    echo " [--optional-time-frame <optional_time_frame>]"
     echo " <domain> <token> <raw_messages_file_path>"
     echo " <target_operator> <target_message_direction>"
-    echo " <start_date> <end_date> <time_frame> <optional_time_frame>"
+    echo " <start_date> <end_date> <time_frame>"
     echo " <output_dir>"
     echo "Runs the Mno Analysis end-to-end (Fetch Raw Messages, compute window of downtime,
         compute messages per period, compute msg difference btwn periods)"
@@ -37,5 +52,10 @@ echo "Starting run with id '$RUN_ID'"
 ./docker-run-compute-messages-per-period.sh --profile-memory ./data "$RAW_MESSAGES_FILE_PATH" "$TARGET_OPERATOR" \
     "$TARGET_MESSAGE_DIRECTION" "$START_DATE" "$END_DATE" "$TIME_FRAME" "$OUTPUT_DIR"
 
-./docker-run-compute-msg-difference-btwn-two-firebase-time-periods.sh --profile-memory ./data "$RAW_MESSAGES_FILE_PATH" \
+if [[ "$OPTIONAL_TIME_FRAME" = true ]]; then
+    ./docker-run-compute-msg-difference-btwn-two-firebase-time-periods.sh --profile-memory ./data "$RAW_MESSAGES_FILE_PATH" \
+    "$TARGET_OPERATOR" "$TARGET_MESSAGE_DIRECTION" "$START_DATE" "$END_DATE" "$OUTPUT_DIR" "$OPTIONAL_TIME_FRAME_VALUE"
+else
+   ./docker-run-compute-msg-difference-btwn-two-firebase-time-periods.sh --profile-memory ./data "$RAW_MESSAGES_FILE_PATH" \
     "$TARGET_OPERATOR" "$TARGET_MESSAGE_DIRECTION" "$START_DATE" "$END_DATE" "$OUTPUT_DIR" 
+fi
