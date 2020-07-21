@@ -4,6 +4,7 @@ from dateutil.parser import isoparse
 from datetime import datetime, timedelta
 
 from core_data_modules.logging import Logger
+from core_data_modules.cleaners import PhoneCleaner
 from temba_client.v2 import Message
 
 
