@@ -49,13 +49,5 @@ echo "Starting run with id '$RUN_ID'"
 ./docker-run-compute-window-of-downtime.sh --profile-memory ./data "$RAW_MESSAGES_FILE_PATH" \
     "$TARGET_OPERATOR" "$TARGET_MESSAGE_DIRECTION" "$START_DATE" "$END_DATE" "$OUTPUT_DIR"
 
-./docker-run-compute-messages-per-period.sh --profile-memory ./data "$RAW_MESSAGES_FILE_PATH" "$TARGET_OPERATOR" \
-    "$TARGET_MESSAGE_DIRECTION" "$START_DATE" "$END_DATE" "$TIME_FRAME" "$OUTPUT_DIR"
-
-if [[ "$OPTIONAL_TIME_FRAME" = true ]]; then
-    ./docker-run-compute-msg-difference-btwn-two-firebase-time-periods.sh --profile-memory ./data "$RAW_MESSAGES_FILE_PATH" \
-    "$TARGET_OPERATOR" "$TARGET_MESSAGE_DIRECTION" "$START_DATE" "$END_DATE" "$OUTPUT_DIR" "$OPTIONAL_TIME_FRAME_VALUE"
-else
-   ./docker-run-compute-msg-difference-btwn-two-firebase-time-periods.sh --profile-memory ./data "$RAW_MESSAGES_FILE_PATH" \
-    "$TARGET_OPERATOR" "$TARGET_MESSAGE_DIRECTION" "$START_DATE" "$END_DATE" "$OUTPUT_DIR" 
-fi
+./docker-run-compute-msg-difference-btwn-two-firebase-time-periods.sh --profile-memory ./data "$RAW_MESSAGES_FILE_PATH" \
+    "$TARGET_OPERATOR" "$TARGET_MESSAGE_DIRECTION" "$START_DATE" "$END_DATE" "$OUTPUT_DIR"
