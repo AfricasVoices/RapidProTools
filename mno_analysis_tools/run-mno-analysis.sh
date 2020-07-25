@@ -23,7 +23,7 @@ if [[ $# -ne 8 ]]; then
     echo " <start_date> <end_date>"
     echo " <output_dir>"
     echo "Runs the Mno Analysis end-to-end (Fetch Raw Messages, compute window of downtime, 
-        compute messages per period, compute msg difference btwn periods)"
+        compute message difference between two firebase periods)"
     exit
 fi
     
