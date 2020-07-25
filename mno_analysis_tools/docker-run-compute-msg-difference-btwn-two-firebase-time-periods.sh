@@ -10,6 +10,10 @@ while [[ $# -gt 0 ]]; do
             PROFILE_MEMORY=true
             MEMORY_PROFILE_OUTPUT_PATH="$2"
             shift 2;;
+        --time-frame)
+            TIME_FRAME="$2"
+            TIME_FRAME_ARG="-t $TIME_FRAME"
+            shift 2;;
         --)
             shift
             break;;
