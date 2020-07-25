@@ -23,11 +23,11 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Check that the correct number of arguments were provided.
-if [[ $# -lt 6 ]]; then
+if [[ $# -ne 6 ]]; then
     echo "Usage: ./docker-run-compute-msg-difference-btwn-two-firebase-time-periods.sh
-    [--profile-memory <profile-output-path>] 
+    [--profile-memory <profile-output-path>] [--time-frame <time-frame>]
     <raw_messages_file_path> <target_operator> <target_message_direction> 
-    <start_date> <end_date> <output_dir> <time_frame>" 
+    <start_date> <end_date> <output_dir>" 
     exit   
 fi
  
@@ -38,7 +38,6 @@ TARGET_MESSAGE_DIRECTION=$3
 START_DATE=$4
 END_DATE=$5
 OUTPUT_DIR=$6
-TIME_FRAME=${7:-00:00:10}
 
 # Build an image for this pipeline stage.
 docker build --build-arg INSTALL_MEMORY_PROFILER="$PROFILE_MEMORY" -t "$IMAGE_NAME" .
@@ -57,7 +56,7 @@ fi
 
 CMD="pipenv run $PROFILE_MEMORY_CMD python -u compute_msg_difference_btwn_two_firebase_time_periods.py \
     /data/raw_messages.json /data/${MSG_DIRECTION}_msg_diff_per_period.json \
-    \"$TARGET_OPERATOR\" \"$TARGET_MESSAGE_DIRECTION\"  \"$START_DATE\" \"$END_DATE\" -t \"$TIME_FRAME\"
+    \"$TARGET_OPERATOR\" \"$TARGET_MESSAGE_DIRECTION\"  \"$START_DATE\" \"$END_DATE\" ${TIME_FRAME_ARG}
 "
 
 container="$(docker container create -w /app "$IMAGE_NAME" /bin/bash -c "$CMD")"
