@@ -4,9 +4,9 @@ set -e
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-         --optional-time-frame)
-            OPTIONAL_TIME_FRAME=true
-            OPTIONAL_TIME_FRAME_VALUE="$2"
+        --time-frame)
+            TIME_FRAME="$2"
+            TIME_FRAME_ARG="--time-frame $TIME_FRAME"
             shift 2;;
         --)
             shift
