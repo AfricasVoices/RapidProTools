@@ -16,14 +16,13 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if [[ $# -ne 9 ]]; then
-    echo "Usage: ./run-mno-analysis.sh"
-    echo " [--optional-time-frame <optional_time_frame>]"
+if [[ $# -ne 8 ]]; then
+    echo "Usage: ./run-mno-analysis.sh [--time-frame <time-frame>]"
     echo " <domain> <token> <raw_messages_file_path>"
     echo " <target_operator> <target_message_direction>"
-    echo " <start_date> <end_date> <time_frame>"
+    echo " <start_date> <end_date>"
     echo " <output_dir>"
-    echo "Runs the Mno Analysis end-to-end (Fetch Raw Messages, compute window of downtime,
+    echo "Runs the Mno Analysis end-to-end (Fetch Raw Messages, compute window of downtime, 
         compute messages per period, compute msg difference btwn periods)"
     exit
 fi
@@ -35,8 +34,7 @@ TARGET_OPERATOR=$4
 TARGET_MESSAGE_DIRECTION=$5
 START_DATE=$6
 END_DATE=$7
-TIME_FRAME=$8
-OUTPUT_DIR=$9
+OUTPUT_DIR=$8
 
 DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 HASH=$(git rev-parse HEAD)
@@ -49,5 +47,5 @@ echo "Starting run with id '$RUN_ID'"
 ./docker-run-compute-window-of-downtime.sh --profile-memory ./data "$RAW_MESSAGES_FILE_PATH" \
     "$TARGET_OPERATOR" "$TARGET_MESSAGE_DIRECTION" "$START_DATE" "$END_DATE" "$OUTPUT_DIR"
 
-./docker-run-compute-msg-difference-btwn-two-firebase-time-periods.sh --profile-memory ./data "$RAW_MESSAGES_FILE_PATH" \
+./docker-run-compute-msg-difference-btwn-two-firebase-time-periods.sh --profile-memory ./data ${TIME_FRAME_ARG} "$RAW_MESSAGES_FILE_PATH" \
     "$TARGET_OPERATOR" "$TARGET_MESSAGE_DIRECTION" "$START_DATE" "$END_DATE" "$OUTPUT_DIR"
