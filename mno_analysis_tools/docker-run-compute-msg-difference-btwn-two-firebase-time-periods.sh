@@ -6,7 +6,7 @@ IMAGE_NAME=compute-msg-difference-btwn-two-firebase-time-periods
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-         --profile-memory)
+        --profile-memory)
             PROFILE_MEMORY=true
             MEMORY_PROFILE_OUTPUT_PATH="$2"
             shift 2;;
