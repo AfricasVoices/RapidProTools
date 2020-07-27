@@ -41,8 +41,8 @@ echo "Starting run with id '$RUN_ID'"
 
 ./docker-run-fetch-raw-messages.sh --profile-memory ./data "$DOMAIN" "$TOKEN" "$OUTPUT_DIR"
 
-./docker-run-compute-window-of-downtime.sh --profile-memory ./data "$RAW_MESSAGES_FILE_PATH" \
+./docker-run-compute-window-of-downtime.sh --profile-memory ./data "${OUTPUT_DIR%/}/raw_messages.json" \
     "$TARGET_OPERATOR" "$TARGET_MESSAGE_DIRECTION" "$START_DATE" "$END_DATE" "$OUTPUT_DIR"
 
-./docker-run-compute-msg-difference-btwn-two-firebase-time-periods.sh --profile-memory ./data ${TIME_FRAME_ARG} "$RAW_MESSAGES_FILE_PATH" \
+./docker-run-compute-msg-difference-btwn-two-firebase-time-periods.sh --profile-memory ./data ${TIME_FRAME_ARG} "${OUTPUT_DIR%/}/raw_messages.json" \
     "$TARGET_OPERATOR" "$TARGET_MESSAGE_DIRECTION" "$START_DATE" "$END_DATE" "$OUTPUT_DIR"
