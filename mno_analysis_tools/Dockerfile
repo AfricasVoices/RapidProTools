@@ -13,6 +13,7 @@ RUN if [ "$INSTALL_MEMORY_PROFILER" = "true" ]; then \
 
 # Make a directory for intermediate data
 RUN mkdir /data
+RUN mkdir /system-metrics
 
 # Set working directory
 WORKDIR /app

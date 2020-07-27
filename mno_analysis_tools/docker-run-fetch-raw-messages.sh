@@ -36,7 +36,7 @@ docker build --build-arg INSTALL_MEMORY_PROFILER="$PROFILE_MEMORY" -t "$IMAGE_NA
 
 # Create a container from the image that was just built.
 if [[ "$PROFILE_MEMORY" = true ]]; then
-    PROFILE_MEMORY_CMD="mprof run -o /data/fetch_raw_messages_memory.prof"
+    PROFILE_MEMORY_CMD="mprof run -o /system-metrics/fetch_raw_messages_memory.prof"
 fi
 
 CMD="pipenv run $PROFILE_MEMORY_CMD python -u fetch_raw_messages.py \
@@ -63,7 +63,7 @@ mkdir -p "$OUTPUT_DIR"
 docker cp "$container:/data/." "$OUTPUT_DIR"
 
 if [[ "$PROFILE_MEMORY" = true ]]; then
-    echo "Copying $container_short_id:/data/fetch_raw_messages_memory.prof -> $MEMORY_PROFILE_OUTPUT_PATH"
+    echo "Copying $container_short_id:/system-metrics/fetch_raw_messages_memory.prof -> $MEMORY_PROFILE_OUTPUT_PATH"
     mkdir -p "$(dirname "$MEMORY_PROFILE_OUTPUT_PATH")"
-    docker cp "$container:/data/fetch_raw_messages_memory.prof" "$MEMORY_PROFILE_OUTPUT_PATH"
+    docker cp "$container:/system-metrics/fetch_raw_messages_memory.prof" "$MEMORY_PROFILE_OUTPUT_PATH"
 fi
