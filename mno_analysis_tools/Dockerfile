@@ -26,5 +26,4 @@ RUN pipenv sync
 # Copy the rest of the project
 ADD fetch_raw_messages.py /app
 ADD compute_window_of_downtime.py /app
-ADD compute_messages_per_period.py /app
 ADD compute_msg_difference_btwn_two_firebase_time_periods.py /app
