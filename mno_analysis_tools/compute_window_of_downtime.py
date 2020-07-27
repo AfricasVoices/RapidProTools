@@ -36,7 +36,7 @@ if __name__ == "__main__":
     end_date = args.end_date
 
     with open(raw_messages_file_path, mode="r") as f:
-        log.info("Loading messages from {raw_messages_file_path}...")
+        log.info(f"Loading messages from {raw_messages_file_path}...")
         raw_messages_data = json.load(f)
         messages = [Message.deserialize(val) for val in raw_messages_data]
         log.info(f"Loaded {len(messages)} messages")
