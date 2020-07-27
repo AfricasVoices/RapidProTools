@@ -16,12 +16,10 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if [[ $# -ne 8 ]]; then
+if [[ $# -ne 7 ]]; then
     echo "Usage: ./run-mno-analysis.sh [--time-frame <time-frame>]"
-    echo " <domain> <token> <raw_messages_file_path>"
-    echo " <target_operator> <target_message_direction>"
-    echo " <start_date> <end_date>"
-    echo " <output_dir>"
+    echo " <domain> <token> <target_operator> <target_message_direction>"
+    echo " <start_date> <end_date> <output_dir>"
     echo "Runs the Mno Analysis end-to-end (Fetch Raw Messages, compute window of downtime, 
         compute message difference between two firebase periods)"
     exit
@@ -29,12 +27,11 @@ fi
     
 DOMAIN=$1 
 TOKEN=$2
-RAW_MESSAGES_FILE_PATH=$3
-TARGET_OPERATOR=$4
-TARGET_MESSAGE_DIRECTION=$5
-START_DATE=$6
-END_DATE=$7
-OUTPUT_DIR=$8
+TARGET_OPERATOR=$3
+TARGET_MESSAGE_DIRECTION=$4
+START_DATE=$5
+END_DATE=$6
+OUTPUT_DIR=$7
 
 DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 HASH=$(git rev-parse HEAD)
