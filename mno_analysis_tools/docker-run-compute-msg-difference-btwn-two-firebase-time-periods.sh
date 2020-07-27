@@ -54,9 +54,9 @@ else
    MSG_DIRECTION="outgoing"
 fi
 
-CMD="pipenv run $PROFILE_MEMORY_CMD python -u compute_msg_difference_btwn_two_firebase_time_periods.py \
+CMD="pipenv run $PROFILE_MEMORY_CMD python -u compute_msg_difference_btwn_two_firebase_time_periods.py "$TIME_FRAME_ARG" \
     /data/raw_messages.json /data/${MSG_DIRECTION}_msg_diff_per_period.json \
-    \"$TARGET_OPERATOR\" \"$TARGET_MESSAGE_DIRECTION\"  \"$START_DATE\" \"$END_DATE\" ${TIME_FRAME_ARG}
+    \"$TARGET_OPERATOR\" \"$TARGET_MESSAGE_DIRECTION\"  \"$START_DATE\" \"$END_DATE\"
 "
 
 container="$(docker container create -w /app "$IMAGE_NAME" /bin/bash -c "$CMD")"
