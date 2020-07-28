@@ -68,6 +68,7 @@ if __name__ == "__main__":
             msg_direction = msg.direction
             filtered_messages.append(msg)
     log.info(f"returning {len(filtered_messages)} messages")
+    filtered_messages_timestamps = [msg.sent_on for msg in filtered_messages]
 
     time_interval = timedelta(hours=time_frame.hour,
                               minutes=time_frame.minute, seconds=time_frame.second)
