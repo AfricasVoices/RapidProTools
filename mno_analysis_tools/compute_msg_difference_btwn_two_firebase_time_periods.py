@@ -87,6 +87,10 @@ if __name__ == "__main__":
 
         period_start = date_time_bounds[index]
         period_end = date_time_bounds[next_index]
+
+        start_index = timestamps_with_bounds.index(period_start) + 1
+        end_index = timestamps_with_bounds.index(period_end)
+
         messages_per_two_firebase_time_period.append({
             "Operator": operator,
             "MessageDirection": msg_direction,
