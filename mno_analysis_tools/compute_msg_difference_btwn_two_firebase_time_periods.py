@@ -85,11 +85,8 @@ if __name__ == "__main__":
     for index in range(len(date_time_bounds) - 1):
         next_index = index + 1
 
-        messages_this_period = 0
-        for msg in filtered_messages:
-            if date_time_bounds[index] <= msg.sent_on < date_time_bounds[next_index]:
-                messages_this_period += 1
-
+        period_start = date_time_bounds[index]
+        period_end = date_time_bounds[next_index]
         messages_per_two_firebase_time_period.append({
             "Operator": operator,
             "MessageDirection": msg_direction,
