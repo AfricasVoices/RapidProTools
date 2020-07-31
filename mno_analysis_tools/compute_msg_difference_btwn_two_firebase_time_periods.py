@@ -81,6 +81,7 @@ if __name__ == "__main__":
     # Compute the number of messages between two firebase time bounds i.e `PreviousMessageTimestamp` and
     # `NextMessageTimestamp` to get number of mesages in each firebase period and relate 
     #  each quantity with the operator and the message direction.
+    log.info("Computing number of messages in firebase time periods")
     messages_per_two_firebase_time_period = []
     for index in range(len(date_time_bounds) - 1):
         next_index = index + 1
@@ -102,6 +103,7 @@ if __name__ == "__main__":
         })
 
     # Compute message difference between two firebase time periods
+    log.info("Computing message difference between two firebase time periods")
     message_difference_per_two_firebase_time_period = []
     for index in range(len(messages_per_two_firebase_time_period) - 1):
         next_index = index + 1
