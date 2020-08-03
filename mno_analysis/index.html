@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./img/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+    <title>MNO Analysis</title>
+</head>
+<body>
+    <nav class="navbar navbar-light bg-light">
+        <span class="navbar-text">MNO ANALYSIS</span>
+    </nav>
+    <div class="container">
+        <div class="d-flex">
+            <button class="btn btn-outline-success m-2" id="in">Incoming Messages</button>
+            <button class="btn btn-outline-success m-2" id="out">Outgoing Messages</button>
+        </div>
+        <div class="card shadow my-1" id="line-graph"></div>
+        <div class="card shadow my-1" id="bar-graph"><div id="tooltip"></div></div>
+    </div>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
