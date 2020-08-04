@@ -53,12 +53,10 @@ const tooltipWidth = 300;
 let data_path = `./data/incoming_messages/incoming_msg_diff_per_period.json`;
 // Update chart data
 d3.select("#in").on("click", () => {
-    messageDirection = "incoming";
     data_path = `./data/incoming_messages/incoming_msg_diff_per_period.json`;
     drawGraph(data_path)
 });
 d3.select("#out").on("click", () => {
-    messageDirection = "outgoing";
     data_path = `./data/outgoing_messages/outgoing_msg_diff_per_period.json`;
     drawGraph(data_path)
 });
