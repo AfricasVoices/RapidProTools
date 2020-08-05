@@ -104,7 +104,7 @@ if __name__ == "__main__":
             "PeriodStart": messages_per_two_firebase_time_period[index]["PeriodStart"],
             "PeriodBetween": messages_per_two_firebase_time_period[index]["PeriodBetween"],
             "PeriodEnd": messages_per_two_firebase_time_period[next_index]["PeriodEnd"],
-            "MessageDifference": messages_per_two_firebase_time_period[next_index]["NumberOfMessages"] - messages_per_two_firebase_time_period[index]["NumberOfMessages"]
+            "MessageDifference": str(abs(messages_per_two_firebase_time_period[next_index]["NumberOfMessages"] - messages_per_two_firebase_time_period[index]["NumberOfMessages"]))
         })
 
     log.info(f"writing message_difference_per_period json file...")
