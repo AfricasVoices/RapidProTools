@@ -1,0 +1,39 @@
+.tooltip {
+    position: absolute;
+    text-align: left;
+    font-family: "SuisseIntl";
+    font-size: 12px;
+    width: 80px;
+    height: 52px;
+    padding: 8px;
+    background: white;
+    pointer-events: none;
+    background-color: white;
+    line-height: 0.05em;
+    /* border: solid;
+        border-width: 1px; */
+}
+
+.overlay {
+    fill: none;
+    opacity: 0.2;
+}
+
+rect:hover{
+    fill: #0C9CDF;
+    transition: 0.5s all ease-in;
+}
+
+#tooltip {
+    position: absolute;
+    width: 215px;
+    padding: 10px;
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid #000;
+    pointer-events: none;
+    display: none;
+    font-family: sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+}
