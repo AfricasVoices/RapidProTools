@@ -102,7 +102,7 @@ if __name__ == "__main__":
             "Operator": operator,
             "MessageDirection": msg_direction,
             "PeriodStart": messages_per_two_firebase_time_period[index]["PeriodStart"],
-            "PeriodBetween": messages_per_two_firebase_time_period[index]["PeriodEnd"],
+            "PeriodBetween": messages_per_two_firebase_time_period[index]["PeriodBetween"],
             "PeriodEnd": messages_per_two_firebase_time_period[next_index]["PeriodEnd"],
             "MessageDifference": messages_per_two_firebase_time_period[next_index]["NumberOfMessages"] - messages_per_two_firebase_time_period[index]["NumberOfMessages"]
         })
