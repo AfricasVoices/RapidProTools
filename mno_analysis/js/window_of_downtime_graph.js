@@ -85,13 +85,20 @@ export class WindowOfDowntime {
                 .on("mouseover", function(d){
                     let xPoint = parseFloat(d3.select(this).attr('x')) + x.bandwidth() / 2;
                     let yPoint = parseFloat(d3.select(this).attr('y')) / 2 + height / 2;
+                    let seconds = parseInt(d.value, 10);
+                    let days = Math.floor(seconds / (3600*24));
+                    seconds -= days*3600*24;
+                    let hours = Math.floor(seconds / 3600);
+                    seconds -= hours*3600;
+                    let minutes = Math.floor(seconds / 60);
+                    seconds -= minutes*60;
                     d3.select("#tooltip")
                         .style("left", xPoint + "px")
                         .style("top", yPoint + "px")
                         .style("display", "block")
                         .text(`From: ${d3.timeFormat("%Y-%m-%d (%H:%M)")(d.date)}
                             To: ${d3.timeFormat("%Y-%m-%d (%H:%M)")(d.endDate)}
-                            Value: ${decimalFormatter(d.value / 86400)}`);
+                            Downtime: ${days}d ${hours}h ${minutes}m ${seconds}s`);
                 })
                 .on("mouseout", () => d3.select("#tooltip").style("display", "none"));
         }, err => {
