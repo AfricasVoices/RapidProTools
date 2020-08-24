@@ -24,7 +24,3 @@ d3.select("#out").on("click", () => {
 });
 
 updateGraphs(msgDowntimeDataPath, msgDifferenceDataPath);
-
-
-
-
