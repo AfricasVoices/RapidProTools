@@ -68,33 +68,42 @@ if __name__ == "__main__":
             msg_direction = msg.direction
             filtered_messages.append(msg)
     log.info(f"returning {len(filtered_messages)} messages")
+    filtered_messages_timestamps = [msg.sent_on for msg in filtered_messages]
 
     time_interval = timedelta(hours=time_frame.hour,
                               minutes=time_frame.minute, seconds=time_frame.second)
 
     date_time_bounds = date_time_range(start_date, end_date, time_interval)
 
+    timestamps_with_bounds = filtered_messages_timestamps + date_time_bounds
+    timestamps_with_bounds.sort()
+
     # Compute the number of messages between two firebase time bounds i.e `PreviousMessageTimestamp` and
     # `NextMessageTimestamp` to get number of mesages in each firebase period and relate 
     #  each quantity with the operator and the message direction.
+    log.info("Computing number of messages in firebase time periods")
     messages_per_two_firebase_time_period = []
     for index in range(len(date_time_bounds) - 1):
         next_index = index + 1
 
-        messages_this_period = 0
-        for msg in filtered_messages:
-            if date_time_bounds[index] <= msg.sent_on < date_time_bounds[next_index]:
-                messages_this_period += 1
+        period_start = date_time_bounds[index]
+        period_end = date_time_bounds[next_index]
+
+        start_index = timestamps_with_bounds.index(period_start) + 1
+        end_index = timestamps_with_bounds.index(period_end)
+        messages_this_period = len(timestamps_with_bounds[start_index:end_index])
+        timestamps_with_bounds = timestamps_with_bounds[end_index:]
 
         messages_per_two_firebase_time_period.append({
             "Operator": operator,
             "MessageDirection": msg_direction,
-            "PeriodStart": date_time_bounds[index].isoformat(),
-            "PeriodEnd": date_time_bounds[next_index].isoformat(),
+            "PeriodStart": period_start.isoformat(),
+            "PeriodEnd": period_end.isoformat(),
             "NumberOfMessages": messages_this_period
         })
 
     # Compute message difference between two firebase time periods
+    log.info("Computing message difference between two firebase time periods")
     message_difference_per_two_firebase_time_period = []
     for index in range(len(messages_per_two_firebase_time_period) - 1):
         next_index = index + 1
