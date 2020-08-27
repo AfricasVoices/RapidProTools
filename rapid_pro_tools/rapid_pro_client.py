@@ -4,12 +4,13 @@ import json
 import random
 import time
 import urllib
+import warnings
 from io import BytesIO
 
 from core_data_modules.cleaners import PhoneCleaner
 from core_data_modules.logging import Logger
 from core_data_modules.traced_data import TracedData, Metadata
-from core_data_modules.util import TimeUtils
+from core_data_modules.util import TimeUtils, IOUtils
 from dateutil.relativedelta import relativedelta
 from temba_client.exceptions import TembaRateExceededError
 from temba_client.v2 import TembaClient, Broadcast, Run, Message
@@ -365,15 +366,15 @@ class RapidProClient(object):
             interrupted += len(batch)
             log.info(f"Interrupted {interrupted} / {len(urns)} URNs")
 
-    def _get_archived_runs_for_flow_id(self, flow_id, last_modified_after_inclusive=None,
-                                       last_modified_before_exclusive=None):
+    def _get_archived_runs(self, flow_id=None, last_modified_after_inclusive=None,
+                           last_modified_before_exclusive=None):
         """
         Gets the raw runs for the given flow_id from Rapid Pro's archives.
         
         Uses the last_modified dates to determine which archives to download.
 
-        :param flow_id: Id of the flow to download the runs of.
-        :type flow_id: str
+        :param flow_id: Id of the flow to download the runs of. If None, downloads runs from all flows.
+        :type flow_id: str | None
         :param last_modified_after_inclusive: Start of the date-range to download runs from.
                                               If set, only downloads runs last modified since that date,
                                               otherwise downloads from the beginning of time.
@@ -402,7 +403,7 @@ class RapidProClient(object):
 
             for run in self.get_archive(archive_metadata):
                 # Skip runs from flows other than the flow of interest
-                if run.flow.uuid != flow_id:
+                if flow_id is not None and run.flow.uuid != flow_id:
                     continue
 
                 # Skip runs from a datetime that is outside the date range of interest
@@ -414,13 +415,13 @@ class RapidProClient(object):
 
         return runs
 
-    def get_raw_runs_for_flow_id(self, flow_id, last_modified_after_inclusive=None, last_modified_before_exclusive=None,
-                                 raw_export_log_file=None, ignore_archives=False):
+    def get_raw_runs(self, flow_id=None, last_modified_after_inclusive=None, last_modified_before_exclusive=None,
+                     raw_export_log_file=None, ignore_archives=False):
         """
         Gets the raw runs for the given flow_id from Rapid Pro's production database and, if needed, from its archives.
 
-        :param flow_id: Id of the flow to download the runs of.
-        :type flow_id: str
+        :param flow_id: Id of the flow to download the runs of. If None, returns runs from all flows.
+        :type flow_id: str | None
         :param last_modified_after_inclusive: Start of the date-range to download runs from.
                                               If set, only downloads runs last modified since that date,
                                               otherwise downloads from the beginning of time.
@@ -436,10 +437,11 @@ class RapidProClient(object):
         :return: Raw runs downloaded from Rapid Pro.
         :rtype: list of temba_client.v2.types.Run
         """
+        flow_id_log = "from all flows" if flow_id is None else f"from flow with id {flow_id}"
         all_time_log = "" if last_modified_after_inclusive is not None or last_modified_before_exclusive is not None else ", from all of time"
         after_log = "" if last_modified_after_inclusive is None else f", modified after {last_modified_after_inclusive.isoformat()} inclusive"
         before_log = "" if last_modified_before_exclusive is None else f", modified before {last_modified_before_exclusive.isoformat()} exclusive"
-        log.info(f"Fetching raw runs for flow with id '{flow_id}'{all_time_log}{after_log}{before_log}...")
+        log.info(f"Fetching raw runs {flow_id_log}{all_time_log}{after_log}{before_log}...")
 
         last_modified_before_inclusive = None
         if last_modified_before_exclusive is not None:
@@ -449,8 +451,8 @@ class RapidProClient(object):
             log.debug(f"Ignoring runs in archives (because `ignore_archives` argument was set to True)")
             archived_runs = []
         else:
-            archived_runs = self._get_archived_runs_for_flow_id(
-                flow_id, last_modified_after_inclusive=last_modified_after_inclusive,
+            archived_runs = self._get_archived_runs(
+                flow_id=flow_id, last_modified_after_inclusive=last_modified_after_inclusive,
                 last_modified_before_exclusive=last_modified_before_exclusive
             )
 
@@ -486,6 +488,13 @@ class RapidProClient(object):
         raw_runs.sort(key=lambda run: run.modified_on)
 
         return raw_runs
+
+    def get_raw_runs_with_flow_id(self, flow_id, last_modified_after_inclusive=None, last_modified_before_exclusive=None,
+                                  raw_export_log_file=None, ignore_archives=False):
+        warnings.warn("RapidProClient.get_raw_runs_with_flow_id is deprecated; use get_raw_runs instead",
+                      DeprecationWarning)
+        return self.get_raw_runs(flow_id, last_modified_after_inclusive, last_modified_before_exclusive,
+                                 raw_export_log_file, ignore_archives)
 
     def get_raw_contacts(self, last_modified_after_inclusive=None, last_modified_before_exclusive=None,
                          raw_export_log_file=None):
@@ -696,6 +705,93 @@ class RapidProClient(object):
                     time.sleep(server_wait_time + backoff_wait_time)
                 else:
                     raise ex
+
+    def export_all_data(self, export_dir_path):
+        """
+        Exports all the data available from Rapid Pro's API, including archives, to the specified directory.
+
+        Caveats:
+         - This doesn't export data which is marked in Rapid Pro as archived, e.g. archived flows or triggers. There's
+           no way of getting archived data out of Rapid Pro without first manually un-archiving it. Note that this
+           applies only to data marked as archived in the UI, and is different to to Rapid Pro's automated archiving
+           of older runs and messages, which *are* included in the export.
+         - This doesn't export data at the templates, ticketers, or workspace endpoints because these aren't supported
+           by the Rapid Pro python client library. These features are new and unused by AVF.
+         - There's no underlying 'export all data' API provided by Rapid Pro, so this only exports data from endpoints
+           which were known about last time this function was updated.
+
+        :param export_dir_path: Directory to export the data to.
+        :type export_dir_path: str
+        """
+        IOUtils.ensure_dirs_exist(export_dir_path)
+
+        # Export the straightforward cases
+        endpoints = {
+            "boundaries": self.rapid_pro.get_boundaries,
+            "broadcasts": self.rapid_pro.get_broadcasts,
+            "campaigns": self.rapid_pro.get_campaigns,
+            "campaign_events": self.rapid_pro.get_campaign_events,
+            "channels": self.rapid_pro.get_channels,
+            "channel_events": self.rapid_pro.get_channel_events,
+            "classifiers": self.rapid_pro.get_classifiers,
+            "contacts": self.rapid_pro.get_contacts,
+            "fields": self.rapid_pro.get_fields,
+            "flows": self.rapid_pro.get_flows,
+            "flow_starts": self.rapid_pro.get_flow_starts,
+            "globals": self.rapid_pro.get_globals,
+            "groups": self.rapid_pro.get_groups,
+            "labels": self.rapid_pro.get_labels,
+            "resthooks": self.rapid_pro.get_resthooks,
+            "resthook_events": self.rapid_pro.get_resthook_events,
+            "resthook_subscribers": self.rapid_pro.get_resthook_subscribers,
+        }
+        for endpoint, export_func in endpoints.items():
+            export_file_path = f"{export_dir_path}/{endpoint}.jsonl"
+            log.info(f"Exporting {endpoint} to '{export_file_path}'...")
+
+            with open(export_file_path, "w") as f:
+                items_exported = 0
+                for batch in export_func().iterfetches(retry_on_rate_exceed=True):
+                    for item in batch:
+                        items_exported += 1
+                        f.write(json.dumps(item.serialize()))
+                log.info(f"Done. Exported {items_exported} {endpoint}")
+
+        # Now handle the special cases...
+
+        # Export endpoints which have archives, using the relevant RapidProClient 'get' functions because these handle
+        # fetching from archives transparently.
+        endpoints_with_archives = {
+            "messages": self.get_raw_messages,
+            "runs": self.get_raw_runs
+        }
+        for endpoint, export_func in endpoints_with_archives.items():
+            export_file_path = f"{export_dir_path}/{endpoint}.jsonl"
+            with open(export_file_path, "w") as f:
+                log.info(f"Exporting {endpoint}, including those in archives, to {export_file_path}...")
+                items_exported = 0
+                for item in export_func():
+                    f.write(json.dumps(item.serialize()))
+                    items_exported += 1
+                log.info(f"Done. Exported {items_exported} {endpoint}")
+
+        # Export the org data, which needs special treatment because it's not a list.
+        export_file_path = f"{export_dir_path}/org.json"
+        log.info(f"Exporting org to '{export_file_path}'...")
+        org = self.rapid_pro.get_org(retry_on_rate_exceed=True)
+        with open(export_file_path, "w") as f:
+            f.write(json.dumps(org.serialize()))
+        log.info(f"Done. Exported org")
+
+        # Export the definitions data, which needs special treatment because this endpoint returns no data by default
+        # (unlike all the other endpoints which return everything by default).
+        export_file_path = f"{export_dir_path}/definitions.json"
+        log.info(f"Exporting definitions to '{export_file_path}'")
+        all_flow_ids = self.get_all_flow_ids()
+        definitions = self.get_flow_definitions_for_flow_ids(all_flow_ids)
+        with open(export_file_path, "w") as f:
+            f.write(json.dumps(definitions.serialize()))
+        log.info(f"Done. Exported definitions")
 
     @staticmethod
     def convert_runs_to_traced_data(user, raw_runs, raw_contacts, phone_uuids, test_contacts=None):
