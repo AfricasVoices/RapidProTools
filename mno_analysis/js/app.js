@@ -11,6 +11,8 @@ class Controller {
         WindowOfDowntime.drawGraph(Controller.msgDowntimeDataPath, windowOfDowntimeThreshold);
         MessageDifference.drawGraph(Controller.msgDifferenceDataPath);
     }
+}
+Controller.updateGraphs();
 
 // Update chart data
 d3.select("#in").on("click", () => {
@@ -27,5 +29,3 @@ d3.select("#downtimeThreshold").on("input", function() {
     // WindowOfDowntime.drawGraph(msgDowntimeDataPath, this.value);
     Controller.updateGraphs(this.value);
 });
-
-updateGraphs(msgDowntimeDataPath, msgDifferenceDataPath);
