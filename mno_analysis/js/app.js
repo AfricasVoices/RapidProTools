@@ -14,14 +14,18 @@ class Controller {
 
 // Update chart data
 d3.select("#in").on("click", () => {
-    msgDowntimeDataPath = "./data/incoming_messages/incoming_msg_downtime.json";
-    msgDifferenceDataPath= `./data/incoming_messages/incoming_msg_diff_per_period.json`;
-    updateGraphs(msgDowntimeDataPath, msgDifferenceDataPath);
+    Controller.msgDowntimeDataPath = "./data/incoming_messages/incoming_msg_downtime.json";
+    Controller.msgDifferenceDataPath = `./data/incoming_messages/incoming_msg_diff_per_period.json`;
+    Controller.updateGraphs();
 });
 d3.select("#out").on("click", () => {
-    msgDowntimeDataPath = "./data/outgoing_messages/outgoing_msg_downtime.json";
-    msgDifferenceDataPath= `./data/outgoing_messages/outgoing_msg_diff_per_period.json`;
-    updateGraphs(msgDowntimeDataPath, msgDifferenceDataPath);
+    Controller.msgDowntimeDataPath = "./data/outgoing_messages/outgoing_msg_downtime.json";
+    Controller.msgDifferenceDataPath = `./data/outgoing_messages/outgoing_msg_diff_per_period.json`;
+    Controller.updateGraphs();
+});
+d3.select("#downtimeThreshold").on("input", function() {
+    // WindowOfDowntime.drawGraph(msgDowntimeDataPath, this.value);
+    Controller.updateGraphs(this.value);
 });
 
 updateGraphs(msgDowntimeDataPath, msgDifferenceDataPath);
