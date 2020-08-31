@@ -18,7 +18,13 @@
             <button class="btn btn-outline-success m-2" id="out">Outgoing Messages</button>
         </div>
         <div class="card shadow my-1" id="line-graph"></div>
-        <div class="card shadow my-1" id="bar-graph"><div id="tooltip"></div></div>
+        <section>
+            <div class="d-md-flex justify-content-start my-2">
+                <span class="font-weight-bold" type="text">Set the threshold into maximum period of downtime (days)</span> 
+                <div class="col-md-2"><input class="form-control form-control-sm shadow-none" type="number" id="downtimeThreshold" step="1" min="1"></div>
+            </div>
+            <div class="card shadow my-1" id="bar-graph"><div id="tooltip"></div></div>
+        </section> 
     </div>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="./js/app.js" type="module"></script>
