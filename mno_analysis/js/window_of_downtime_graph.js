@@ -1,5 +1,5 @@
 export class WindowOfDowntime {
-    static drawGraph(data_path) {
+    static drawGraph(data_path, threshold) {
         let margin = { top: 40, right: 100, bottom: 105, left: 70 },
             width = 960 - margin.left - margin.right,
             height = 500 - margin.top - margin.bottom;
@@ -43,7 +43,7 @@ export class WindowOfDowntime {
             .text("Periods with the maximum window of time with 0 messages.");
 
         d3.json(data_path).then(window_of_downtime => {
-            let data = window_of_downtime.filter(d => +d.DownTimeDurationSeconds > 86400);
+            let data = window_of_downtime.filter(d => +d.DownTimeDurationSeconds > (threshold * 86400));
             data.forEach(d => {
                 d.date = new Date(d.PreviousMessageTimestamp);
                 d.endDate = new Date(d.NextMessageTimestamp)
