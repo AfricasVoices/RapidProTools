@@ -791,7 +791,8 @@ class RapidProClient(object):
         definitions = self.get_flow_definitions_for_flow_ids(all_flow_ids)
         with open(export_file_path, "w") as f:
             f.write(json.dumps(definitions.serialize()))
-        log.info(f"Done. Exported definitions")
+        log.info(f"Done. Exported definitions for {len(definitions.flows)} flows, {len(definitions.campaigns)} "
+                 f"campaigns, and {len(definitions.triggers)} triggers")
 
     @staticmethod
     def convert_runs_to_traced_data(user, raw_runs, raw_contacts, phone_uuids, test_contacts=None):
