@@ -53,6 +53,7 @@ if __name__ == "__main__":
         if operator == target_operator and msg.direction == target_message_direction:
             msg_sent_on_timestamps.append(msg.sent_on)
     msg_sent_on_timestamps.append(end_date)
+    msg_sent_on_timestamps.sort()
 
     computed_windows_of_downtime = []
     # Compute the time difference between two consecutive messages i.e `PreviousMessageTimestamp` and
