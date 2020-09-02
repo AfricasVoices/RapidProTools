@@ -713,7 +713,7 @@ class RapidProClient(object):
         Caveats:
          - This doesn't export data which is marked in Rapid Pro as archived, e.g. archived flows or triggers. There's
            no way of getting archived data out of Rapid Pro without first manually un-archiving it. Note that this
-           applies only to data marked as archived in the UI, and is different to to Rapid Pro's automated archiving
+           applies only to data marked as archived in the UI, and is different to Rapid Pro's automated archiving
            of older runs and messages, which *are* included in the export.
          - This doesn't export data at the templates, ticketers, or workspace endpoints because these aren't supported
            by the Rapid Pro python client library. These features are new and unused by AVF.
