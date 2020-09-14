@@ -25,6 +25,7 @@ d3.select("#out").on("click", () => {
     Controller.msgDifferenceDataPath = `./data/outgoing_messages/outgoing_msg_diff_per_period.json`;
     Controller.updateGraphs();
 });
+d3.select("#downtimeThreshold").property("value", 1);
 d3.select("#downtimeThreshold").on("input", function() {
     Controller.updateGraphs(this.value);
 });
