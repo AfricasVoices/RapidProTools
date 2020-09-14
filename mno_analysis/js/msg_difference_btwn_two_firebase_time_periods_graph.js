@@ -40,7 +40,7 @@ export class MessageDifference {
                 "translate(" + width / 2 + " ," + (height + margin.top + 50) + ")"
             )
             .style("text-anchor", "middle")
-            .text("Date (Y-M-D) when two firebase time periods end");
+            .text("Date (Y-M-D) when two firebase time periods ended");
 
         // Y axis Label
         msgDifferenceGraph
