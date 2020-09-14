@@ -20,7 +20,7 @@ export class WindowOfDowntime {
                 "translate(" + width / 2 + " ," + (height + margin.top + 50) + ")"
             )
             .style("text-anchor", "middle")
-            .text("Date (Y-M-D)");
+            .text("Date (Y-M-D) when downtime started");
 
         // Y axis Label
         windowOfDowntimeGraph
