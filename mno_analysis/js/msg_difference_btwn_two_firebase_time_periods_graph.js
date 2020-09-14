@@ -23,6 +23,15 @@ export class MessageDifference {
             .style("text-decoration", "bold")
             .text("Message Difference between Two Firebase Time Periods (rN = d(n)/d(t))");
 
+        msgDifferenceGraph
+            .append("text")
+            .attr("x", width / 2)
+            .attr("y", (0 - margin.top / 2) + 20)
+            .attr("text-anchor", "middle")
+            .style("font-size", "20px")
+            .style("text-decoration", "bold")
+            .text("(The time period for firebase is 10 min)");
+
         // X axis Label 
         msgDifferenceGraph
             .append("text")
