@@ -1,7 +1,7 @@
 
 export class MessageDifference {
     static drawGraph(data_path) {
-        let margin = { top: 40, right: 100, bottom: 105, left: 70 },
+        let margin = { top: 60, right: 100, bottom: 120, left: 70 },
             width = 960 - margin.left - margin.right,
             height = 500 - margin.top - margin.bottom;
 
