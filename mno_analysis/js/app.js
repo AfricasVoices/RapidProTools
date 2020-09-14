@@ -26,6 +26,5 @@ d3.select("#out").on("click", () => {
     Controller.updateGraphs();
 });
 d3.select("#downtimeThreshold").on("input", function() {
-    // WindowOfDowntime.drawGraph(msgDowntimeDataPath, this.value);
     Controller.updateGraphs(this.value);
 });
