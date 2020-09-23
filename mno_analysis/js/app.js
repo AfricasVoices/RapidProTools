@@ -3,7 +3,7 @@ import { WindowOfDowntime } from "./window_of_downtime_graph.js";
 
 // GLOBAL APP CONTROLLER
 class Controller {
-    static updateGraphs(windowOfDowntimeThreshold = 1) {
+    static updateGraphs(windowOfDowntimeThreshold = 86399) {
         if (!Controller.msgDowntimeDataPath) Controller.msgDowntimeDataPath = "./data/incoming_messages/incoming_msg_downtime.json";
         if (!Controller.msgDifferenceDataPath) Controller.msgDifferenceDataPath = "./data/incoming_messages/incoming_msg_diff_per_period.json";
         // Clear previous graphs before redrawing
