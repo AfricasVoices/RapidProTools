@@ -76,7 +76,7 @@ export class WindowOfDowntime {
                 .range([ height, 0]);
             let decimalFormatter = d3.format(".2s");
             windowOfDowntimeGraph.append("g").call(
-                d3.axisLeft(y).ticks(5).tickFormat(d => decimalFormatter(d / 86400)));
+                d3.axisLeft(y).ticks(10).tickFormat(d => decimalFormatter(d / 86400)));
 
             // Bars
             windowOfDowntimeGraph.selectAll("mybar")
