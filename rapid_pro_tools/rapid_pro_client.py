@@ -30,6 +30,13 @@ class RapidProClient(object):
         :type token: str
         """
         self.rapid_pro = TembaClient(server, token)
+
+    def instance_name(self):
+        """
+        :return: The name of this instance.
+        :rtype: str
+        """
+        return self.rapid_pro.get_org(retry_on_rate_exceed=True).name
         
     def list_archives(self, archive_type=None):
         """
