@@ -93,6 +93,57 @@ export class MessageDifference {
             // Create the area variable: where both the area and the brush take place
             let line = msgDifferenceGraph.append("g").attr("clip-path", "url(#clip)");
             let lineGenerator = d3.line().x(d => x(d.date)).y((d) => y(d.value));
+
+            // Add brushing
+            let brush = d3.brushX()  // Add the brush feature using the d3.brush function                 
+                .extent( [ [0,0], [width,height] ] )  // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+                .on("end", updateChart) // Each time the brush selection changes, trigger the 'updateChart' function
+
+            // Add the brushing
+            line.append("g")
+                .attr("class", "brush")
+                .call(brush);
+
+            // A function that set idleTimeOut to null
+            let idleTimeout
+            function idled() { idleTimeout = null; }
+
+            // A function that update the chart for given boundaries
+            function updateChart() {
+
+                // What are the selected boundaries?
+                let extent = d3.event.selection
+
+                // If no selection, back to initial coordinate. Otherwise, update X axis domain
+                if (!extent) {
+                    if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
+                    x.domain([ 4,8])
+                } else {
+                    x.domain([ x.invert(extent[0]), x.invert(extent[1]) ])
+                    line.select(".brush").call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
+                }
+
+                // Update axis and line position
+                xAxis.transition().duration(1000).call(d3.axisBottom(x).tickFormat(formatDate))
+                xAxis
+                    .selectAll("text")
+                    .attr("transform", "translate(-10,0)rotate(-45)")
+                    .style("text-anchor", "end");
+                line
+                    .select('.line-graph')
+                    .transition()
+                    .duration(1000)
+                    .attr("d", lineGenerator)
+
+                // If user double click, reinitialize the chart
+                msgDifferenceGraph.on("dblclick", function() {
+                    x.domain(d3.extent(data, d => d.date))
+                    xAxis.transition().call(d3.axisBottom(x))
+                    line.select('.line-graph')
+                        .transition()
+                        .attr("d", lineGenerator)
+                });
+            }
         
             // Create focus object for tooltip and circle
             function drawFocus() {
@@ -124,10 +175,7 @@ export class MessageDifference {
                     .attr("class", "tooltip")
                     .style("opacity", 1);
         
-                // Create an overlay rectangle to draw the above objects on top of
-                msgDifferenceGraph.append("rect")
-                    .attr("class", "overlay")
-                    .attr("width", width)
+                line.attr("width", width)
                     .attr("height", height)
                     .on("mouseover", () => focus.style("display", null))
                     .on("mouseout", () => focus.style("display", "none"))
@@ -190,6 +238,7 @@ export class MessageDifference {
         
             line.append("path")
                 .datum(data)
+                .attr("class", "line-graph")
                 .attr("fill", "none")
                 .attr("stroke", "blue")
                 .attr("stroke-width", 2)
