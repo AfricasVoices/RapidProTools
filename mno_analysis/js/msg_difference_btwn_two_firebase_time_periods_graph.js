@@ -160,7 +160,7 @@ export class MessageDifference {
                     .attr("x", -15)
                     .attr("dy", "-17px")
                     .attr("font-size", "12px")
-                    .style("fill", "black");
+                    .style("fill", "blue");
         
                 focus.append("div")
                     .attr("x", 10)
