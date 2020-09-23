@@ -134,7 +134,7 @@ export class MessageDifference {
                     .transition()
                     .duration(1000)
                     .attr("d", lineGenerator)
-                    
+
             }
         
             // Create focus object for tooltip and circle
@@ -150,14 +150,15 @@ export class MessageDifference {
                 focus.append("rect")
                     .attr("x", -30)
                     .attr("y", "-2em")
-                    .attr("width", 70)
+                    .attr("width", 200)
                     .attr("height", 20)
-                    .style("fill", "white");
+                    .style("fill", "whitesmoke")
+                    .style("opacity", 0);
         
                 // Add text annotation for tooltip
                 focus.append("text")
-                    .attr("x", -30)
-                    .attr("dy", "-1em")
+                    .attr("x", -15)
+                    .attr("dy", "-17px")
                     .attr("font-size", "12px")
                     .style("fill", "black");
         
@@ -223,7 +224,10 @@ export class MessageDifference {
                         .style("opacity", 1);
         
                     // Show the circle on the path
-                    focus.selectAll(".focus circle").style("opacity", 1);
+                    d3.selectAll(".focus circle").style("opacity", 1);
+
+                    // Show the rect on the path
+                    d3.selectAll(".focus rect").style("opacity", 1);
                 }
             }
             drawFocus();
