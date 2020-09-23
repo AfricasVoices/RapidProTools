@@ -43,7 +43,7 @@ export class WindowOfDowntime {
             .text("Periods with the maximum window of time with 0 messages.");
 
         d3.json(data_path).then(window_of_downtime => {
-            let data = window_of_downtime.filter(d => +d.DownTimeDurationSeconds > (threshold * 86400));
+            let data = window_of_downtime.filter(d => +d.DownTimeDurationSeconds > threshold);
             data.forEach(d => {
                 d.date = new Date(d.PreviousMessageTimestamp);
                 d.endDate = new Date(d.NextMessageTimestamp)
