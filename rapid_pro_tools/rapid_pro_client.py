@@ -31,7 +31,7 @@ class RapidProClient(object):
         """
         self.rapid_pro = TembaClient(server, token)
 
-    def instance_name(self):
+    def get_instance_name(self):
         """
         :return: The name of this instance.
         :rtype: str
