@@ -25,7 +25,13 @@ d3.select("#out").on("click", () => {
     Controller.msgDifferenceDataPath = `./data/outgoing_messages/outgoing_msg_diff_per_period.json`;
     Controller.updateGraphs();
 });
-d3.select("#downtimeThreshold").property("value", 1);
+d3.select("#downtimeThreshold").property("value", "23:59:59");
 d3.select("#downtimeThreshold").on("input", function() {
-    Controller.updateGraphs(this.value);
+    let hrsMinSec = this.value;
+    let listWithHrsMinSec = hrsMinSec.split(":");
+    let hoursToSeconds = (+listWithHrsMinSec[0]) * 3600,
+        minutesToSeconds = (+listWithHrsMinSec[1]) * 60,
+        seconds = (+listWithHrsMinSec[2]);
+    let totalSeconds = (hoursToSeconds + minutesToSeconds + seconds);
+    Controller.updateGraphs(totalSeconds);
 });
