@@ -57,10 +57,11 @@ export class WindowOfDowntime {
                 .range([ 0, width ])
                 .domain(data.map(d => d.date))
                 .padding(0.2);
-                
+
             let xAxis = d3.axisBottom(x)
                 .tickFormat(formatDate)
                 .tickValues(x.domain().filter((d,i) => !(i%10))) // control d3 scaleBand ticks
+                // tickValues uses the remainder operator to show only 1 in every 10 ticks
 
             windowOfDowntimeGraph.append("g")
                 .attr("transform", "translate(0," + height + ")")
