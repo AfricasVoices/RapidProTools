@@ -94,7 +94,6 @@ export class MessageDifference {
             let line = msgDifferenceGraph.append("g").attr("clip-path", "url(#clip)");
             let lineGenerator = d3.line().x(d => x(d.date)).y((d) => y(d.value));
 
-            // Add brushing
             let brush = d3.brushX()  // Add the brush feature using the d3.brush function                 
                 .extent( [ [0,0], [width,height] ] )  // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
                 .on("end", updateChart) // Each time the brush selection changes, trigger the 'updateChart' function
