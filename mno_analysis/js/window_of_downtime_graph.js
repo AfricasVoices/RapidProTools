@@ -57,9 +57,14 @@ export class WindowOfDowntime {
                 .range([ 0, width ])
                 .domain(data.map(d => d.date))
                 .padding(0.2);
+                
+            let xAxis = d3.axisBottom(x)
+                .tickFormat(formatDate)
+                .tickValues(x.domain().filter((d,i) => !(i%10))) // control d3 scaleBand ticks
+
             windowOfDowntimeGraph.append("g")
                 .attr("transform", "translate(0," + height + ")")
-                .call(d3.axisBottom(x).tickFormat(formatDate))
+                .call(xAxis)
                 .selectAll("text")
                 .attr("transform", "translate(-10,0)rotate(-45)")
                 .style("text-anchor", "end");
