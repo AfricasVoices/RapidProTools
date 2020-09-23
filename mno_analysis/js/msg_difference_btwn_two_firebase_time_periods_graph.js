@@ -64,10 +64,11 @@ export class MessageDifference {
             let x = d3.scaleTime()
                 .domain(d3.extent(data, d => d.date))
                 .range([0, width]);
-            msgDifferenceGraph
+            let xAxis = msgDifferenceGraph
                 .append("g")
                 .attr("transform", "translate(0," + height + ")")
                 .call(d3.axisBottom(x).tickFormat(formatDate))
+            xAxis
                 .selectAll("text")
                 .attr("transform", "translate(-10,0)rotate(-45)")
                 .style("text-anchor", "end");
