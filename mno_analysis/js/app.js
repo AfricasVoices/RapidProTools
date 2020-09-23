@@ -3,7 +3,7 @@ import { WindowOfDowntime } from "./window_of_downtime_graph.js";
 
 // GLOBAL APP CONTROLLER
 class Controller {
-    static updateGraphs(windowOfDowntimeThreshold = 86399) {
+    static updateGraphs(windowOfDowntimeThreshold = 43200) {
         if (!Controller.msgDowntimeDataPath) Controller.msgDowntimeDataPath = "./data/incoming_messages/incoming_msg_downtime.json";
         if (!Controller.msgDifferenceDataPath) Controller.msgDifferenceDataPath = "./data/incoming_messages/incoming_msg_diff_per_period.json";
         // Clear previous graphs before redrawing
@@ -25,7 +25,7 @@ d3.select("#out").on("click", () => {
     Controller.msgDifferenceDataPath = `./data/outgoing_messages/outgoing_msg_diff_per_period.json`;
     Controller.updateGraphs();
 });
-d3.select("#downtimeThreshold").property("value", "23:59:59");
+d3.select("#downtimeThreshold").property("value", "12:00:00");
 d3.select("#downtimeThreshold").on("input", function() {
     let hrsMinSec = this.value;
     let listWithHrsMinSec = hrsMinSec.split(":");
