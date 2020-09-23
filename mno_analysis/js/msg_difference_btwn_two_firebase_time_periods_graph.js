@@ -117,7 +117,7 @@ export class MessageDifference {
                 // If no selection, back to initial coordinate. Otherwise, update X axis domain
                 if (!extent) {
                     if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
-                    x.domain([ 4,8])
+                    x.domain(d3.extent(data, d => d.date))
                 } else {
                     x.domain([ x.invert(extent[0]), x.invert(extent[1]) ])
                     line.select(".brush").call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
@@ -134,15 +134,7 @@ export class MessageDifference {
                     .transition()
                     .duration(1000)
                     .attr("d", lineGenerator)
-
-                // If user double click, reinitialize the chart
-                msgDifferenceGraph.on("dblclick", function() {
-                    x.domain(d3.extent(data, d => d.date))
-                    xAxis.transition().call(d3.axisBottom(x))
-                    line.select('.line-graph')
-                        .transition()
-                        .attr("d", lineGenerator)
-                });
+                    
             }
         
             // Create focus object for tooltip and circle
@@ -243,7 +235,7 @@ export class MessageDifference {
                 .attr("stroke", "blue")
                 .attr("stroke-width", 2)
                 .attr("d", lineGenerator);
-                
+
         }, err => {
             console.log(err)
         });    
