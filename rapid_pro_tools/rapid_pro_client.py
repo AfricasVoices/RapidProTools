@@ -31,16 +31,16 @@ class RapidProClient(object):
         """
         self.rapid_pro = TembaClient(server, token)
 
-    def get_instance_name(self):
+    def get_workspace_name(self):
         """
-        :return: The name of this instance.
+        :return: The name of this workspace.
         :rtype: str
         """
         return self.rapid_pro.get_org(retry_on_rate_exceed=True).name
         
     def list_archives(self, archive_type=None):
         """
-        Lists all of the available archives on this instance.
+        Lists all of the available archives on this workspace.
 
         Returns a list of objects with archive metadata. Pass one of these metadata objects into
         `RapidProClient.get_archive` to download the archive itself. Note that the download links in the returned
@@ -50,7 +50,7 @@ class RapidProClient(object):
         :param archive_type: The type of archives to list (either 'message' or 'run') or None.
                              If None, lists both types of archive.
         :type archive_type: str | None
-        :return: List of available archives on this instance.
+        :return: List of available archives on this workspace.
         :rtype: list of temba_client.v2.types.Archive
         """
         assert archive_type in {"message", "run"}
@@ -134,9 +134,9 @@ class RapidProClient(object):
 
     def get_all_flow_ids(self):
         """
-        Gets all the flow ids currently available on the Rapid Pro instance.
+        Gets all the flow ids currently available on this Rapid Pro workspace.
         
-        :return: Ids of all flows on Rapid Pro instance.
+        :return: Ids of all flows on this Rapid Pro workspace.
         :rtype: list of str
         """
         return [f.uuid for f in self.rapid_pro.get_flows().all(retry_on_rate_exceed=True)]
@@ -231,7 +231,7 @@ class RapidProClient(object):
                 created_before_exclusive=created_before_exclusive
             )
 
-        log.info(f"Fetching messages from production Rapid Pro instance...")
+        log.info(f"Fetching messages from production Rapid Pro workspace...")
         production_messages = self.rapid_pro.get_messages(after=created_after_inclusive, before=created_before_inclusive)\
             .all(retry_on_rate_exceed=True)
 
@@ -463,7 +463,7 @@ class RapidProClient(object):
                 last_modified_before_exclusive=last_modified_before_exclusive
             )
 
-        log.info(f"Fetching runs from production Rapid Pro instance...")
+        log.info(f"Fetching runs from production Rapid Pro workspace...")
         production_runs = self.rapid_pro.get_runs(
             flow=flow_id, after=last_modified_after_inclusive, before=last_modified_before_inclusive
         ).all(retry_on_rate_exceed=True)
