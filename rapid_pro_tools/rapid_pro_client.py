@@ -498,8 +498,7 @@ class RapidProClient(object):
 
     def get_raw_runs_for_flow_id(self, flow_id, last_modified_after_inclusive=None, last_modified_before_exclusive=None,
                                   raw_export_log_file=None, ignore_archives=False):
-        warnings.warn("RapidProClient.get_raw_runs_for_flow_id is deprecated; use get_raw_runs instead",
-                      DeprecationWarning)
+        warnings.warn("RapidProClient.get_raw_runs_for_flow_id is deprecated; use get_raw_runs instead")
         return self.get_raw_runs(flow_id, last_modified_after_inclusive, last_modified_before_exclusive,
                                  raw_export_log_file, ignore_archives)
 
