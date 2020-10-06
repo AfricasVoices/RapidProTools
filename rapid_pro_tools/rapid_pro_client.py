@@ -717,7 +717,8 @@ class RapidProClient(object):
                 if retries >= cls.MAX_RETRIES:
                     raise ex
 
-                if not ex.caused_by.startswith("504 Server Error"):
+                print(ex.caused_by)
+                if not ex.caused_by.response.status_code == 504:
                     log.error(ex.caused_by)
                     raise ex
 
