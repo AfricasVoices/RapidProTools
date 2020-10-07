@@ -669,17 +669,49 @@ class RapidProClient(object):
         log.info(f"Downloaded {len(fields)} fields")
         return fields
 
-    def create_field(self, label):
+    def create_field(self, label, field_id=None):
         """
         Creates a contact field with the given label.
 
         :param label: The name of the contact field to create.
         :type label: str
+        :param field_id: The id to request Rapid Pro to use for the new contact field. This must be in a format
+                         which Rapid Pro will accept, otherwise the created id may differ and this function will
+                         fail.
+        :type field_id: str
         :return: The contact field that was just created.
         :rtype: temba_client.v2.types.Field
         """
-        log.info(f"Creating field '{label}'...")
-        return self._retry_on_rate_exceed(lambda: self.rapid_pro.create_field(label, "text"))
+        if field_id is None:
+            log.info(f"Creating field with label '{label}'...")
+            rapid_pro_field = self._retry_on_rate_exceed(lambda: self.rapid_pro.create_field(label, "text"))
+            log.info(f"Created field with id '{rapid_pro_field.key}'")
+            return rapid_pro_field
+        else:
+            # Rapid Pro allows fields to be overwritten if they already exist.
+            # Check if the requested field id exists, and fail if it does.
+            fields = self.rapid_pro.get_fields(key=field_id).all(retry_on_rate_exceed=True)
+            assert len(fields) == 0, f"Field with id '{field_id}' already exists in workspace"
+
+            # Create a field with the requested id. Rapid Pro doesn't allow us to specify the field id, but they're
+            # predictably generated from the label, so create a new field by setting the label to the field id
+            # we want. Rapid Pro uses underscores in its field ids but doesn't accept them in label names, so replace
+            # underscores with spaces first.
+            initial_label = field_id.replace("_", " ").lower()
+            log.info(f"Creating field with label '{initial_label}', to ensure the field id is '{field_id}'...")
+            rapid_pro_field = self._retry_on_rate_exceed(lambda: self.rapid_pro.create_field(initial_label, "text"))
+            log.info(f"Created field with id '{rapid_pro_field.key}'")
+            assert rapid_pro_field.key == field_id, \
+                f"The field id created by Rapid Pro, '{rapid_pro_field.key}', differs from the requested id " \
+                f"'{field_id}'. Please clean up the problematic field in Rapid Pro, and try again making sure " \
+                f"you request a valid id."
+
+            # Having created a field with the desired id, update its label to the one requested.
+            log.info(f"Updating field with id '{rapid_pro_field.key}' to have label '{label}'...")
+            rapid_pro_field = self._retry_on_rate_exceed(lambda: self.rapid_pro.update_field(rapid_pro_field, label, "text"))
+            log.info(f"Done. Created field with label '{rapid_pro_field.label}' and id '{rapid_pro_field.key}'")
+
+            return rapid_pro_field
 
     @classmethod
     def _retry_on_rate_exceed(cls, request):
