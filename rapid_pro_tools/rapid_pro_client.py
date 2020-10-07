@@ -720,7 +720,9 @@ class RapidProClient(object):
                 if not ex.caused_by.response.status_code == 504:
                     raise ex
 
-                log.debug(f"TembaHttpError: '{ex.caused_by}'. Retrying...")
+                # Don't log the details in the error message, because the detail string contains a URL which may
+                # include a phone number
+                log.debug(f"TembaHttpError, retrying...")
 
     def export_all_data(self, export_dir_path):
         """
