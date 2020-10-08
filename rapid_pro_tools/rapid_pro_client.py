@@ -12,7 +12,7 @@ from core_data_modules.logging import Logger
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils, IOUtils
 from dateutil.relativedelta import relativedelta
-from temba_client.exceptions import TembaRateExceededError
+from temba_client.exceptions import TembaRateExceededError, TembaHttpError
 from temba_client.v2 import TembaClient, Broadcast, Run, Message
 
 log = Logger(__name__)
@@ -702,15 +702,27 @@ class RapidProClient(object):
             except TembaRateExceededError as ex:
                 retries += 1
 
-                if retries < cls.MAX_RETRIES and ex.retry_after:
-                    server_wait_time = ex.retry_after
-                    backoff_wait_time = random.uniform(0, 2 ** (min(retries, cls.MAX_BACKOFF_POWER)))
-                    
-                    log.debug(f"Rate exceeded. Sleeping for {server_wait_time + backoff_wait_time} seconds")
-
-                    time.sleep(server_wait_time + backoff_wait_time)
-                else:
+                if retries >= cls.MAX_RETRIES or not ex.retry_after:
                     raise ex
+
+                server_wait_time = ex.retry_after
+                backoff_wait_time = random.uniform(0, 2 ** (min(retries, cls.MAX_BACKOFF_POWER)))
+
+                log.debug(f"Rate exceeded. Sleeping for {server_wait_time + backoff_wait_time} seconds")
+
+                time.sleep(server_wait_time + backoff_wait_time)
+            except TembaHttpError as ex:
+                retries += 1
+
+                if retries >= cls.MAX_RETRIES:
+                    raise ex
+
+                if not ex.caused_by.response.status_code == 504:
+                    raise ex
+
+                # (Don't log the details in the error message, because the detail string contains a URL which may
+                # include a phone number)
+                log.debug(f"TembaHttpError 504, retrying...")
 
     def export_all_data(self, export_dir_path):
         """
