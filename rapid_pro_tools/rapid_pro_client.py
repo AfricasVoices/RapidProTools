@@ -897,6 +897,7 @@ class RapidProClient(object):
             contact_urns = contacts_lut[run.contact.uuid].urns
             run_dict = {
                 "avf_phone_id": phone_to_uuid_lut[PhoneCleaner.normalise_phone(contact_urns[0])],
+                "urn_type": contact_urns[0].split(":")[0],
                 f"run_id - {run.flow.name}": run.id
             }
 
