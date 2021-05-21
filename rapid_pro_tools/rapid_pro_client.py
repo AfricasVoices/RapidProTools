@@ -67,6 +67,10 @@ class RapidProClient(object):
         :return: Data downloaded from the archive.
         :rtype: list of temba_client.v2.Message | list of temba_client.v2.Run
         """
+        if archive_metadata.record_count == 0:
+            log.info(f"Skipping empty archive {archive_metadata.start_date} ({archive_metadata.download_url})...")
+            return []
+
         # Download the archive, which is in a gzipped JSONL format, and decompress.
         log.info(f"Downloading {archive_metadata.record_count} records from {archive_metadata.period} archive "
                  f"{archive_metadata.start_date} ({archive_metadata.download_url})...")
