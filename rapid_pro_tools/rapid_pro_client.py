@@ -37,6 +37,13 @@ class RapidProClient(object):
         :rtype: str
         """
         return self.rapid_pro.get_org(retry_on_rate_exceed=True).name
+
+    def get_workspace_uuid(self):
+        """
+        :return: The uuid of this workspace.
+        :rtype: str
+        """
+        return self.rapid_pro.get_org(retry_on_rate_exceed=True).uuid
         
     def list_archives(self, archive_type=None):
         """
