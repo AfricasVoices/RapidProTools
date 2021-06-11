@@ -593,11 +593,13 @@ class RapidProClient(object):
         :return: Updated list of Rapid Pro objects.
         :rtype: list of temba_client.serialization.TembaObject
         """
-        if prev_raw_data is not None:
+        if prev_raw_data is None:
+            prev_raw_data = []
+        else:
             prev_raw_data = list(prev_raw_data)
 
         last_modified_after_inclusive = None
-        if prev_raw_data is not None and len(prev_raw_data) > 0:
+        if len(prev_raw_data) > 0:
             prev_raw_data.sort(key=lambda contact: contact.modified_on)
             last_modified_after_inclusive = prev_raw_data[-1].modified_on + datetime.timedelta(microseconds=1)
 
