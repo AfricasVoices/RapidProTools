@@ -817,7 +817,7 @@ class RapidProClient(object):
                 for batch in export_func().iterfetches(retry_on_rate_exceed=True):
                     for item in batch:
                         items_exported += 1
-                        f.write(json.dumps(item.serialize()))
+                        f.write(json.dumps(item.serialize()) + "\n")
                 log.info(f"Done. Exported {items_exported} {endpoint}")
 
         # Now handle the special cases...
@@ -834,7 +834,7 @@ class RapidProClient(object):
                 log.info(f"Exporting {endpoint}, including those in archives, to {export_file_path}...")
                 items_exported = 0
                 for item in export_func():
-                    f.write(json.dumps(item.serialize()))
+                    f.write(json.dumps(item.serialize()) + "\n")
                     items_exported += 1
                 log.info(f"Done. Exported {items_exported} {endpoint}")
 
