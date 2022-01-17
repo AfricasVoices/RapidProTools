@@ -667,7 +667,7 @@ class RapidProClient(object):
             lambda run: run.id, prev_raw_data=prev_raw_runs, raw_export_log_file=raw_export_log_file
         )
 
-    def update_contact(self, urn, name=None, contact_fields=None):
+    def update_contact(self, urn, name=None, contact_fields=None, groups=None):
         """
         Updates a contact on the server.
 
@@ -678,8 +678,11 @@ class RapidProClient(object):
         :param contact_fields: Dictionary of field key to new field value | None. If None, no keys are updated.
                                Keys present on the server contact but not in this dictionary are left unchanged.
         :type contact_fields: (dict of str -> str) | None
+        :param groups: list of group objects or UUIDs
+        :type groups: list | None
         """
-        return self._retry_on_rate_exceed(lambda: self.rapid_pro.update_contact(urn, name=name, fields=contact_fields))
+        return self._retry_on_rate_exceed(lambda: self.rapid_pro.update_contact(urn, name=name,
+                                                                                fields=contact_fields, groups=groups))
 
     def get_fields(self):
         """
