@@ -282,6 +282,22 @@ class RapidProClient(object):
 
         return [group for group in self.rapid_pro.get_groups(uuid=uuid, name=name).all(retry_on_rate_exceed=True)]
 
+    def get_contacts(self, uuid=None, urn=None, group=None, deleted=None, before=None, after=None, reverse=None):
+        """
+        Gets all matching contacts
+        :param uuid: contact UUID
+        :param urn: contact URN
+        :param group: contact group name or UUID
+        :param deleted: return deleted contact only
+        :param reverse: whether to return contacts ordered in reverse (oldest first).
+        :param datetime before: modified before
+        :param datetime after: modified after
+        :return: contact query
+        """
+        return [contact for contact in self.rapid_pro.get_contacts(uuid=uuid, urn=urn, group=group, deleted=deleted,
+                                                               before=before, after=after, reverse=reverse).all(
+                                                                                            retry_on_rate_exceed=True)]
+
 
     def send_message_to_urn(self, message, target_urn, interrupt=False):
         """
