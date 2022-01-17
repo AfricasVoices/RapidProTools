@@ -272,6 +272,16 @@ class RapidProClient(object):
 
         return raw_messages
 
+    def get_groups(self, uuid=None, name=None):
+        """
+        Gets all matching contact groups
+        :param uuid: group UUID
+        :param name: group name
+        :return: group query
+        """
+
+        return self._retry_on_rate_exceed(lambda: self.rapid_pro.get_groups(uuid=None, name=name))
+
     def send_message_to_urn(self, message, target_urn, interrupt=False):
         """
         Sends a message to the given URN.
@@ -724,6 +734,25 @@ class RapidProClient(object):
             rapid_pro_field = self._retry_on_rate_exceed(lambda: self.rapid_pro.update_field(rapid_pro_field, label, "text"))
             log.info(f"Done. Created field with label '{rapid_pro_field.label}' and id '{rapid_pro_field.key}'")
 
+            return rapid_pro_field
+
+    def create_group(self, name, field_id=None):
+        """
+        Creates a contact group with the given label.
+
+        :param name: The name of the contact group to create.
+        :type name: str
+        :param field_id: The id to request Rapid Pro to use for the new contact field. This must be in a format
+                         which Rapid Pro will accept, otherwise the created id may differ and this function will
+                         fail.
+        :type field_id: str
+        :return: The contact field that was just created.
+        :rtype: temba_client.v2.types.Field
+        """
+        if field_id is None:
+            log.info(f"Creating group with label '{name}'...")
+            rapid_pro_field = self._retry_on_rate_exceed(lambda: self.rapid_pro.create_group(name, "text"))
+            log.info(f"Created field with id '{rapid_pro_field.key}'")
             return rapid_pro_field
 
     @classmethod
