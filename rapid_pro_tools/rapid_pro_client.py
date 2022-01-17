@@ -738,22 +738,12 @@ class RapidProClient(object):
 
     def create_group(self, name, field_id=None):
         """
-        Creates a contact group with the given label.
-
-        :param name: The name of the contact group to create.
-        :type name: str
-        :param field_id: The id to request Rapid Pro to use for the new contact field. This must be in a format
-                         which Rapid Pro will accept, otherwise the created id may differ and this function will
-                         fail.
-        :type field_id: str
-        :return: The contact field that was just created.
-        :rtype: temba_client.v2.types.Field
+        Creates a new contact group
+        :param str name: group name
+        :return: the new group
         """
-        if field_id is None:
-            log.info(f"Creating group with label '{name}'...")
-            rapid_pro_field = self._retry_on_rate_exceed(lambda: self.rapid_pro.create_group(name, "text"))
-            log.info(f"Created field with id '{rapid_pro_field.key}'")
-            return rapid_pro_field
+
+        return self._retry_on_rate_exceed(lambda: self.rapid_pro.create_group(self, name=name, field_id=field_id))
 
     @classmethod
     def _retry_on_rate_exceed(cls, request):
