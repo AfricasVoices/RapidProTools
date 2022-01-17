@@ -280,7 +280,8 @@ class RapidProClient(object):
         :return: group query
         """
 
-        return self._retry_on_rate_exceed(lambda: self.rapid_pro.get_groups(uuid=None, name=name))
+        return [group for group in self.rapid_pro.get_groups(uuid=uuid, name=name).all(retry_on_rate_exceed=True)]
+
 
     def send_message_to_urn(self, message, target_urn, interrupt=False):
         """
