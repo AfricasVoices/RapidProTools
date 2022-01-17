@@ -737,14 +737,14 @@ class RapidProClient(object):
 
             return rapid_pro_field
 
-    def create_group(self, name, field_id=None):
+    def create_group(self, name):
         """
         Creates a new contact group
         :param str name: group name
         :return: the new group
         """
 
-        return self._retry_on_rate_exceed(lambda: self.rapid_pro.create_group(self, name=name, field_id=field_id))
+        return self._retry_on_rate_exceed(lambda: self.rapid_pro.create_group(name=name))
 
     @classmethod
     def _retry_on_rate_exceed(cls, request):
