@@ -274,30 +274,42 @@ class RapidProClient(object):
 
     def get_groups(self, uuid=None, name=None):
         """
-        Gets all matching contact groups
+        Gets all matching contact groups from a rapid_pro workspace
+
         :param uuid: group UUID
+        :type uuid: str
         :param name: group name
+        :type group name: str
         :return: group query
+        :rtype: list of temba_client.v2.types.Group
         """
 
         return [group for group in self.rapid_pro.get_groups(uuid=uuid, name=name).all(retry_on_rate_exceed=True)]
 
     def get_contacts(self, uuid=None, urn=None, group=None, deleted=None, before=None, after=None, reverse=None):
         """
-        Gets all matching contacts
+        Gets all matching contacts from a rapid_pro workspace
+
         :param uuid: contact UUID
+        :type uuid: str
         :param urn: contact URN
+        :type urn: str
         :param group: contact group name or UUID
+        :type group: str
         :param deleted: return deleted contact only
+        :type deleted: bool
         :param reverse: whether to return contacts ordered in reverse (oldest first).
-        :param datetime before: modified before
-        :param datetime after: modified after
+        :type reverse: bool
+        :param before: modified before
+        :type before: datetime
+        :param  after: modified after
+        :type before: datetime
         :return: contact query
+        :rtype: list of temba_client.v2.types.Group
         """
         return [contact for contact in self.rapid_pro.get_contacts(uuid=uuid, urn=urn, group=group, deleted=deleted,
                                                                before=before, after=after, reverse=reverse).all(
                                                                                             retry_on_rate_exceed=True)]
-
 
     def send_message_to_urn(self, message, target_urn, interrupt=False):
         """
@@ -758,9 +770,12 @@ class RapidProClient(object):
 
     def create_group(self, name):
         """
-        Creates a new contact group
-        :param str name: group name
-        :return: the new group
+        Creates a new contact group in a rapid_pro workspace.
+
+        :param name: group name.
+        :type name: str.
+        :return: the new group.
+        :rtype: temba_client.v2.types.Group
         """
 
         return self._retry_on_rate_exceed(lambda: self.rapid_pro.create_group(name=name))
