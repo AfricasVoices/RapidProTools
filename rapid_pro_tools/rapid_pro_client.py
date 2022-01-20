@@ -276,35 +276,38 @@ class RapidProClient(object):
         """
         Gets all matching contact groups from a rapid_pro workspace
 
-        :param uuid: group UUID
-        :type uuid: str
-        :param name: group name
-        :type group name: str
-        :return: group query
+        :param uuid: group UUID to filter on. If None, returns all groups in the workspace.
+        :type uuid: str | None
+        :param name: group name to filter on. If None, returns all groups in the workspace.
+        :type group name: str | None
+        :return: List of groups matching the group query
         :rtype: list of temba_client.v2.types.Group
         """
-
         return [group for group in self.rapid_pro.get_groups(uuid=uuid, name=name).all(retry_on_rate_exceed=True)]
 
     def get_contacts(self, uuid=None, urn=None, group=None, deleted=None, before=None, after=None, reverse=None):
         """
         Gets all matching contacts from a rapid_pro workspace
 
-        :param uuid: contact UUID
-        :type uuid: str
+        :param uuid: contact UUID to filter on. If None, returns all contacts in the workspace.
+        :type uuid: str | None
         :param urn: contact URN
-        :type urn: str
-        :param group: contact group name or UUID
-        :type group: str
+        :type urn: str | None
+        :param group: contact group name or UUID to filter on. If None, returns all groups in the workspace.
+        :type group: str | None
         :param deleted: return deleted contact only
-        :type deleted: bool
+        :type deleted: bool | None
         :param reverse: whether to return contacts ordered in reverse (oldest first).
-        :type reverse: bool
-        :param before: modified before
-        :type before: datetime
-        :param  after: modified after
-        :type before: datetime
-        :return: contact query
+        :type reverse: bool | None
+        :param last_modified_before_exclusive:  Start of the date-range to download contacts from.
+                                                If set, only downloads messages modified on Rapid Pro before that date,
+                                                otherwise downloads from the beginning of time.
+        :type last_modified_before_exclusive: datetime
+        :param  last_modified_after_inclusive:  Start of the date-range to download contacts from.
+                                                If set, only downloads messages modified on Rapid Pro after that date,
+                                                otherwise downloads from the beginning of time.
+        :type last_modified_after_inclusive: datetime
+        :return: List of contacts who match the query
         :rtype: list of temba_client.v2.types.Group
         """
         return [contact for contact in self.rapid_pro.get_contacts(uuid=uuid, urn=urn, group=group, deleted=deleted,
@@ -706,7 +709,8 @@ class RapidProClient(object):
         :param contact_fields: Dictionary of field key to new field value | None. If None, no keys are updated.
                                Keys present on the server contact but not in this dictionary are left unchanged.
         :type contact_fields: (dict of str -> str) | None
-        :param groups: list of group objects or UUIDs
+        :param groups: list of group objects or UUIDs. This will overwrite the groups in rapid_pro. If you intend to add
+                                                        fetch the contact and append to the existing group.
         :type groups: list | None
         """
         return self._retry_on_rate_exceed(lambda: self.rapid_pro.update_contact(urn, name=name,
@@ -770,14 +774,14 @@ class RapidProClient(object):
 
     def create_group(self, name):
         """
-        Creates a new contact group in a rapid_pro workspace.
+        Creates a new contact group in a rapid_pro workspace. If the group exists rapid pro will add a suffix 1,2.. and
+        create a group with the modified name.
 
         :param name: group name.
         :type name: str.
         :return: the new group.
         :rtype: temba_client.v2.types.Group
         """
-
         return self._retry_on_rate_exceed(lambda: self.rapid_pro.create_group(name=name))
 
     @classmethod
