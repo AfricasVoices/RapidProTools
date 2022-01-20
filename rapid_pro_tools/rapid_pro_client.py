@@ -710,7 +710,7 @@ class RapidProClient(object):
                                Keys present on the server contact but not in this dictionary are left unchanged.
         :type contact_fields: (dict of str -> str) | None
         :param groups: list of group objects or UUIDs. This will overwrite the groups in rapid_pro. If you intend to add
-                                                        fetch the contact and append to the existing group.
+                                                       fetch the contact and append the group to the existing groups list.
         :type groups: list | None
         """
         return self._retry_on_rate_exceed(lambda: self.rapid_pro.update_contact(urn, name=name,
@@ -774,7 +774,7 @@ class RapidProClient(object):
 
     def create_group(self, name):
         """
-        Creates a new contact group in a rapid_pro workspace. If the group exists rapid pro will add a suffix 1,2.. and
+        Creates a new contact group in a rapid_pro workspace. If the group exists, rapid pro will add a suffix 1,2.. and
         create a group with the modified name.
 
         :param name: group name.
