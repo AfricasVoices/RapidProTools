@@ -12,7 +12,7 @@ from core_data_modules.logging import Logger
 from core_data_modules.traced_data import TracedData, Metadata
 from core_data_modules.util import TimeUtils, IOUtils
 from dateutil.relativedelta import relativedelta
-from temba_client.exceptions import TembaRateExceededError, TembaHttpError
+from temba_client.exceptions import ( TembaRateExceededError, TembaHttpError, TembaBadRequestError)
 from temba_client.v2 import TembaClient, Broadcast, Run, Message
 
 log = Logger(__name__)
@@ -698,7 +698,7 @@ class RapidProClient(object):
             lambda run: run.id, prev_raw_data=prev_raw_runs, raw_export_log_file=raw_export_log_file
         )
 
-    def update_contact(self, urn, name=None, contact_fields=None, groups=None):
+    def update_contact(self, urn, name=None, contact_fields=None, contact_field_label=None, groups=None):
         """
         Updates a contact on the server.
 
@@ -713,8 +713,25 @@ class RapidProClient(object):
                                                        fetch the contact and append the group to the existing groups list.
         :type groups: list | None
         """
-        return self._retry_on_rate_exceed(lambda: self.rapid_pro.update_contact(urn, name=name,
+
+        try:
+            return self._retry_on_rate_exceed(lambda: self.rapid_pro.update_contact(urn, name=name,
                                                                                 fields=contact_fields, groups=groups))
+        except TembaBadRequestError:
+            if contact_field_label is not None:
+                log.debug(f'Creating new contact field with label' )
+                contact_field = self.create_field(label=contact_field_label)
+                log.debug(f'Created new contact field with label {contact_field.key}, key:{contact_field.label}' )
+
+                log.debug(f'Updating the urn with the new contact field values' )
+                contact_field_value = contact_fields.values()[0]
+                _contact_fields = {contact_field.key: contact_field_value}
+
+                return self._retry_on_rate_exceed(
+                    lambda: self.rapid_pro.update_contact(urn, name=name, fields=_contact_fields,
+                                                          groups=groups))
+            else:
+                raise TembaBadRequestError
 
     def get_fields(self):
         """
