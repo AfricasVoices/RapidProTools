@@ -718,10 +718,10 @@ class RapidProClient(object):
             return self._retry_on_rate_exceed(lambda: self.rapid_pro.update_contact(urn, name=name,
                                                                                 fields=contact_fields, groups=groups))
         except TembaBadRequestError:
-            if contact_field_label is not None:
-                log.debug(f'Creating new contact field with label' )
-                contact_field = self.create_field(label=contact_field_label)
-                log.debug(f'Created new contact field with label {contact_field.key}, key:{contact_field.label}' )
+            if contact_fields is not None:
+                log.debug(f'Found no matching contact field creating a new one ...' )
+                contact_field = self.create_field(label=contact_fields.keys()[0])
+                log.debug(f'Created new contact field with label {contact_field.label}, key:{contact_field.key}' )
 
                 log.debug(f'Updating the urn with the new contact field values' )
                 contact_field_value = contact_fields.values()[0]
