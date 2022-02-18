@@ -820,12 +820,16 @@ class RapidProClient(object):
                 if retries >= cls.MAX_RETRIES:
                     raise ex
 
-                if not ex.caused_by.response.status_code == 504:
-                    raise ex
+                if ex.caused_by.response.status_code == 504:
+                    # (Don't log the details in the error message, because the detail string contains a URL which may
+                    # include a phone number)
+                    log.debug(f"TembaHttpError 504, retrying...")
 
-                # (Don't log the details in the error message, because the detail string contains a URL which may
-                # include a phone number)
-                log.debug(f"TembaHttpError 504, retrying...")
+                if ex.caused_by.response.status_code == 500:
+                    log.debug(f"TembaHttpError 500, retrying...")
+
+                else:
+                    raise ex
 
     def export_all_data(self, export_dir_path):
         """
