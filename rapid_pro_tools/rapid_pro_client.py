@@ -789,20 +789,19 @@ class RapidProClient(object):
         """
         Creates a new contact in a rapid_pro workspace.
 
-        :param name: contact name
+        :param name: the full name of the contact
         :type name: str | None
-        :param language: the contact language code, e.g. "eng"
+        :param language: the contact language iso code, e.g. "eng"
         :type language: str | None
         :param urns: list of URN strings, e.g ['telegram:123456']
         :type urns: list | None
-        :param contact_fields: contact fields to update
+        :param contact_fields: contact fields to set or update
         :type contact_fields: dict of contact_field key -> value | None
         :param list groups: list of group objects, UUIDs or names
         :type groups: list | None
         :return: the new contact
         :rtype: temba_client.v2.types.Contact
         """
-
         return self._retry_on_rate_exceed(lambda: self.rapid_pro.create_contact(name=name, language=language, urns=urns,
                                                                                 fields=contact_fields, groups=groups))
 
