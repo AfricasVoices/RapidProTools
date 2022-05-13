@@ -797,7 +797,7 @@ class RapidProClient(object):
         :type urns: list | None
         :param contact_fields: contact fields to set or update
         :type contact_fields: dict of contact_field key -> value | None
-        :param list groups: list of group objects, UUIDs or names
+        :param groups: list of group objects, UUIDs or names
         :type groups: list | None
         :return: the new contact
         :rtype: temba_client.v2.types.Contact
