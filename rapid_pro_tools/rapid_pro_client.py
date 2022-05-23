@@ -460,7 +460,10 @@ class RapidProClient(object):
                     (last_modified_before_exclusive is not None and archive_start_date >= last_modified_before_exclusive):
                 log.debug(f"Skipping {archive_metadata.period} archive with date range {archive_start_date} - "
                           f"{archive_end_date}")
-                continue
+                print(f"archive_end_date: {archive_end_date} < ")
+                print(f"created_after_inclusive: {last_modified_after_inclusive}")
+                print(f"created_before_exclusive: {archive_start_date}>=")
+                print(f"archive_start_date: {last_modified_before_exclusive} < ")
 
             for run in self.get_archive(archive_metadata):
                 # Skip runs from flows other than the flow of interest
