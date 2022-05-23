@@ -192,9 +192,10 @@ class RapidProClient(object):
 
             if (created_after_inclusive is not None and archive_end_date < created_after_inclusive) or \
                     (created_before_exclusive is not None and archive_start_date >= created_before_exclusive):
-                log.debug(f"Skipping {archive_metadata.period} archive with date range {archive_start_date} - "
-                          f"{archive_end_date}")
-                continue
+                print(f"archive_end_date: {archive_end_date} < ")
+                print(f"created_after_inclusive: {created_after_inclusive}")
+                print(f"created_before_exclusive: {created_before_exclusive}>=")
+                print(f"archive_start_date: {archive_start_date} < ")
 
             for message in self.get_archive(archive_metadata):
                 # Skip messages from a datetime that is outside the date range of interest
