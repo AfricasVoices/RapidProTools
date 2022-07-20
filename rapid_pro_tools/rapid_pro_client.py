@@ -161,7 +161,7 @@ class RapidProClient(object):
         :return: An export object containing all of the requested flows, their dependencies, and triggers.
         :rtype: temba_client.v2.types.Export
         """
-        return self.rapid_pro.get_definitions(flows=flow_ids, dependencies="all")
+        return self.rapid_pro.get_definitions(flows=flow_ids, dependencies="all", retry_on_rate_exceed=True)
     
     def _get_archived_messages(self, created_after_inclusive=None, created_before_exclusive=None):
         """
@@ -934,6 +934,9 @@ class RapidProClient(object):
         export_file_path = f"{export_dir_path}/definitions.json"
         log.info(f"Exporting definitions to '{export_file_path}'")
         all_flow_ids = self.get_all_flow_ids()
+        log.debug(f"len of flow ids {len(all_flow_ids)}")
+        log.debug(all_flow_ids)
+
         definitions = self.get_flow_definitions_for_flow_ids(all_flow_ids)
         with open(export_file_path, "w") as f:
             f.write(json.dumps(definitions.serialize()))
