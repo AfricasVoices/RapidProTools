@@ -162,7 +162,21 @@ class RapidProClient(object):
         :rtype: temba_client.v2.types.Export
         """
         return self.rapid_pro.get_definitions(flows=flow_ids, dependencies="all")
-    
+
+    def get_flow(self, flow_id):
+        """
+        Gets the flow with the given `flow_id`.
+
+        :param flow_id: Id of the flow to get.
+        :type flow_id: str
+        :return: The requested flow.
+        :rtype: temba_client.v2.types.Flow
+        """
+        flows = self.rapid_pro.get_flows(flow_id).all(retry_on_rate_exceed=True)
+        assert len(flows) > 0, f"Flow '{flow_id}' not found on Rapid Pro"
+        assert len(flows) < 2, f"{len(flows)} matching flows found, but only 1 was expected"
+        return flows[0]
+
     def _get_archived_messages(self, created_after_inclusive=None, created_before_exclusive=None):
         """
         Gets the raw messages from Rapid Pro's archives.
