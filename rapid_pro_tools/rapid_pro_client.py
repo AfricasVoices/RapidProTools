@@ -21,7 +21,7 @@ log = Logger(__name__)
 class RapidProClient(object):
     MAX_RETRIES = 5
     MAX_BACKOFF_POWER = 6
-    
+
     def __init__(self, server, token):
         """
         :param server: Server hostname, e.g. 'rapidpro.io'
@@ -44,7 +44,7 @@ class RapidProClient(object):
         :rtype: str
         """
         return self.rapid_pro.get_org(retry_on_rate_exceed=True).uuid
-        
+
     def list_archives(self, archive_type=None):
         """
         Lists all of the available archives on this workspace.
@@ -53,7 +53,7 @@ class RapidProClient(object):
         `RapidProClient.get_archive` to download the archive itself. Note that the download links in the returned
         metadata are only valid for a short period of time. From experimentation as at January 2020,
         links are valid for 1 day after this call is made.
-        
+
         :param archive_type: The type of archives to list (either 'message' or 'run') or None.
                              If None, lists both types of archive.
         :type archive_type: str | None
@@ -68,20 +68,22 @@ class RapidProClient(object):
         """
         Downloads the archive specified by an archive metadata object, and converts it into a valid list of Message
         or Run objects.
-        
+
         :param archive_metadata: Metadata for the archive. To obtain these, see `RapidProClient.list_archives`.
         :type archive_metadata: temba_client.v2.types.Archive
         :return: Data downloaded from the archive.
         :rtype: list of temba_client.v2.Message | list of temba_client.v2.Run
         """
         if archive_metadata.record_count == 0:
-            log.info(f"Skipping empty archive {archive_metadata.start_date} ({archive_metadata.download_url})...")
+            log.info(
+                f"Skipping empty archive {archive_metadata.start_date} ({archive_metadata.download_url})...")
             return []
 
         # Download the archive, which is in a gzipped JSONL format, and decompress.
         log.info(f"Downloading {archive_metadata.record_count} records from {archive_metadata.period} archive "
                  f"{archive_metadata.start_date} ({archive_metadata.download_url})...")
-        archive_response = urllib.request.urlopen(archive_metadata.download_url)
+        archive_response = urllib.request.urlopen(
+            archive_metadata.download_url)
         raw_file = BytesIO(archive_response.read())
         decompressed_file = gzip.GzipFile(fileobj=raw_file)
 
@@ -98,9 +100,9 @@ class RapidProClient(object):
                 # API directly, and we don't use this in the pipelines, just set missing entries to None.
                 if "start" not in serialized_run:
                     serialized_run["start"] = None
-                    
+
                 results.append(Run.deserialize(serialized_run))
-        
+
         else:
             assert archive_metadata.archive_type == "message", "Unsupported archive type, must be either 'run' or 'message'"
             for line in decompressed_file.readlines():
@@ -126,7 +128,8 @@ class RapidProClient(object):
 
         if len(matching_flows) == 0:
             available_flow_names = [f.name for f in flows]
-            raise KeyError(f"Requested flow not found on RapidPro (Available flows: {', '.join(available_flow_names)})")
+            raise KeyError(
+                f"Requested flow not found on RapidPro (Available flows: {', '.join(available_flow_names)})")
         if len(matching_flows) > 1:
             raise KeyError("Non-unique flow name")
 
@@ -146,7 +149,7 @@ class RapidProClient(object):
     def get_all_flow_ids(self):
         """
         Gets all the flow ids currently available on this Rapid Pro workspace.
-        
+
         :return: Ids of all flows on this Rapid Pro workspace.
         :rtype: list of str
         """
@@ -172,15 +175,17 @@ class RapidProClient(object):
         :return: The requested flow.
         :rtype: temba_client.v2.types.Flow
         """
-        flows = self.rapid_pro.get_flows(flow_id).all(retry_on_rate_exceed=True)
+        flows = self.rapid_pro.get_flows(
+            flow_id).all(retry_on_rate_exceed=True)
         assert len(flows) > 0, f"Flow '{flow_id}' not found on Rapid Pro"
-        assert len(flows) < 2, f"{len(flows)} matching flows found, but only 1 was expected"
+        assert len(
+            flows) < 2, f"{len(flows)} matching flows found, but only 1 was expected"
         return flows[0]
 
     def _get_archived_messages(self, created_after_inclusive=None, created_before_exclusive=None):
         """
         Gets the raw messages from Rapid Pro's archives.
-        
+
         Uses the created dates to determine which archives to download.
         Filtering is done on creation date because this is the only timestamp metadata field Rapid Pro supports filtering
 
@@ -199,10 +204,12 @@ class RapidProClient(object):
             # Determine the start and end dates for this archive
             archive_start_date = archive_metadata.start_date
             if archive_metadata.period == "daily":
-                archive_end_date = archive_start_date + relativedelta(days=1, microseconds=-1)
+                archive_end_date = archive_start_date + \
+                    relativedelta(days=1, microseconds=-1)
             else:
                 assert archive_metadata.period == "monthly"
-                archive_end_date = archive_start_date + relativedelta(months=1, microseconds=-1)
+                archive_end_date = archive_start_date + \
+                    relativedelta(months=1, microseconds=-1)
 
             if (created_after_inclusive is not None and archive_end_date < created_after_inclusive) or \
                     (created_before_exclusive is not None and archive_start_date >= created_before_exclusive):
@@ -241,14 +248,17 @@ class RapidProClient(object):
         all_time_log = "" if created_after_inclusive is not None or created_before_exclusive is not None else " from all of time"
         after_log = "" if created_after_inclusive is None else f", modified after {created_after_inclusive.isoformat()} inclusive"
         before_log = "" if created_before_exclusive is None else f", modified before {created_before_exclusive.isoformat()} exclusive"
-        log.info(f"Fetching raw messages{all_time_log}{after_log}{before_log}...")
+        log.info(
+            f"Fetching raw messages{all_time_log}{after_log}{before_log}...")
 
         created_before_inclusive = None
         if created_before_exclusive is not None:
-            created_before_inclusive = created_before_exclusive - datetime.timedelta(microseconds=1)
+            created_before_inclusive = created_before_exclusive - \
+                datetime.timedelta(microseconds=1)
 
         if ignore_archives:
-            log.debug(f"Ignoring messages in archives (because `ignore_archives` argument was set to True)")
+            log.debug(
+                f"Ignoring messages in archives (because `ignore_archives` argument was set to True)")
             archived_messages = []
         else:
             archived_messages = self._get_archived_messages(
@@ -264,7 +274,7 @@ class RapidProClient(object):
         log.info(f"Fetched {len(raw_messages)} messages ({len(archived_messages)} from archives, "
                  f"{len(production_messages)} from production)")
 
-        # Check that we only see each message once. 
+        # Check that we only see each message once.
         seen_message_ids = set()
         for message in raw_messages:
             assert message.id not in seen_message_ids, f"Duplicate message {message.id} found in the downloaded data. " \
@@ -274,11 +284,13 @@ class RapidProClient(object):
 
         if raw_export_log_file is not None:
             log.info(f"Logging {len(raw_messages)} fetched messages...")
-            json.dump([contact.serialize() for contact in raw_messages], raw_export_log_file)
+            json.dump([contact.serialize()
+                      for contact in raw_messages], raw_export_log_file)
             raw_export_log_file.write("\n")
             log.info(f"Logged fetched messages")
         else:
-            log.debug("Not logging the raw export (argument 'raw_export_log_file' was None)")
+            log.debug(
+                "Not logging the raw export (argument 'raw_export_log_file' was None)")
 
         # Sort in ascending order of creation date
         raw_messages = list(raw_messages)
@@ -325,8 +337,8 @@ class RapidProClient(object):
         :rtype: list of temba_client.v2.types.Group
         """
         return [contact for contact in self.rapid_pro.get_contacts(uuid=uuid, urn=urn, group=group, deleted=deleted,
-                                                               before=before, after=after, reverse=reverse).all(
-                                                                                            retry_on_rate_exceed=True)]
+                                                                   before=before, after=after, reverse=reverse).all(
+            retry_on_rate_exceed=True)]
 
     def send_message_to_urn(self, message, target_urn, interrupt=False):
         """
@@ -345,11 +357,12 @@ class RapidProClient(object):
         """
         if interrupt:
             self.interrupt_urns([target_urn])
-        
+
         log.info("Sending a message to an individual...")
         log.debug(f"Sending to '{target_urn}' the message '{message}'...")
         response = self.rapid_pro.create_broadcast(message, urns=[target_urn])
-        log.info(f"Message send request created with broadcast id {response.id}")
+        log.info(
+            f"Message send request created with broadcast id {response.id}")
         return response.id
 
     def send_message_to_urns(self, message, target_urns, interrupt=False):
@@ -392,13 +405,15 @@ class RapidProClient(object):
             if interrupt:
                 self.rapid_pro.bulk_interrupt_contacts(batch)
                 interrupted += len(batch)
-            response: Broadcast = self.rapid_pro.create_broadcast(message, urns=batch)
+            response: Broadcast = self.rapid_pro.create_broadcast(
+                message, urns=batch)
             sent += len(batch)
             broadcast_ids.append(response.id)
             log.info(f"Interrupted {interrupted} / {len(urns)} URNs")
             log.info(f"Sent {sent} / {len(urns)} URNs")
 
-        log.info(f"Message send request created with broadcast ids {broadcast_ids}")
+        log.info(
+            f"Message send request created with broadcast ids {broadcast_ids}")
         return broadcast_ids
 
     def get_broadcast_for_broadcast_id(self, broadcast_id):
@@ -410,7 +425,8 @@ class RapidProClient(object):
         :return: Broadcast with id 'broadcast_id'
         :rtype: temba_client.v2.Broadcast
         """
-        matching_broadcasts = self.rapid_pro.get_broadcasts(broadcast_id).all(retry_on_rate_exceed=True)
+        matching_broadcasts = self.rapid_pro.get_broadcasts(
+            broadcast_id).all(retry_on_rate_exceed=True)
         assert len(matching_broadcasts) == 1, f"{len(matching_broadcasts)} broadcasts have id {broadcast_id} " \
             f"(expected exactly 1)"
         return matching_broadcasts[0]
@@ -444,7 +460,7 @@ class RapidProClient(object):
                            last_modified_before_exclusive=None):
         """
         Gets the raw runs for the given flow_id from Rapid Pro's archives.
-        
+
         Uses the last_modified dates to determine which archives to download.
 
         :param flow_id: Id of the flow to download the runs of. If None, downloads runs from all flows.
@@ -464,10 +480,12 @@ class RapidProClient(object):
             # Determine the start and end dates for this archive
             archive_start_date = archive_metadata.start_date
             if archive_metadata.period == "daily":
-                archive_end_date = archive_start_date + relativedelta(days=1, microseconds=-1)
+                archive_end_date = archive_start_date + \
+                    relativedelta(days=1, microseconds=-1)
             else:
                 assert archive_metadata.period == "monthly"
-                archive_end_date = archive_start_date + relativedelta(months=1, microseconds=-1)
+                archive_end_date = archive_start_date + \
+                    relativedelta(months=1, microseconds=-1)
 
             if (last_modified_after_inclusive is not None and archive_end_date < last_modified_after_inclusive) or \
                     (last_modified_before_exclusive is not None and archive_start_date >= last_modified_before_exclusive):
@@ -515,14 +533,17 @@ class RapidProClient(object):
         all_time_log = "" if last_modified_after_inclusive is not None or last_modified_before_exclusive is not None else ", from all of time"
         after_log = "" if last_modified_after_inclusive is None else f", modified after {last_modified_after_inclusive.isoformat()} inclusive"
         before_log = "" if last_modified_before_exclusive is None else f", modified before {last_modified_before_exclusive.isoformat()} exclusive"
-        log.info(f"Fetching raw runs {flow_id_log}{all_time_log}{after_log}{before_log}...")
+        log.info(
+            f"Fetching raw runs {flow_id_log}{all_time_log}{after_log}{before_log}...")
 
         last_modified_before_inclusive = None
         if last_modified_before_exclusive is not None:
-            last_modified_before_inclusive = last_modified_before_exclusive - datetime.timedelta(microseconds=1)
+            last_modified_before_inclusive = last_modified_before_exclusive - \
+                datetime.timedelta(microseconds=1)
 
         if ignore_archives:
-            log.debug(f"Ignoring runs in archives (because `ignore_archives` argument was set to True)")
+            log.debug(
+                f"Ignoring runs in archives (because `ignore_archives` argument was set to True)")
             archived_runs = []
         else:
             archived_runs = self._get_archived_runs(
@@ -551,11 +572,13 @@ class RapidProClient(object):
 
         if raw_export_log_file is not None:
             log.info(f"Logging {len(raw_runs)} fetched runs...")
-            json.dump([contact.serialize() for contact in raw_runs], raw_export_log_file)
+            json.dump([contact.serialize()
+                      for contact in raw_runs], raw_export_log_file)
             raw_export_log_file.write("\n")
             log.info(f"Logged fetched runs")
         else:
-            log.debug("Not logging the raw export (argument 'raw_export_log_file' was None)")
+            log.debug(
+                "Not logging the raw export (argument 'raw_export_log_file' was None)")
 
         # Sort in ascending order of modification date
         raw_runs = list(raw_runs)
@@ -565,7 +588,8 @@ class RapidProClient(object):
 
     def get_raw_runs_for_flow_id(self, flow_id, last_modified_after_inclusive=None, last_modified_before_exclusive=None,
                                  raw_export_log_file=None, ignore_archives=False):
-        warnings.warn("RapidProClient.get_raw_runs_for_flow_id is deprecated; use get_raw_runs instead")
+        warnings.warn(
+            "RapidProClient.get_raw_runs_for_flow_id is deprecated; use get_raw_runs instead")
         return self.get_raw_runs(flow_id, last_modified_after_inclusive, last_modified_before_exclusive,
                                  raw_export_log_file, ignore_archives)
 
@@ -590,30 +614,35 @@ class RapidProClient(object):
         all_time_log = "" if last_modified_after_inclusive is not None or last_modified_before_exclusive is not None else " from all of time"
         after_log = "" if last_modified_after_inclusive is None else f", modified after {last_modified_after_inclusive.isoformat()} inclusive"
         before_log = "" if last_modified_before_exclusive is None else f", modified before {last_modified_before_exclusive.isoformat()} exclusive"
-        log.info(f"Fetching raw contacts{all_time_log}{after_log}{before_log}...")
+        log.info(
+            f"Fetching raw contacts{all_time_log}{after_log}{before_log}...")
 
         last_modified_before_inclusive = None
         if last_modified_before_exclusive is not None:
-            last_modified_before_inclusive = last_modified_before_exclusive - datetime.timedelta(microseconds=1)
+            last_modified_before_inclusive = last_modified_before_exclusive - \
+                datetime.timedelta(microseconds=1)
 
         raw_contacts = self.rapid_pro.get_contacts(
             after=last_modified_after_inclusive, before=last_modified_before_inclusive).all(retry_on_rate_exceed=True)
-        assert len(set(c.uuid for c in raw_contacts)) == len(raw_contacts), "Non-unique contact UUID in RapidPro"
+        assert len(set(c.uuid for c in raw_contacts)) == len(
+            raw_contacts), "Non-unique contact UUID in RapidPro"
 
         log.info(f"Fetched {len(raw_contacts)} contacts")
 
         if raw_export_log_file is not None:
             log.info(f"Logging {len(raw_contacts)} fetched contacts...")
-            json.dump([contact.serialize() for contact in raw_contacts], raw_export_log_file)
+            json.dump([contact.serialize()
+                      for contact in raw_contacts], raw_export_log_file)
             raw_export_log_file.write("\n")
             log.info(f"Logged fetched contacts")
         else:
-            log.debug("Not logging the raw export (argument 'raw_export_log_file' was None)")
+            log.debug(
+                "Not logging the raw export (argument 'raw_export_log_file' was None)")
 
         # Sort in ascending order of modification date
         raw_contacts = list(raw_contacts)
         raw_contacts.reverse()
-        
+
         return raw_contacts
 
     @staticmethod
@@ -634,7 +663,8 @@ class RapidProClient(object):
         for x in raw_data:
             data_lut[id_key(x)] = x
         latest_data = list(data_lut.values())
-        log.info(f"Filtered raw data for the latest objects. Returning {len(latest_data)}/{len(raw_data)} items.")
+        log.info(
+            f"Filtered raw data for the latest objects. Returning {len(latest_data)}/{len(raw_data)} items.")
         return latest_data
 
     def update_raw_data_with_latest_modified(self, get_fn, id_key, prev_raw_data=None, raw_export_log_file=None):
@@ -664,18 +694,20 @@ class RapidProClient(object):
         last_modified_after_inclusive = None
         if len(prev_raw_data) > 0:
             prev_raw_data.sort(key=lambda contact: contact.modified_on)
-            last_modified_after_inclusive = prev_raw_data[-1].modified_on + datetime.timedelta(microseconds=1)
+            last_modified_after_inclusive = prev_raw_data[-1].modified_on + datetime.timedelta(
+                microseconds=1)
 
-        new_data = get_fn(last_modified_after_inclusive=last_modified_after_inclusive, raw_export_log_file=raw_export_log_file)
+        new_data = get_fn(last_modified_after_inclusive=last_modified_after_inclusive,
+                          raw_export_log_file=raw_export_log_file)
 
         all_raw_data = prev_raw_data + new_data
         return self.filter_latest(all_raw_data, id_key)
-    
+
     def update_raw_contacts_with_latest_modified(self, prev_raw_contacts=None, raw_export_log_file=None):
         """
         Updates a list of contacts previously downloaded from Rapid Pro, by only fetching contacts which have been 
         updated since that previous export was performed.
-        
+
         :param prev_raw_contacts: A list of Rapid Pro contact objects from a previous export, or None.
                                   If None, all contacts will be downloaded.
         :type prev_raw_contacts: list of temba_client.v2.types.Contact | None
@@ -708,7 +740,8 @@ class RapidProClient(object):
         :rtype: list of temba_client.v2.types.Run
         """
         return self.update_raw_data_with_latest_modified(
-            lambda **kwargs: self.get_raw_runs(flow_id, ignore_archives=ignore_archives, **kwargs),
+            lambda **kwargs: self.get_raw_runs(flow_id,
+                                               ignore_archives=ignore_archives, **kwargs),
             lambda run: run.id, prev_raw_data=prev_raw_runs, raw_export_log_file=raw_export_log_file
         )
 
@@ -729,6 +762,21 @@ class RapidProClient(object):
         """
         return self._retry_on_rate_exceed(lambda: self.rapid_pro.update_contact(urn, name=name,
                                                                                 fields=contact_fields, groups=groups))
+
+    def contact_actions(self, contacts, action, group=None):
+        """
+        Perform an action on a set of contacts in bulk.
+
+        :param contacts: The contact UUIDs or URNs (array of up to 100 strings)
+        :type contacts: list of str   
+        :param action: The action to perform, a string one of: add - Add the contacts to the given group, remove - Remove the contacts from the given group,
+                       block - Block the contacts, unblock - Un-block the contacts, interrupt - Interrupt and end any of the contacts' active flow runs,
+                       delete - Permanently delete the contacts.
+        :type action: str
+        :param group: The UUID or name of a contact group (string, optional)
+        :type group: str | None
+        """
+        return self._retry_on_rate_exceed(lambda: self.rapid_pro.contact_actions(contacts, action, group=group))
 
     def get_fields(self):
         """
@@ -757,22 +805,27 @@ class RapidProClient(object):
         """
         if field_id is None:
             log.info(f"Creating field with label '{label}'...")
-            rapid_pro_field = self._retry_on_rate_exceed(lambda: self.rapid_pro.create_field(label, "text"))
+            rapid_pro_field = self._retry_on_rate_exceed(
+                lambda: self.rapid_pro.create_field(label, "text"))
             log.info(f"Created field with id '{rapid_pro_field.key}'")
             return rapid_pro_field
         else:
             # Rapid Pro allows fields to be overwritten if they already exist.
             # Check if the requested field id exists, and fail if it does.
-            fields = self.rapid_pro.get_fields(key=field_id).all(retry_on_rate_exceed=True)
-            assert len(fields) == 0, f"Field with id '{field_id}' already exists in workspace"
+            fields = self.rapid_pro.get_fields(
+                key=field_id).all(retry_on_rate_exceed=True)
+            assert len(
+                fields) == 0, f"Field with id '{field_id}' already exists in workspace"
 
             # Create a field with the requested id. Rapid Pro doesn't allow us to specify the field id, but they're
             # predictably generated from the label, so create a new field by setting the label to the field id
             # we want. Rapid Pro uses underscores in its field ids but doesn't accept them in label names, so replace
             # underscores with spaces first.
             initial_label = field_id.replace("_", " ").lower()
-            log.info(f"Creating field with label '{initial_label}', to ensure the field id is '{field_id}'...")
-            rapid_pro_field = self._retry_on_rate_exceed(lambda: self.rapid_pro.create_field(initial_label, "text"))
+            log.info(
+                f"Creating field with label '{initial_label}', to ensure the field id is '{field_id}'...")
+            rapid_pro_field = self._retry_on_rate_exceed(
+                lambda: self.rapid_pro.create_field(initial_label, "text"))
             log.info(f"Created field with id '{rapid_pro_field.key}'")
             assert rapid_pro_field.key == field_id, \
                 f"The field id created by Rapid Pro, '{rapid_pro_field.key}', differs from the requested id " \
@@ -780,9 +833,12 @@ class RapidProClient(object):
                 f"you request a valid id."
 
             # Having created a field with the desired id, update its label to the one requested.
-            log.info(f"Updating field with id '{rapid_pro_field.key}' to have label '{label}'...")
-            rapid_pro_field = self._retry_on_rate_exceed(lambda: self.rapid_pro.update_field(rapid_pro_field, label, "text"))
-            log.info(f"Done. Created field with label '{rapid_pro_field.label}' and id '{rapid_pro_field.key}'")
+            log.info(
+                f"Updating field with id '{rapid_pro_field.key}' to have label '{label}'...")
+            rapid_pro_field = self._retry_on_rate_exceed(
+                lambda: self.rapid_pro.update_field(rapid_pro_field, label, "text"))
+            log.info(
+                f"Done. Created field with label '{rapid_pro_field.label}' and id '{rapid_pro_field.key}'")
 
             return rapid_pro_field
 
@@ -797,7 +853,6 @@ class RapidProClient(object):
         :rtype: temba_client.v2.types.Group
         """
         return self._retry_on_rate_exceed(lambda: self.rapid_pro.create_group(name=name))
-
 
     def create_contact(self, name=None, language=None, urns=None, contact_fields=None, groups=None):
         """
@@ -824,10 +879,10 @@ class RapidProClient(object):
         """
         Calls the given request function. If the Rapid Pro server fails with a rate exceeded error, retries up to 
         cls.MAX_RETRIES times using binary exponential backoff.
-        
+
         This function is needed because while the Rapid Pro API supports auto-retrying on get requests,
         it does not for create/update/delete requests.
-        
+
         :param request: Function which runs the request when called.
         :type request: function
         :return: Result of the request.
@@ -844,9 +899,11 @@ class RapidProClient(object):
                     raise ex
 
                 server_wait_time = ex.retry_after
-                backoff_wait_time = random.uniform(0, 2 ** (min(retries, cls.MAX_BACKOFF_POWER)))
+                backoff_wait_time = random.uniform(
+                    0, 2 ** (min(retries, cls.MAX_BACKOFF_POWER)))
 
-                log.debug(f"Rate exceeded. Sleeping for {server_wait_time + backoff_wait_time} seconds")
+                log.debug(
+                    f"Rate exceeded. Sleeping for {server_wait_time + backoff_wait_time} seconds")
 
                 time.sleep(server_wait_time + backoff_wait_time)
             except TembaHttpError as ex:
@@ -928,7 +985,8 @@ class RapidProClient(object):
         for endpoint, export_func in endpoints_with_archives.items():
             export_file_path = f"{export_dir_path}/{endpoint}.jsonl"
             with open(export_file_path, "w") as f:
-                log.info(f"Exporting {endpoint}, including those in archives, to {export_file_path}...")
+                log.info(
+                    f"Exporting {endpoint}, including those in archives, to {export_file_path}...")
                 items_exported = 0
                 for item in export_func():
                     f.write(json.dumps(item.serialize()) + "\n")
@@ -1012,13 +1070,19 @@ class RapidProClient(object):
             }
 
             for category, response in run.values.items():
-                run_dict[category.title() + " (Category) - " + run.flow.name] = response.category
-                run_dict[category.title() + " (Value) - " + run.flow.name] = response.value
+                run_dict[category.title() + " (Category) - " +
+                         run.flow.name] = response.category
+                run_dict[category.title() + " (Value) - " +
+                         run.flow.name] = response.value
                 # Convert from "input" to "text" here to match terminology in Rapid Pro's Excel exports.
-                run_dict[category.title() + " (Text) - " + run.flow.name] = response.input
-                run_dict[category.title() + " (Name) - " + run.flow.name] = response.name
-                run_dict[category.title() + " (Time) - " + run.flow.name] = response.time.isoformat()
-                run_dict[category.title() + " (Run ID) - " + run.flow.name] = run.id
+                run_dict[category.title() + " (Text) - " +
+                         run.flow.name] = response.input
+                run_dict[category.title() + " (Name) - " +
+                         run.flow.name] = response.name
+                run_dict[category.title() + " (Time) - " +
+                         run.flow.name] = response.time.isoformat()
+                run_dict[category.title() + " (Run ID) - " +
+                         run.flow.name] = run.id
 
             if run.contact.uuid in test_contacts:
                 run_dict["test_run"] = True
