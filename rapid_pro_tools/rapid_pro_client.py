@@ -729,6 +729,21 @@ class RapidProClient(object):
         """
         return self._retry_on_rate_exceed(lambda: self.rapid_pro.update_contact(urn, name=name,
                                                                                 fields=contact_fields, groups=groups))
+    
+    def contact_actions(self, contacts, action, group=None):
+        """
+        Perform an action on a set of contacts in bulk.
+
+        :param contacts: The contact UUIDs or URNs (array of up to 100 strings)
+        :type contacts: list of str   
+        :param action: The action to perform, a string one of: add - Add the contacts to the given group, remove - Remove the contacts from the given group,
+                       block - Block the contacts, unblock - Un-block the contacts, interrupt - Interrupt and end any of the contacts' active flow runs,
+                       delete - Permanently delete the contacts.
+        :type action: str
+        :param group: The UUID or name of a contact group (string, optional)
+        :type group: str | None
+        """
+        return self._retry_on_rate_exceed(lambda: self.rapid_pro.contact_actions(contacts, action, group=group))
 
     def get_fields(self):
         """
